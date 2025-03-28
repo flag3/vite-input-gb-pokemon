@@ -36,38 +36,6 @@ function App() {
   const totalSteps = sequences.reduce((sum, seq) => sum + seq.actions.length, 0);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (isPlaying) return;
-
-      switch (e.key) {
-        case 'ArrowUp':
-          handleMove('↑');
-          break;
-        case 'ArrowDown':
-          handleMove('↓');
-          break;
-        case 'ArrowLeft':
-          handleMove('←');
-          break;
-        case 'ArrowRight':
-          handleMove('→');
-          break;
-        case 'a':
-        case 'A':
-          handleAction();
-          break;
-        case 's':
-        case 'S':
-          setIsHiragana(prev => !prev);
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  useEffect(() => {
     if (!isPlaying || currentStep >= totalSteps) {
       setIsPlaying(false);
       return;
@@ -92,14 +60,34 @@ function App() {
 
           setCurrentAction(action);
 
-          if (inputCharCount === 5 && action === 'A') {
-            newPosition.x = 8;
-            newPosition.y = 5;
-          } else if (action === 's') {
+          if (action === 's') {
             newIsHiragana = !newIsHiragana;
+          } else if (action === 'S' && currentVersion !== 'GEN1') {
+            if (currentVersion === 'GEN2_BOX') {
+              newPosition.x = 14;
+              newPosition.y = 4;
+            } else if (currentVersion === 'GEN2_MAIL') {
+              newPosition.x = 15;
+              newPosition.y = 4;
+            }
           } else if (action === 'A') {
-            if (newPosition.x === 0 && newPosition.y === 6) {
-              newIsHiragana = !newIsHiragana;
+            if (currentVersion === 'GEN1') {
+              if (inputCharCount === 5) {
+                const grid = createGrid(currentVersion, newIsHiragana);
+                newPosition.x = grid.width - 1;
+                newPosition.y = grid.height - 2;
+              }
+            } else {
+              const charLimit = currentVersion === 'GEN2_BOX' ? 8 : 32;
+              if (inputCharCount === charLimit) {
+                if (currentVersion === 'GEN2_BOX') {
+                  newPosition.x = 14;
+                  newPosition.y = 4;
+                } else {
+                  newPosition.x = 15;
+                  newPosition.y = 4;
+                }
+              }
             }
           } else {
             const grid = createGrid(currentVersion, newIsHiragana);
@@ -107,26 +95,34 @@ function App() {
 
             switch (action) {
               case '↑':
-                if (newPosition.y === 0) {
-                  newPosition.y = 6;
-                  newPosition.x = 0;
-                } else if (newPosition.y === 6) {
-                  newPosition.y = 5;
+                if (currentVersion === 'GEN1') {
+                  if (newPosition.y === 0) {
+                    newPosition.y = 6;
+                    newPosition.x = 0;
+                  } else if (newPosition.y === 6) {
+                    newPosition.y = 5;
+                  } else {
+                    newPosition.y = Math.max(0, newPosition.y - 1);
+                  }
                 } else {
                   newPosition.y = Math.max(0, newPosition.y - 1);
                 }
                 break;
               case '↓':
-                if (newPosition.y === 5 && newPosition.x === 0) {
-                  newPosition.y = 6;
-                } else if (newPosition.y === 6) {
-                  newPosition.y = 0;
+                if (currentVersion === 'GEN1') {
+                  if (newPosition.y === 5 && newPosition.x === 0) {
+                    newPosition.y = 6;
+                  } else if (newPosition.y === 6) {
+                    newPosition.y = 0;
+                  } else {
+                    newPosition.y = Math.min(5, newPosition.y + 1);
+                  }
                 } else {
-                  newPosition.y = Math.min(5, newPosition.y + 1);
+                  newPosition.y = Math.min(4, newPosition.y + 1);
                 }
                 break;
               case '←':
-                if (newPosition.y === 6) {
+                if (currentVersion === 'GEN1' && newPosition.y === 6) {
                   newPosition.x = 0;
                 } else {
                   const positions = currentRow.map(pos => pos.x).sort((a, b) => a - b);
@@ -138,7 +134,7 @@ function App() {
                 }
                 break;
               case '→':
-                if (newPosition.y === 6) {
+                if (currentVersion === 'GEN1' && newPosition.y === 6) {
                   newPosition.x = 0;
                 } else {
                   const positions = currentRow.map(pos => pos.x).sort((a, b) => a - b);
@@ -194,18 +190,8 @@ function App() {
     setIsHiragana(false);
     if (text) {
       const grid = { ...GRIDS[currentVersion], isHiragana: false };
-      const { chars, modes } = decomposeTextWithMode(text, false);
+      const { chars, modes } = decomposeTextWithMode(text, false, currentVersion);
       const newSequences = findInputSequence(grid, chars.join(''), modes);
-
-      if (newSequences.length > 0) {
-        const endAction = chars.length <= 4 ? 'S' : 'A';
-        newSequences.push({
-          char: 'END',
-          actions: [endAction],
-          totalSteps: 1
-        });
-      }
-
       setSequences(newSequences);
     } else {
       setSequences([{
@@ -226,7 +212,7 @@ function App() {
     setIsHiragana(false);
     if (inputText) {
       const grid = { ...GRIDS[version], isHiragana: false };
-      const { chars, modes } = decomposeTextWithMode(inputText, false);
+      const { chars, modes } = decomposeTextWithMode(inputText, false, version);
       const newSequences = findInputSequence(grid, chars.join(''), modes);
       setSequences(newSequences);
     }
@@ -275,44 +261,72 @@ function App() {
 
         setCurrentAction(action);
 
-        if (inputCharCount === 5 && action === 'A') {
-          newPosition.x = 8;
-          newPosition.y = 5;
-        } else if (action === 's') {
+        if (action === 's') {
           newIsHiragana = !newIsHiragana;
-        } else if (action === 'A') {
-          if (newPosition.x === 0 && newPosition.y === 6) {
-            newIsHiragana = !newIsHiragana;
+        } else if (action === 'S' && currentVersion !== 'GEN1') {
+          if (currentVersion === 'GEN2_BOX') {
+            newPosition.x = 14;
+            newPosition.y = 4;
+          } else if (currentVersion === 'GEN2_MAIL') {
+            newPosition.x = 15;
+            newPosition.y = 4;
           }
-        } else if (action !== 'B') {
+        } else if (action === 'A') {
+          if (currentVersion === 'GEN1') {
+            if (inputCharCount === 5) {
+              const grid = createGrid(currentVersion, newIsHiragana);
+              newPosition.x = grid.width - 1;
+              newPosition.y = grid.height - 2;
+            }
+          } else {
+            const charLimit = currentVersion === 'GEN2_BOX' ? 8 : 32;
+            if (inputCharCount === charLimit) {
+              if (currentVersion === 'GEN2_BOX') {
+                newPosition.x = 14;
+                newPosition.y = 4;
+              } else {
+                newPosition.x = 15;
+                newPosition.y = 4;
+              }
+            }
+          }
+        } else {
           const grid = createGrid(currentVersion, newIsHiragana);
           const currentRow = grid.grid.filter(pos => pos.y === newPosition.y);
-          const positions = currentRow.map(pos => pos.x).sort((a, b) => a - b);
 
           switch (action) {
             case '↑':
-              if (newPosition.y === 0) {
-                newPosition.y = 6;
-                newPosition.x = 0;
-              } else if (newPosition.y === 6) {
-                newPosition.y = 5;
+              if (currentVersion === 'GEN1') {
+                if (newPosition.y === 0) {
+                  newPosition.y = 6;
+                  newPosition.x = 0;
+                } else if (newPosition.y === 6) {
+                  newPosition.y = 5;
+                } else {
+                  newPosition.y = Math.max(0, newPosition.y - 1);
+                }
               } else {
                 newPosition.y = Math.max(0, newPosition.y - 1);
               }
               break;
             case '↓':
-              if (newPosition.y === 5 && newPosition.x === 0) {
-                newPosition.y = 6;
-              } else if (newPosition.y === 6) {
-                newPosition.y = 0;
+              if (currentVersion === 'GEN1') {
+                if (newPosition.y === 5 && newPosition.x === 0) {
+                  newPosition.y = 6;
+                } else if (newPosition.y === 6) {
+                  newPosition.y = 0;
+                } else {
+                  newPosition.y = Math.min(5, newPosition.y + 1);
+                }
               } else {
-                newPosition.y = Math.min(5, newPosition.y + 1);
+                newPosition.y = Math.min(4, newPosition.y + 1);
               }
               break;
             case '←':
-              if (newPosition.y === 6) {
+              if (currentVersion === 'GEN1' && newPosition.y === 6) {
                 newPosition.x = 0;
               } else {
+                const positions = currentRow.map(pos => pos.x).sort((a, b) => a - b);
                 if (newPosition.x === positions[0]) {
                   newPosition.x = positions[positions.length - 1];
                 } else {
@@ -321,9 +335,10 @@ function App() {
               }
               break;
             case '→':
-              if (newPosition.y === 6) {
+              if (currentVersion === 'GEN1' && newPosition.y === 6) {
                 newPosition.x = 0;
               } else {
+                const positions = currentRow.map(pos => pos.x).sort((a, b) => a - b);
                 if (newPosition.x === positions[positions.length - 1]) {
                   newPosition.x = positions[0];
                 } else {
@@ -370,65 +385,6 @@ function App() {
     setStateHistory(prev => prev.slice(0, -1));
   };
 
-  const handleMove = (direction: InputAction) => {
-    const newPosition = { ...currentPosition };
-    const grid = createGrid(currentVersion, isHiragana);
-    const currentRow = grid.grid.filter(pos => pos.y === currentPosition.y);
-
-    switch (direction) {
-      case '↑':
-        if (newPosition.y === 0) {
-          newPosition.y = 6;
-          newPosition.x = 0;
-        } else if (newPosition.y === 6) {
-          newPosition.y = 5;
-        } else {
-          newPosition.y = Math.max(0, newPosition.y - 1);
-        }
-        break;
-      case '↓':
-        if (newPosition.y === 5 && newPosition.x === 0) {
-          newPosition.y = 6;
-        } else if (newPosition.y === 6) {
-          newPosition.y = 0;
-        } else {
-          newPosition.y = Math.min(5, newPosition.y + 1);
-        }
-        break;
-      case '←':
-        if (newPosition.y === 6) {
-          newPosition.x = 0;
-        } else {
-          const positions = currentRow.map(pos => pos.x).sort((a, b) => a - b);
-          if (newPosition.x === positions[0]) {
-            newPosition.x = positions[positions.length - 1];
-          } else {
-            newPosition.x = positions[positions.findIndex(x => x === newPosition.x) - 1];
-          }
-        }
-        break;
-      case '→':
-        if (newPosition.y === 6) {
-          newPosition.x = 0;
-        } else {
-          const positions = currentRow.map(pos => pos.x).sort((a, b) => a - b);
-          if (newPosition.x === positions[positions.length - 1]) {
-            newPosition.x = positions[0];
-          } else {
-            newPosition.x = positions[positions.findIndex(x => x === newPosition.x) + 1];
-          }
-        }
-        break;
-    }
-    setCurrentPosition(newPosition);
-  };
-
-  const handleAction = () => {
-    if (currentPosition.x === 0 && currentPosition.y === 6) {
-      setIsHiragana(prev => !prev);
-    }
-  };
-
   return (
     <div style={{
       maxWidth: '1200px',
@@ -447,6 +403,8 @@ function App() {
               style={{ marginLeft: '8px', padding: '4px' }}
             >
               <option value="GEN1">gen-1 nickname</option>
+              <option value="GEN2_BOX">gen-2 box</option>
+              <option value="GEN2_MAIL">gen-2 mail</option>
             </select>
           </label>
         </div>
