@@ -1,0 +1,25 @@
+export type GameVersion = 'GEN1' | 'GEN2_MAIL' | 'GEN2_BOX';
+export type InputAction = 'A' | 'B' | 's' | 'S' | '→' | '←' | '↑' | '↓';
+
+export interface Position {
+  x: number;
+  y: number;
+}
+
+export interface CharacterPosition extends Position {
+  char: string;
+}
+
+export interface CharacterGrid {
+  version: GameVersion;
+  isHiragana: boolean;
+  width: number;
+  height: number;
+  grid: CharacterPosition[];
+}
+
+export type InputPath = {
+  char: string;
+  actions: InputAction[];
+  totalSteps: number;
+}; 
