@@ -553,7 +553,6 @@ function App() {
       }}>
         <InputSequence
           sequences={sequences}
-          targetText={inputText}
           currentStep={currentStep}
           currentCharIndex={currentCharIndex}
         />

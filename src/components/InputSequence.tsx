@@ -3,7 +3,6 @@ import { InputPath } from '../types';
 
 interface InputSequenceProps {
   sequences: InputPath[];
-  targetText: string;
   currentStep: number;
   currentCharIndex: number;
 }
@@ -70,7 +69,6 @@ const getCurrentText = (sequences: InputPath[], currentStep: number): string => 
 
 export const InputSequence: React.FC<InputSequenceProps> = ({
   sequences,
-  targetText,
   currentStep,
   currentCharIndex
 }) => {
@@ -86,8 +84,7 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
         fontSize: '18px',
         fontFamily: 'monospace'
       }}>
-        <div style={{ marginBottom: '8px' }}>Target: {targetText}</div>
-        <div>Current: {currentText}<span style={{ animation: 'blink 1s infinite' }}>|</span></div>
+        <div>{currentText}<span style={{ animation: 'blink 1s infinite' }}>|</span></div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
