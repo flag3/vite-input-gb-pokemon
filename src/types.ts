@@ -1,6 +1,5 @@
 export type GameVersion = 'GEN1' | 'GEN2_NICKNAME' | 'GEN2_BOX' | 'GEN2_MAIL';
 export type InputAction = 'A' | 'B' | 's' | 'S' | '→' | '←' | '↑' | '↓';
-export type KeyboardAction = 'Enter' | 'Backspace' | 'ArrowRight' | 'ArrowLeft' | 'ArrowUp' | 'ArrowDown';
 
 export interface Position {
   x: number;

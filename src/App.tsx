@@ -229,12 +229,6 @@ function App() {
       const { chars, modes } = decomposeTextWithMode(truncatedText, false, currentVersion);
       const newSequences = findInputSequence(grid, chars.join(''), modes);
       setSequences(newSequences);
-    } else {
-      setSequences([{
-        char: 'END',
-        actions: ['↓', '↓', '↓', '↓', '↓', '→', '→', '→', '→', '→', '→', 'A'],
-        totalSteps: 12
-      }]);
     }
   };
 
