@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { CharacterGrid } from './components/CharacterGrid';
 import { InputSequence } from './components/InputSequence';
 import { GRIDS, createGrid } from './data/characterGrids';
@@ -43,224 +43,7 @@ function App() {
 
   const totalSteps = sequences.reduce((sum, seq) => sum + seq.actions.length, 0);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    if (!isPlaying || currentStep >= totalSteps) {
-      setIsPlaying(false);
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      let stepCount = 0;
-      let charIndex = 0;
-      let inputCharCount = 0;
-      const newPosition = { ...currentPosition };
-      let newIsHiragana = isHiragana;
-
-      for (let i = 0; i < sequences.length; i++) {
-        const sequence = sequences[i];
-        if (sequence.char !== '゛' && sequence.char !== '゜') {
-          inputCharCount++;
-        }
-        if (stepCount + sequence.actions.length > currentStep) {
-          charIndex = i;
-          const actionIndex = currentStep - stepCount;
-          const action = sequence.actions[actionIndex];
-
-          setCurrentAction(action);
-
-          if (action === 's') {
-            newIsHiragana = !newIsHiragana;
-          } else if (action === 'S' && currentVersion !== 'GEN1') {
-            if (currentVersion === 'GEN2_NICKNAME' || currentVersion === 'GEN2_BOX') {
-              newPosition.x = 14;
-              newPosition.y = 4;
-            } else if (currentVersion === 'GEN2_MAIL') {
-              newPosition.x = 15;
-              newPosition.y = 4;
-            }
-          } else if (action === 'A') {
-            if (currentVersion === 'GEN1') {
-              if (inputCharCount === 5) {
-                const grid = createGrid(currentVersion, newIsHiragana);
-                newPosition.x = grid.width - 1;
-                newPosition.y = grid.height - 2;
-              }
-            } else {
-              const charLimit = currentVersion === 'GEN2_MAIL' ? 32 : 8;
-              if (inputCharCount === charLimit) {
-                if (currentVersion === 'GEN2_NICKNAME' || currentVersion === 'GEN2_BOX') {
-                  newPosition.x = 14;
-                  newPosition.y = 4;
-                } else {
-                  newPosition.x = 15;
-                  newPosition.y = 4;
-                }
-              }
-            }
-          } else {
-            const grid = createGrid(currentVersion, newIsHiragana);
-            const currentRow = grid.grid.filter(pos => pos.y === newPosition.y);
-
-            switch (action) {
-              case '↑':
-                if (currentVersion === 'GEN1') {
-                  if (newPosition.y === 0) {
-                    newPosition.y = 6;
-                    newPosition.x = 0;
-                  } else if (newPosition.y === 6) {
-                    newPosition.y = 5;
-                  } else {
-                    newPosition.y = Math.max(0, newPosition.y - 1);
-                  }
-                } else {
-                  newPosition.y = Math.max(0, newPosition.y - 1);
-                }
-                break;
-              case '↓':
-                if (currentVersion === 'GEN1') {
-                  if (newPosition.y === 5 && newPosition.x === 0) {
-                    newPosition.y = 6;
-                  } else if (newPosition.y === 6) {
-                    newPosition.y = 0;
-                  } else {
-                    newPosition.y = Math.min(5, newPosition.y + 1);
-                  }
-                } else {
-                  newPosition.y = Math.min(4, newPosition.y + 1);
-                }
-                break;
-              case '←':
-                if (currentVersion === 'GEN1' && newPosition.y === 6) {
-                  newPosition.x = 0;
-                } else {
-                  const positions = currentRow.map(pos => pos.x).sort((a, b) => a - b);
-                  if (newPosition.x === positions[0]) {
-                    newPosition.x = positions[positions.length - 1];
-                  } else {
-                    newPosition.x = positions[positions.findIndex(x => x === newPosition.x) - 1];
-                  }
-                }
-                break;
-              case '→':
-                if (currentVersion === 'GEN1' && newPosition.y === 6) {
-                  newPosition.x = 0;
-                } else {
-                  const positions = currentRow.map(pos => pos.x).sort((a, b) => a - b);
-                  if (newPosition.x === positions[positions.length - 1]) {
-                    newPosition.x = positions[0];
-                  } else {
-                    newPosition.x = positions[positions.findIndex(x => x === newPosition.x) + 1];
-                  }
-                }
-                break;
-            }
-          }
-
-          setStateHistory(prev => [...prev, {
-            position: { ...newPosition },
-            isHiragana: newIsHiragana,
-            charIndex,
-            action
-          }]);
-
-          break;
-        }
-        stepCount += sequence.actions.length;
-      }
-
-      setCurrentStep(prev => prev + 1);
-      setCurrentCharIndex(charIndex);
-      setCurrentPosition(newPosition);
-      setIsHiragana(newIsHiragana);
-    }, playbackSpeed);
-
-    return () => clearTimeout(timer);
-  }, [isPlaying, currentStep, sequences, currentPosition, currentVersion, playbackSpeed, isHiragana]);
-
-  useEffect(() => {
-    if (sequences.length > 0) {
-      setStateHistory([{
-        position: { x: 0, y: 0 },
-        isHiragana: false,
-        charIndex: 0,
-        action: null
-      }]);
-    }
-  }, [sequences]);
-
-  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value.replace(/　/g, ' ');
-    const maxLength = MAX_CHAR_LIMITS[currentVersion];
-    const truncatedText = text.slice(0, maxLength);
-
-    setInputText(truncatedText);
-    setCurrentStep(0);
-    setCurrentCharIndex(0);
-    setCurrentPosition({ x: 0, y: 0 });
-    setIsPlaying(false);
-    setIsHiragana(false);
-    if (truncatedText) {
-      const grid = { ...GRIDS[currentVersion], isHiragana: false };
-      const { chars, modes } = decomposeTextWithMode(truncatedText, false, currentVersion);
-      const newSequences = findInputSequence(grid, chars.join(''), modes);
-      setSequences(newSequences);
-    } else {
-      setSequences([{
-        char: 'END',
-        actions: ['↓', '↓', '↓', '↓', '↓', '→', '→', '→', '→', '→', '→', 'A'],
-        totalSteps: 12
-      }]);
-    }
-  };
-
-  const handleVersionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const version = e.target.value as GameVersion;
-    setCurrentVersion(version);
-    setCurrentPosition({ x: 0, y: 0 });
-    setCurrentStep(0);
-    setCurrentCharIndex(0);
-    setIsPlaying(false);
-    setIsHiragana(false);
-    if (inputText) {
-      const grid = { ...GRIDS[version], isHiragana: false };
-      const { chars, modes } = decomposeTextWithMode(inputText, false, version);
-      const newSequences = findInputSequence(grid, chars.join(''), modes);
-      setSequences(newSequences);
-    }
-  };
-
-  const handlePlayPause = () => {
-    if (currentStep >= totalSteps) {
-      setCurrentStep(0);
-      setCurrentPosition({ x: 0, y: 0 });
-      setCurrentCharIndex(0);
-      setIsHiragana(false);
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const handleReset = () => {
-    setCurrentStep(0);
-    setCurrentPosition({ x: 0, y: 0 });
-    setCurrentCharIndex(0);
-    setIsPlaying(false);
-    setIsHiragana(false);
-  };
-
-  const handleSpeedChange = (_event: Event, value: number | number[]) => {
-    setPlaybackSpeed(1000 - (Array.isArray(value) ? value[0] : value));
-  };
-
-  const handleStepForward = () => {
+  const handleStepForward = useCallback(() => {
     if (currentStep >= totalSteps) return;
 
     let stepCount = 0;
@@ -395,6 +178,102 @@ function App() {
     setCurrentCharIndex(charIndex);
     setCurrentPosition(newPosition);
     setIsHiragana(newIsHiragana);
+  }, [currentStep, totalSteps, currentPosition, isHiragana, sequences, currentVersion]);
+
+  useEffect(() => {
+    if (!isPlaying || currentStep >= totalSteps) {
+      setIsPlaying(false);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      handleStepForward();
+    }, playbackSpeed);
+
+    return () => clearTimeout(timer);
+  }, [isPlaying, currentStep, totalSteps, playbackSpeed, handleStepForward]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (sequences.length > 0) {
+      setStateHistory([{
+        position: { x: 0, y: 0 },
+        isHiragana: false,
+        charIndex: 0,
+        action: null
+      }]);
+    }
+  }, [sequences]);
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value.replace(/　/g, ' ');
+    const maxLength = MAX_CHAR_LIMITS[currentVersion];
+    const truncatedText = text.slice(0, maxLength);
+
+    setInputText(truncatedText);
+    setCurrentStep(0);
+    setCurrentCharIndex(0);
+    setCurrentPosition({ x: 0, y: 0 });
+    setIsPlaying(false);
+    setIsHiragana(false);
+    if (truncatedText) {
+      const grid = { ...GRIDS[currentVersion], isHiragana: false };
+      const { chars, modes } = decomposeTextWithMode(truncatedText, false, currentVersion);
+      const newSequences = findInputSequence(grid, chars.join(''), modes);
+      setSequences(newSequences);
+    } else {
+      setSequences([{
+        char: 'END',
+        actions: ['↓', '↓', '↓', '↓', '↓', '→', '→', '→', '→', '→', '→', 'A'],
+        totalSteps: 12
+      }]);
+    }
+  };
+
+  const handleVersionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const version = e.target.value as GameVersion;
+    setCurrentVersion(version);
+    setCurrentPosition({ x: 0, y: 0 });
+    setCurrentStep(0);
+    setCurrentCharIndex(0);
+    setIsPlaying(false);
+    setIsHiragana(false);
+    if (inputText) {
+      const grid = { ...GRIDS[version], isHiragana: false };
+      const { chars, modes } = decomposeTextWithMode(inputText, false, version);
+      const newSequences = findInputSequence(grid, chars.join(''), modes);
+      setSequences(newSequences);
+    }
+  };
+
+  const handlePlayPause = () => {
+    if (currentStep >= totalSteps) {
+      setCurrentStep(0);
+      setCurrentPosition({ x: 0, y: 0 });
+      setCurrentCharIndex(0);
+      setIsHiragana(false);
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleReset = () => {
+    setCurrentStep(0);
+    setCurrentPosition({ x: 0, y: 0 });
+    setCurrentCharIndex(0);
+    setIsPlaying(false);
+    setIsHiragana(false);
+  };
+
+  const handleSpeedChange = (_event: Event, value: number | number[]) => {
+    setPlaybackSpeed(1000 - (Array.isArray(value) ? value[0] : value));
   };
 
   const handleStepBackward = () => {
