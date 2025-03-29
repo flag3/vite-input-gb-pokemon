@@ -188,7 +188,7 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
           });
           continue;
         }
-      } else if (inputCharCount === (grid.version === 'GEN2_MAIL' ? 32 : 8)) {
+      } else if (inputCharCount === (grid.version === 'GEN2_NICKNAME' ? 5 : grid.version === 'GEN2_BOX' ? 8 : 32)) {
         const hiraganaResult = findCharacterPosition(currentChar, { ...grid, isHiragana: true });
         const katakanaResult = findCharacterPosition(currentChar, { ...grid, isHiragana: false });
 
@@ -280,7 +280,7 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
         actions: [inputCharCount === 5 ? 'A' : 'S'],
         totalSteps: 1
       });
-    } else if (inputCharCount !== (grid.version === 'GEN2_MAIL' ? 32 : 8)) {
+    } else if (inputCharCount !== (grid.version === 'GEN2_NICKNAME' ? 5 : grid.version === 'GEN2_BOX' ? 8 : 32)) {
       sequences.push({
         char: 'END',
         actions: ['S', 'A'],
