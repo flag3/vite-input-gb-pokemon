@@ -63,6 +63,11 @@ export const createGrid = (version: GameVersion, isHiragana: boolean): Character
       width = 9;
       height = 7;
       break;
+    case 'GEN2_NICKNAME':
+      baseGrid = isHiragana ? twoGenBoxHiraganaGrid : twoGenBoxKatakanaGrid;
+      width = 15;
+      height = 5;
+      break;
     case 'GEN2_BOX':
       baseGrid = isHiragana ? twoGenBoxHiraganaGrid : twoGenBoxKatakanaGrid;
       width = 15;
@@ -97,6 +102,7 @@ export const createGrid = (version: GameVersion, isHiragana: boolean): Character
 
 export const GRIDS: Record<GameVersion, CharacterGrid> = {
   GEN1: createGrid('GEN1', true),
+  GEN2_NICKNAME: createGrid('GEN2_NICKNAME', true),
   GEN2_BOX: createGrid('GEN2_BOX', true),
   GEN2_MAIL: createGrid('GEN2_MAIL', true)
 }; 

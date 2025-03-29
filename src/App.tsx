@@ -15,6 +15,7 @@ import { IconButton, Slider, Tooltip } from '@mui/material';
 
 const MAX_CHAR_LIMITS: Record<GameVersion, number> = {
   GEN1: 5,
+  GEN2_NICKNAME: 5,
   GEN2_BOX: 8,
   GEN2_MAIL: 32
 };
@@ -79,7 +80,7 @@ function App() {
           if (action === 's') {
             newIsHiragana = !newIsHiragana;
           } else if (action === 'S' && currentVersion !== 'GEN1') {
-            if (currentVersion === 'GEN2_BOX') {
+            if (currentVersion === 'GEN2_NICKNAME' || currentVersion === 'GEN2_BOX') {
               newPosition.x = 14;
               newPosition.y = 4;
             } else if (currentVersion === 'GEN2_MAIL') {
@@ -94,9 +95,9 @@ function App() {
                 newPosition.y = grid.height - 2;
               }
             } else {
-              const charLimit = currentVersion === 'GEN2_BOX' ? 8 : 32;
+              const charLimit = currentVersion === 'GEN2_MAIL' ? 32 : 8;
               if (inputCharCount === charLimit) {
-                if (currentVersion === 'GEN2_BOX') {
+                if (currentVersion === 'GEN2_NICKNAME' || currentVersion === 'GEN2_BOX') {
                   newPosition.x = 14;
                   newPosition.y = 4;
                 } else {
@@ -283,7 +284,7 @@ function App() {
         if (action === 's') {
           newIsHiragana = !newIsHiragana;
         } else if (action === 'S' && currentVersion !== 'GEN1') {
-          if (currentVersion === 'GEN2_BOX') {
+          if (currentVersion === 'GEN2_NICKNAME' || currentVersion === 'GEN2_BOX') {
             newPosition.x = 14;
             newPosition.y = 4;
           } else if (currentVersion === 'GEN2_MAIL') {
@@ -292,15 +293,15 @@ function App() {
           }
         } else if (action === 'A') {
           if (currentVersion === 'GEN1') {
-            if (inputCharCount === 5) {
+            if (inputCharCount === MAX_CHAR_LIMITS[currentVersion]) {
               const grid = createGrid(currentVersion, newIsHiragana);
               newPosition.x = grid.width - 1;
               newPosition.y = grid.height - 2;
             }
           } else {
-            const charLimit = currentVersion === 'GEN2_BOX' ? 8 : 32;
+            const charLimit = MAX_CHAR_LIMITS[currentVersion];
             if (inputCharCount === charLimit) {
-              if (currentVersion === 'GEN2_BOX') {
+              if (currentVersion === 'GEN2_NICKNAME' || currentVersion === 'GEN2_BOX') {
                 newPosition.x = 14;
                 newPosition.y = 4;
               } else {
@@ -437,6 +438,7 @@ function App() {
               }}
             >
               <option value="GEN1">gen-1 nickname</option>
+              <option value="GEN2_NICKNAME">gen-2 nickname</option>
               <option value="GEN2_BOX">gen-2 box</option>
               <option value="GEN2_MAIL">gen-2 mail</option>
             </select>
@@ -451,7 +453,7 @@ function App() {
             type="text"
             value={inputText}
             onChange={handleTextChange}
-            placeholder={currentVersion === 'GEN1' ? "Enter nickname" : currentVersion === 'GEN2_BOX' ? "Enter box name" : "Enter mail"}
+            placeholder={(currentVersion === 'GEN1' || currentVersion === "GEN2_NICKNAME") ? "Enter nickname" : currentVersion === 'GEN2_BOX' ? "Enter box name" : "Enter mail"}
             style={{
               width: '100%',
               padding: '8px',

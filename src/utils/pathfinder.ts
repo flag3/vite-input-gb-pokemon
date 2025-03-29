@@ -15,6 +15,10 @@ const findCharacterPosition = (char: string, grid: CharacterGrid): { position: C
       hiraganaBaseGrid = hiraganaGrid;
       katakanaBaseGrid = katakanaGrid;
       break;
+    case 'GEN2_NICKNAME':
+      hiraganaBaseGrid = twoGenBoxHiraganaGrid;
+      katakanaBaseGrid = twoGenBoxKatakanaGrid;
+      break;
     case 'GEN2_BOX':
       hiraganaBaseGrid = twoGenBoxHiraganaGrid;
       katakanaBaseGrid = twoGenBoxKatakanaGrid;
@@ -184,7 +188,7 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
           });
           continue;
         }
-      } else if (inputCharCount === (grid.version === 'GEN2_BOX' ? 8 : 32)) {
+      } else if (inputCharCount === (grid.version === 'GEN2_MAIL' ? 32 : 8)) {
         const hiraganaResult = findCharacterPosition(currentChar, { ...grid, isHiragana: true });
         const katakanaResult = findCharacterPosition(currentChar, { ...grid, isHiragana: false });
 
@@ -276,7 +280,7 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
         actions: [inputCharCount === 5 ? 'A' : 'S'],
         totalSteps: 1
       });
-    } else if (inputCharCount !== (grid.version === 'GEN2_BOX' ? 8 : 32)) {
+    } else if (inputCharCount !== (grid.version === 'GEN2_MAIL' ? 32 : 8)) {
       sequences.push({
         char: 'END',
         actions: ['S', 'A'],

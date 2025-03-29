@@ -50,6 +50,8 @@ const isHiragana = (char: string, version: GameVersion): boolean => {
   switch (version) {
     case 'GEN1':
       return gen1HiraganaChars.has(char);
+    case 'GEN2_NICKNAME':
+      return gen2BoxHiraganaChars.has(char);
     case 'GEN2_BOX':
       return gen2BoxHiraganaChars.has(char);
     case 'GEN2_MAIL':
@@ -65,6 +67,8 @@ const isKatakana = (char: string, version: GameVersion): boolean => {
   switch (version) {
     case 'GEN1':
       return gen1KatakanaChars.has(char);
+    case 'GEN2_NICKNAME':
+      return gen2BoxKatakanaChars.has(char);
     case 'GEN2_BOX':
       return gen2BoxKatakanaChars.has(char);
     case 'GEN2_MAIL':
