@@ -8,6 +8,48 @@ interface CharacterGridProps {
 }
 
 export const CharacterGrid: React.FC<CharacterGridProps> = ({ grid, currentPosition, currentAction }) => {
+  const groupableChars = ['かな', 'カナ', 'ていせい', 'けってい'];
+
+  const getGroupedCells = () => {
+    const cells: {
+      char: string;
+      x: number[];
+      y: number;
+      width: number;
+    }[] = [];
+
+    grid.grid.forEach((char) => {
+      if (groupableChars.includes(char.char)) {
+        const existingGroup = cells.find(
+          cell => cell.char === char.char && cell.y === char.y
+        );
+
+        if (existingGroup) {
+          existingGroup.x.push(char.x);
+          existingGroup.width++;
+        } else {
+          cells.push({
+            char: char.char,
+            x: [char.x],
+            y: char.y,
+            width: 1
+          });
+        }
+      } else {
+        cells.push({
+          char: char.char,
+          x: [char.x],
+          y: char.y,
+          width: 1
+        });
+      }
+    });
+
+    return cells;
+  };
+
+  const groupedCells = getGroupedCells();
+
   return (
     <div style={{ position: 'relative' }}>
       <div className="grid-container" style={{
@@ -18,19 +60,19 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({ grid, currentPosit
         backgroundColor: '#f0f0f0',
         borderRadius: '8px'
       }}>
-        {grid.grid.map((char, index) => (
+        {groupedCells.map((cell, index) => (
           <div
             key={index}
             style={{
-              width: '40px',
+              width: `${cell.width * 40 + (cell.width - 1) * 4}px`,
               height: '40px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: currentPosition.x === char.x && currentPosition.y === char.y
+              backgroundColor: cell.x.includes(currentPosition.x) && cell.y === currentPosition.y
                 ? '#2196f3'
                 : 'white',
-              color: currentPosition.x === char.x && currentPosition.y === char.y
+              color: cell.x.includes(currentPosition.x) && cell.y === currentPosition.y
                 ? 'white'
                 : 'black',
               borderRadius: '4px',
@@ -38,11 +80,12 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({ grid, currentPosit
               userSelect: 'none',
               fontSize: '16px',
               position: 'relative',
-              transition: 'background-color 0.2s'
+              transition: 'background-color 0.2s',
+              gridColumn: `${cell.x[0] + 1} / span ${cell.width}`
             }}
           >
-            {char.char}
-            {currentPosition.x === char.x && currentPosition.y === char.y && currentAction === 'A' && (
+            {cell.char}
+            {cell.x.includes(currentPosition.x) && cell.y === currentPosition.y && currentAction === 'A' && (
               <div style={{
                 position: 'absolute',
                 top: '-20px',
@@ -63,11 +106,11 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({ grid, currentPosit
       </div>
       <style>
         {`
-                @keyframes fadeOut {
-                    from { opacity: 1; transform: translate(-50%, 0); }
-                    to { opacity: 0; transform: translate(-50%, -10px); }
-                }
-                `}
+          @keyframes fadeOut {
+            from { opacity: 1; transform: translate(-50%, 0); }
+            to { opacity: 0; transform: translate(-50%, -10px); }
+          }
+        `}
       </style>
     </div>
   );

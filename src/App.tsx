@@ -13,6 +13,12 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { IconButton, Slider, Tooltip } from '@mui/material';
 
+const MAX_CHAR_LIMITS: Record<GameVersion, number> = {
+  GEN1: 5,
+  GEN2_BOX: 8,
+  GEN2_MAIL: 32
+};
+
 interface StateHistory {
   position: { x: number; y: number };
   isHiragana: boolean;
@@ -32,8 +38,18 @@ function App() {
   const [currentAction, setCurrentAction] = useState<InputAction | null>(null);
   const [playbackSpeed, setPlaybackSpeed] = useState(500);
   const [stateHistory, setStateHistory] = useState<StateHistory[]>([]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   const totalSteps = sequences.reduce((sum, seq) => sum + seq.actions.length, 0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (!isPlaying || currentStep >= totalSteps) {
@@ -182,15 +198,18 @@ function App() {
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value.replace(/　/g, ' ');
-    setInputText(text);
+    const maxLength = MAX_CHAR_LIMITS[currentVersion];
+    const truncatedText = text.slice(0, maxLength);
+
+    setInputText(truncatedText);
     setCurrentStep(0);
     setCurrentCharIndex(0);
     setCurrentPosition({ x: 0, y: 0 });
     setIsPlaying(false);
     setIsHiragana(false);
-    if (text) {
+    if (truncatedText) {
       const grid = { ...GRIDS[currentVersion], isHiragana: false };
-      const { chars, modes } = decomposeTextWithMode(text, false, currentVersion);
+      const { chars, modes } = decomposeTextWithMode(truncatedText, false, currentVersion);
       const newSequences = findInputSequence(grid, chars.join(''), modes);
       setSequences(newSequences);
     } else {
@@ -300,18 +319,21 @@ function App() {
                 if (newPosition.y === 0) {
                   newPosition.y = 6;
                   newPosition.x = 0;
-                } else if (newPosition.y === 6) {
-                  newPosition.y = 5;
                 } else {
                   newPosition.y = Math.max(0, newPosition.y - 1);
                 }
               } else {
-                newPosition.y = Math.max(0, newPosition.y - 1);
+                if (newPosition.y === 0) {
+                  newPosition.y = 4;
+                } else {
+                  newPosition.y = Math.max(0, newPosition.y - 1);
+                }
               }
               break;
             case '↓':
               if (currentVersion === 'GEN1') {
-                if (newPosition.y === 5 && newPosition.x === 0) {
+                if (newPosition.y === 5) {
+                  newPosition.x = 0;
                   newPosition.y = 6;
                 } else if (newPosition.y === 6) {
                   newPosition.y = 0;
@@ -319,7 +341,11 @@ function App() {
                   newPosition.y = Math.min(5, newPosition.y + 1);
                 }
               } else {
-                newPosition.y = Math.min(4, newPosition.y + 1);
+                if (newPosition.y === 4) {
+                  newPosition.y = 0;
+                } else {
+                  newPosition.y = Math.min(4, newPosition.y + 1);
+                }
               }
               break;
             case '←':
@@ -391,16 +417,24 @@ function App() {
       margin: '0 auto',
       padding: '20px',
       display: 'grid',
-      gridTemplateColumns: '1fr 400px',
+      gridTemplateColumns: isMobile ? '1fr' : '1fr 400px',
       gap: '40px'
     }}>
       <div>
-        <div style={{ marginBottom: '20px' }}>
+        <div style={{
+          marginBottom: '20px',
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: '10px'
+        }}>
           <label>
             <select
               value={currentVersion}
               onChange={handleVersionChange}
-              style={{ marginLeft: '8px', padding: '4px' }}
+              style={{
+                padding: '8px',
+                width: isMobile ? '100%' : 'auto'
+              }}
             >
               <option value="GEN1">gen-1 nickname</option>
               <option value="GEN2_BOX">gen-2 box</option>
@@ -409,12 +443,15 @@ function App() {
           </label>
         </div>
 
-        <div style={{ marginBottom: '20px' }}>
+        <div style={{
+          marginBottom: '20px',
+          width: '100%'
+        }}>
           <input
             type="text"
             value={inputText}
             onChange={handleTextChange}
-            placeholder="Enter nickname"
+            placeholder={currentVersion === 'GEN1' ? "Enter nickname" : currentVersion === 'GEN2_BOX' ? "Enter box name" : "Enter mail"}
             style={{
               width: '100%',
               padding: '8px',
@@ -425,59 +462,72 @@ function App() {
           />
         </div>
 
-        <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Tooltip title={isPlaying ? 'Pause' : currentStep >= totalSteps ? 'Play from start' : 'Play'}>
-            <IconButton
-              onClick={handlePlayPause}
-              color="primary"
-              size="large"
-            >
-              {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title="Reset">
-            <IconButton
-              onClick={handleReset}
-              color="primary"
-              size="large"
-            >
-              <RestartAltIcon />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title="Previous">
-            <span>
+        <div style={{
+          marginBottom: '20px',
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          alignItems: isMobile ? 'stretch' : 'center',
+          gap: '16px'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            justifyContent: isMobile ? 'center' : 'flex-start'
+          }}>
+            <Tooltip title={isPlaying ? 'Pause' : currentStep >= totalSteps ? 'Play from start' : 'Play'}>
               <IconButton
-                onClick={handleStepBackward}
-                disabled={currentStep === 0}
+                onClick={handlePlayPause}
                 color="primary"
                 size="large"
               >
-                <ArrowBackIcon />
+                {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
               </IconButton>
-            </span>
-          </Tooltip>
+            </Tooltip>
 
-          <Tooltip title="Next">
-            <span>
+            <Tooltip title="Reset">
               <IconButton
-                onClick={handleStepForward}
-                disabled={currentStep >= totalSteps}
+                onClick={handleReset}
                 color="primary"
                 size="large"
               >
-                <ArrowForwardIcon />
+                <RestartAltIcon />
               </IconButton>
-            </span>
-          </Tooltip>
+            </Tooltip>
+
+            <Tooltip title="Previous">
+              <span>
+                <IconButton
+                  onClick={handleStepBackward}
+                  disabled={currentStep === 0}
+                  color="primary"
+                  size="large"
+                >
+                  <ArrowBackIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+
+            <Tooltip title="Next">
+              <span>
+                <IconButton
+                  onClick={handleStepForward}
+                  disabled={currentStep >= totalSteps}
+                  color="primary"
+                  size="large"
+                >
+                  <ArrowForwardIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </div>
 
           <div style={{
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            marginLeft: '16px',
-            minWidth: '200px'
+            flex: 1,
+            minWidth: isMobile ? '100%' : '200px'
           }}>
             <Tooltip title="Playback Speed">
               <SpeedIcon color="primary" />
@@ -492,7 +542,10 @@ function App() {
             />
           </div>
 
-          <div style={{ marginLeft: '16px', color: '#666' }}>
+          <div style={{
+            color: '#666',
+            textAlign: isMobile ? 'center' : 'left'
+          }}>
             Step: {currentStep} / {totalSteps}
           </div>
         </div>
@@ -505,9 +558,10 @@ function App() {
       </div>
 
       <div style={{
-        position: 'sticky',
+        position: isMobile ? 'static' : 'sticky',
         top: '20px',
-        alignSelf: 'start'
+        alignSelf: 'start',
+        marginTop: isMobile ? '20px' : '0'
       }}>
         <InputSequence
           sequences={sequences}

@@ -74,6 +74,11 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
 }) => {
   const currentText = getCurrentText(sequences, currentStep);
 
+  const formatText = (text: string) => {
+    const lines = text.match(/.{1,16}/g) || [];
+    return lines.join('\n');
+  };
+
   return (
     <div style={{ marginTop: '20px' }}>
       <div style={{
@@ -82,9 +87,11 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
         backgroundColor: '#f5f5f5',
         borderRadius: '4px',
         fontSize: '18px',
-        fontFamily: 'monospace'
+        fontFamily: 'monospace',
+        whiteSpace: 'pre-wrap',
+        wordBreak: 'break-all'
       }}>
-        <div>{currentText}<span style={{ animation: 'blink 1s infinite' }}>|</span></div>
+        <div>{formatText(currentText)}<span style={{ animation: 'blink 1s infinite' }}>|</span></div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
