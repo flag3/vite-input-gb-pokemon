@@ -90,7 +90,8 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
         fontFamily: 'monospace',
         whiteSpace: 'pre-wrap',
         wordBreak: 'break-all'
-      }}>
+      }}
+      className="sequence-display">
         <div>{formatText(currentText)}<span style={{ animation: 'blink 1s infinite' }}>|</span></div>
       </div>
 
@@ -109,7 +110,8 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
               backgroundColor: isCurrentSequence ? '#e3f2fd' : 'white',
               borderRadius: '4px',
               transition: 'background-color 0.3s'
-            }}>
+            }}
+            className={`sequence-item ${isCurrentSequence ? 'current' : ''}`}>
               <span style={{
                 marginRight: '8px',
                 fontWeight: 'bold',
@@ -133,6 +135,7 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
                         fontSize: '14px',
                         transition: 'all 0.3s'
                       }}
+                      className={`action-step ${isCurrentAction ? 'current' : ''} ${isCompleted ? 'completed' : ''}`}
                     >
                       {action}
                     </span>
@@ -151,6 +154,34 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
       </div>
       <style>
         {`
+          @media (prefers-color-scheme: dark) {
+            .sequence-display {
+              background-color: #2a2a2a !important;
+              color: rgba(255, 255, 255, 0.95) !important;
+            }
+            .sequence-item {
+              background-color: #333 !important;
+              color: rgba(255, 255, 255, 0.95) !important;
+            }
+            .sequence-item.current {
+              background-color: #1e3a5f !important;
+            }
+            .action-step {
+              background-color: #1e3a5f !important;
+              color: rgba(255, 255, 255, 0.95) !important;
+            }
+            .action-step.current {
+              background-color: #4a90e2 !important;
+              color: white !important;
+            }
+            .action-step.completed {
+              background-color: #2d5f3e !important;
+              color: white !important;
+            }
+            .sequence-item span {
+              color: rgba(255, 255, 255, 0.7) !important;
+            }
+          }
           @keyframes blink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }

@@ -83,6 +83,7 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({ grid, currentPosit
               transition: 'background-color 0.2s',
               gridColumn: `${cell.x[0] + 1} / span ${cell.width}`
             }}
+            className={`character-cell ${cell.x.includes(currentPosition.x) && cell.y === currentPosition.y ? 'active' : ''}`}
           >
             {cell.char}
             {cell.x.includes(currentPosition.x) && cell.y === currentPosition.y && currentAction === 'A' && (
@@ -106,6 +107,19 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({ grid, currentPosit
       </div>
       <style>
         {`
+          @media (prefers-color-scheme: dark) {
+            .grid-container {
+              background-color: #2a2a2a !important;
+            }
+            .character-cell {
+              background-color: #333 !important;
+              color: rgba(255, 255, 255, 0.95) !important;
+            }
+            .character-cell.active {
+              background-color: #4a90e2 !important;
+              color: white !important;
+            }
+          }
           @keyframes fadeOut {
             from { opacity: 1; transform: translate(-50%, 0); }
             to { opacity: 0; transform: translate(-50%, -10px); }
