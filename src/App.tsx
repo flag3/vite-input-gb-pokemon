@@ -135,6 +135,24 @@ function App() {
             case '←':
               if (currentVersion === 'GEN1' && newPosition.y === 6) {
                 newPosition.x = 0;
+              } else if (currentVersion !== 'GEN1' && newPosition.y === 4) {
+                if (currentVersion === 'GEN2_MAIL') {
+                  if (newPosition.x >= 0 && newPosition.x <= 5) {
+                    newPosition.x = 12;
+                  } else if (newPosition.x >= 6 && newPosition.x <= 11) {
+                    newPosition.x = 0;
+                  } else if (newPosition.x >= 12 && newPosition.x <= 17) {
+                    newPosition.x = 6;
+                  }
+                } else {
+                  if (newPosition.x >= 0 && newPosition.x <= 4) {
+                    newPosition.x = 10;
+                  } else if (newPosition.x >= 5 && newPosition.x <= 9) {
+                    newPosition.x = 0;
+                  } else if (newPosition.x >= 10 && newPosition.x <= 14) {
+                    newPosition.x = 5;
+                  }
+                }
               } else {
                 const positions = currentRow.map(pos => pos.x).sort((a, b) => a - b);
                 if (newPosition.x === positions[0]) {
@@ -147,6 +165,24 @@ function App() {
             case '→':
               if (currentVersion === 'GEN1' && newPosition.y === 6) {
                 newPosition.x = 0;
+              } else if (currentVersion !== 'GEN1' && newPosition.y === 4) {
+                if (currentVersion === 'GEN2_MAIL') {
+                  if (newPosition.x >= 0 && newPosition.x <= 5) {
+                    newPosition.x = 6;
+                  } else if (newPosition.x >= 6 && newPosition.x <= 11) {
+                    newPosition.x = 12;
+                  } else if (newPosition.x >= 12 && newPosition.x <= 17) {
+                    newPosition.x = 0;
+                  }
+                } else {
+                  if (newPosition.x >= 0 && newPosition.x <= 4) {
+                    newPosition.x = 5;
+                  } else if (newPosition.x >= 5 && newPosition.x <= 9) {
+                    newPosition.x = 10;
+                  } else if (newPosition.x >= 10 && newPosition.x <= 14) {
+                    newPosition.x = 0;
+                  }
+                }
               } else {
                 const positions = currentRow.map(pos => pos.x).sort((a, b) => a - b);
                 if (newPosition.x === positions[positions.length - 1]) {
