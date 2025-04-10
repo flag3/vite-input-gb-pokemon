@@ -4,6 +4,7 @@ import { hiraganaGrid, katakanaGrid, twoGenBoxHiraganaGrid, twoGenBoxKatakanaGri
 interface InternalPosition {
   x: number;
   y: number;
+  char: string;
 }
 
 interface PositionWithActions {
@@ -251,7 +252,7 @@ const calculateDistance = (from: InternalPosition, to: InternalPosition, grid: C
 
 export const findInputSequence = (grid: CharacterGrid, text: string, modes: boolean[]): InputPath[] => {
   const sequences: InputPath[] = [];
-  let currentPosition: InternalPosition = { x: 0, y: 0 };
+  let currentPosition: InternalPosition = { x: 0, y: 0, char: '' };
   let currentIsHiragana = grid.isHiragana;
   let inputCharCount = 0;
 
@@ -277,6 +278,7 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
       }
 
       const targetPosition = targetIsHiragana ? hiraganaResult!.position : katakanaResult!.position;
+
       const { actions: moveActions } = calculateDistance(currentPosition, targetPosition, grid);
       currentActions.push(...moveActions);
       currentActions.push('A');
@@ -292,7 +294,35 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
       if (i + 1 < text.length && (text[i + 1] === '゛' || text[i + 1] === '゜')) {
         const dakutenResult = findCharacterPosition(text[i + 1], grid);
         if (dakutenResult) {
-          const { actions: dakutenActions } = calculateDistance(currentPosition, dakutenResult.position, grid);
+          const dakutenActions: InputAction[] = [];
+
+          if ((grid.version === 'GEN1' && inputCharCount === 5) ||
+            (grid.version === 'GEN2_NICKNAME' && inputCharCount === 5) ||
+            (grid.version === 'GEN2_BOX' && inputCharCount === 8) ||
+            (grid.version === 'GEN2_MAIL' && inputCharCount === 32)) {
+
+            let fixedStartPosition: InternalPosition;
+
+            switch (grid.version) {
+              case 'GEN1':
+                fixedStartPosition = { x: 8, y: 5, char: currentPosition.char };
+                break;
+              case 'GEN2_NICKNAME':
+              case 'GEN2_BOX':
+                fixedStartPosition = { x: 14, y: 4, char: currentPosition.char };
+                break;
+              case 'GEN2_MAIL':
+                fixedStartPosition = { x: 15, y: 4, char: currentPosition.char };
+                break;
+            }
+
+            const { actions: optimizedDakutenActions } = calculateDistance(fixedStartPosition, dakutenResult.position, grid);
+            dakutenActions.push(...optimizedDakutenActions);
+          } else {
+            const { actions: normalDakutenActions } = calculateDistance(currentPosition, dakutenResult.position, grid);
+            dakutenActions.push(...normalDakutenActions);
+          }
+
           dakutenActions.push('A');
 
           sequences.push({
