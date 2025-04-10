@@ -20,7 +20,7 @@ const isControlChar = (char: string): boolean => {
 };
 
 const isDiacriticalMark = (char: string): boolean => {
-  return char === '゛' || char === '゜' || char === 'ー';
+  return char === '゛' || char === '゜' || char === 'ー' || char === 'リ' || char == 'へ';
 };
 
 const excludeSpecialChars = (char: string): boolean => {

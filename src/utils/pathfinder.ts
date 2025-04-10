@@ -34,12 +34,25 @@ const findCharacterPosition = (char: string, grid: CharacterGrid): { position: C
       break;
   }
 
+  const hiraganaKatakanaMap: Record<string, string[]> = {
+    'り': ['リ'],
+    'リ': ['り'],
+    'へ': ['ヘ'],
+    'ヘ': ['へ']
+  };
+
   const currentGrid = grid.isHiragana ? hiraganaBaseGrid : katakanaBaseGrid;
   for (let y = 0; y < currentGrid.length; y++) {
     for (let x = 0; x < currentGrid[y].length; x++) {
       if (currentGrid[y][x] === char) {
         return {
           position: { char, x, y },
+          needsModeChange: false
+        };
+      }
+      if (hiraganaKatakanaMap[char]?.includes(currentGrid[y][x])) {
+        return {
+          position: { char: currentGrid[y][x], x, y },
           needsModeChange: false
         };
       }
@@ -52,6 +65,12 @@ const findCharacterPosition = (char: string, grid: CharacterGrid): { position: C
       if (otherGrid[y][x] === char) {
         return {
           position: { char, x, y },
+          needsModeChange: true
+        };
+      }
+      if (hiraganaKatakanaMap[char]?.includes(otherGrid[y][x])) {
+        return {
+          position: { char: otherGrid[y][x], x, y },
           needsModeChange: true
         };
       }
