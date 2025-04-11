@@ -24,8 +24,7 @@ const isDiacriticalMark = (char: string): boolean => {
 };
 
 const excludeSpecialChars = (char: string): boolean => {
-  return !isControlChar(char) && !isDiacriticalMark(char) && char !== ' ' &&
-    !char.match(/^[０-９]$/);
+  return !isControlChar(char) && !isDiacriticalMark(char) && char !== ' ';
 };
 
 
