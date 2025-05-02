@@ -250,6 +250,160 @@ const calculateDistance = (from: InternalPosition, to: InternalPosition, grid: C
   };
 };
 
+const getSpacePositions = (grid: CharacterGrid): { hiraganaSpaces: CharacterPosition[], katakanaSpaces: CharacterPosition[] } => {
+  const hiraganaSpaces: CharacterPosition[] = [];
+  const katakanaSpaces: CharacterPosition[] = [];
+  if (grid.version === 'GEN1') {
+    hiraganaSpaces.push(
+      { char: ' ', x: 7, y: 5 }
+    );
+    katakanaSpaces.push(
+      { char: ' ', x: 7, y: 5 }
+    );
+  } else if (grid.version === 'GEN2_NICKNAME' || grid.version === 'GEN2_BOX') {
+    hiraganaSpaces.push(
+      { char: ' ', x: 12, y: 3 },
+      { char: ' ', x: 13, y: 0 },
+      { char: ' ', x: 13, y: 1 },
+      { char: ' ', x: 13, y: 3 },
+      { char: ' ', x: 14, y: 3 }
+    );
+    katakanaSpaces.push(
+      { char: ' ', x: 13, y: 0 },
+      { char: ' ', x: 13, y: 1 }
+    );
+  } else if (grid.version === 'GEN2_MAIL') {
+    hiraganaSpaces.push(
+      { char: ' ', x: 5, y: 0 },
+      { char: ' ', x: 5, y: 1 },
+      { char: ' ', x: 5, y: 2 },
+      { char: ' ', x: 5, y: 3 },
+      { char: ' ', x: 11, y: 0 },
+      { char: ' ', x: 11, y: 1 },
+      { char: ' ', x: 11, y: 2 },
+      { char: ' ', x: 11, y: 3 },
+      { char: ' ', x: 17, y: 3 }
+    );
+    katakanaSpaces.push(
+      { char: ' ', x: 5, y: 0 },
+      { char: ' ', x: 5, y: 1 },
+      { char: ' ', x: 5, y: 2 },
+      { char: ' ', x: 5, y: 3 },
+      { char: ' ', x: 11, y: 0 },
+      { char: ' ', x: 11, y: 1 },
+      { char: ' ', x: 11, y: 2 },
+      { char: ' ', x: 11, y: 3 },
+      { char: ' ', x: 15, y: 3 },
+      { char: ' ', x: 16, y: 3 },
+      { char: ' ', x: 17, y: 3 }
+    );
+  }
+
+  return { hiraganaSpaces, katakanaSpaces };
+};
+
+const findOptimalSpacePosition = (
+  currentPosition: InternalPosition,
+  nextCharPosition: InternalPosition | null,
+  currentIsHiragana: boolean,
+  grid: CharacterGrid
+): { position: CharacterPosition, actions: InputAction[], totalSteps: number } => {
+  const spacePositions = getSpacePositions(grid);
+
+  if (spacePositions.hiraganaSpaces.length === 0 && spacePositions.katakanaSpaces.length === 0) {
+    return {
+      position: { char: ' ', x: currentPosition.x, y: currentPosition.y },
+      actions: ['A'],
+      totalSteps: 1
+    };
+  }
+
+  let minTotalSteps = Infinity;
+  let optimalPosition = spacePositions.hiraganaSpaces[0] || spacePositions.katakanaSpaces[0];
+  let optimalActions: InputAction[] = [];
+
+  const currentModeSpaces = currentIsHiragana ? spacePositions.hiraganaSpaces : spacePositions.katakanaSpaces;
+  for (const spacePos of currentModeSpaces) {
+    const actions: InputAction[] = [];
+
+    if (currentPosition.x !== spacePos.x || currentPosition.y !== spacePos.y) {
+      const { actions: moveActions } = calculateDistance(currentPosition, spacePos, grid);
+      actions.push(...moveActions);
+    }
+
+    actions.push('A');
+
+    let totalSteps = actions.length;
+
+    if (nextCharPosition) {
+      const spaceToNextPosition: InternalPosition = {
+        x: spacePos.x,
+        y: spacePos.y,
+        char: ' '
+      };
+
+      const { distance: nextDistance } = calculateDistance(
+        spaceToNextPosition,
+        nextCharPosition,
+        grid
+      );
+
+      totalSteps += nextDistance;
+    }
+
+    if (totalSteps < minTotalSteps) {
+      minTotalSteps = totalSteps;
+      optimalPosition = spacePos;
+      optimalActions = actions;
+    }
+  }
+
+  const otherModeSpaces = currentIsHiragana ? spacePositions.katakanaSpaces : spacePositions.hiraganaSpaces;
+  for (const spacePos of otherModeSpaces) {
+    const actions: InputAction[] = [];
+
+    actions.push('s');
+
+    if (currentPosition.x !== spacePos.x || currentPosition.y !== spacePos.y) {
+      const { actions: moveActions } = calculateDistance(currentPosition, spacePos, grid);
+      actions.push(...moveActions);
+    }
+
+    actions.push('A');
+
+    let totalSteps = actions.length;
+
+    if (nextCharPosition) {
+      const spaceToNextPosition: InternalPosition = {
+        x: spacePos.x,
+        y: spacePos.y,
+        char: ' '
+      };
+
+
+      const { distance: nextDistance } = calculateDistance(
+        spaceToNextPosition,
+        nextCharPosition,
+        grid
+      );
+
+      totalSteps += nextDistance;
+    }
+
+    if (totalSteps < minTotalSteps) {
+      minTotalSteps = totalSteps;
+      optimalPosition = spacePos;
+      optimalActions = actions;
+    }
+  }
+
+  return {
+    position: optimalPosition,
+    actions: optimalActions,
+    totalSteps: minTotalSteps
+  };
+};
+
 export const findInputSequence = (grid: CharacterGrid, text: string, modes: boolean[]): InputPath[] => {
   const sequences: InputPath[] = [];
   let currentPosition: InternalPosition = { x: 0, y: 0, char: '' };
@@ -263,6 +417,41 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
 
     if (currentChar !== '゛' && currentChar !== '゜') {
       inputCharCount++;
+
+      if (currentChar === ' ') {
+        let nextCharPosition: InternalPosition | null = null;
+        if (i + 1 < text.length && text[i + 1] !== '゛' && text[i + 1] !== '゜') {
+          const nextChar = text[i + 1];
+          const nextMode = modes[i + 1];
+          const nextHiraganaResult = findCharacterPosition(nextChar, { ...grid, isHiragana: true });
+          const nextKatakanaResult = findCharacterPosition(nextChar, { ...grid, isHiragana: false });
+
+          if (nextHiraganaResult || nextKatakanaResult) {
+            const nextTargetIsHiragana = Boolean(nextHiraganaResult && (!nextKatakanaResult || nextMode));
+            const nextTargetPosition = nextTargetIsHiragana
+              ? nextHiraganaResult!.position
+              : nextKatakanaResult!.position;
+
+            nextCharPosition = nextTargetPosition;
+          }
+        }
+
+        const { position: optimalSpacePosition, actions: optimalActions, totalSteps } =
+          findOptimalSpacePosition(currentPosition, nextCharPosition, currentIsHiragana, grid);
+
+        if (optimalActions.includes('s')) {
+          currentIsHiragana = !currentIsHiragana;
+        }
+
+        sequences.push({
+          char: currentChar,
+          actions: optimalActions,
+          totalSteps
+        });
+
+        currentPosition = optimalSpacePosition;
+        continue;
+      }
 
       const hiraganaResult = findCharacterPosition(currentChar, { ...grid, isHiragana: true });
       const katakanaResult = findCharacterPosition(currentChar, { ...grid, isHiragana: false });
