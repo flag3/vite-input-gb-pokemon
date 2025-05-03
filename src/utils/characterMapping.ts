@@ -1,33 +1,17 @@
 import { hiraganaGrid, katakanaGrid, twoGenBoxHiraganaGrid, twoGenBoxKatakanaGrid, twoGenMailHiraganaGrid, twoGenMailKatakanaGrid } from '../data/characterGrids';
 import { GameVersion } from '../types';
+import { DAKUTEN_MAP, isDiacriticalMark, isControlChar } from './constants';
 
-const dakutenMap: Record<string, [string, string]> = {
-  'が': ['か', '゛'], 'ぎ': ['き', '゛'], 'ぐ': ['く', '゛'], 'げ': ['け', '゛'], 'ご': ['こ', '゛'],
-  'ざ': ['さ', '゛'], 'じ': ['し', '゛'], 'ず': ['す', '゛'], 'ぜ': ['せ', '゛'], 'ぞ': ['そ', '゛'],
-  'だ': ['た', '゛'], 'ぢ': ['ち', '゛'], 'づ': ['つ', '゛'], 'で': ['て', '゛'], 'ど': ['と', '゛'],
-  'ば': ['は', '゛'], 'び': ['ひ', '゛'], 'ぶ': ['ふ', '゛'], 'べ': ['へ', '゛'], 'ぼ': ['ほ', '゛'],
-  'ぱ': ['は', '゜'], 'ぴ': ['ひ', '゜'], 'ぷ': ['ふ', '゜'], 'ぺ': ['へ', '゜'], 'ぽ': ['ほ', '゜'],
-  'ガ': ['カ', '゛'], 'ギ': ['キ', '゛'], 'グ': ['ク', '゛'], 'ゲ': ['ケ', '゛'], 'ゴ': ['コ', '゛'],
-  'ザ': ['サ', '゛'], 'ジ': ['シ', '゛'], 'ズ': ['ス', '゛'], 'ゼ': ['セ', '゛'], 'ゾ': ['ソ', '゛'],
-  'ダ': ['タ', '゛'], 'ヂ': ['チ', '゛'], 'ヅ': ['ツ', '゛'], 'デ': ['テ', '゛'], 'ド': ['ト', '゛'],
-  'バ': ['ハ', '゛'], 'ビ': ['ヒ', '゛'], 'ブ': ['フ', '゛'], 'ベ': ['ヘ', '゛'], 'ボ': ['ホ', '゛'],
-  'パ': ['ハ', '゜'], 'ピ': ['ヒ', '゜'], 'プ': ['フ', '゜'], 'ペ': ['ヘ', '゜'], 'ポ': ['ホ', '゜']
-};
-
-const isControlChar = (char: string): boolean => {
-  return char === 'ED' || char === 'カナ' || char === 'かな' ||
-    char === 'ていせい' || char === 'けってい';
-};
-
-const isDiacriticalMark = (char: string): boolean => {
-  return char === '゛' || char === '゜' || char === 'ー' || char === 'リ' || char == 'へ';
+// スペース文字を正規化する関数
+export const normalizeSpaces = (text: string): string => {
+  return text.replace(/[　\s]/g, ' ');
 };
 
 const excludeSpecialChars = (char: string): boolean => {
   return !isControlChar(char) && !isDiacriticalMark(char) && char !== ' ';
 };
 
-
+// 各グリッドで使用可能な文字のセットを作成
 const gen1HiraganaChars = new Set(hiraganaGrid.flat().filter(excludeSpecialChars));
 const gen1KatakanaChars = new Set(katakanaGrid.flat().filter(excludeSpecialChars));
 
@@ -82,8 +66,11 @@ export const decomposeTextWithMode = (text: string, initialIsHiragana: boolean, 
   const modes: boolean[] = [];
   let currentIsHiragana = initialIsHiragana;
 
-  for (const char of text) {
-    const decomposed = dakutenMap[char];
+  // スペースを正規化
+  const normalizedText = normalizeSpaces(text);
+
+  for (const char of normalizedText) {
+    const decomposed = DAKUTEN_MAP[char];
     const chars = decomposed ? [decomposed[0], decomposed[1]] : [char];
 
     for (const c of chars) {

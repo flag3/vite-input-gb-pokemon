@@ -1,5 +1,6 @@
 import React from 'react';
 import { CharacterGrid as CharacterGridType, InputAction } from '../types';
+import { GROUPABLE_CHARS } from '../utils/constants';
 
 interface CharacterGridProps {
   grid: CharacterGridType;
@@ -8,8 +9,6 @@ interface CharacterGridProps {
 }
 
 export const CharacterGrid: React.FC<CharacterGridProps> = ({ grid, currentPosition, currentAction }) => {
-  const groupableChars = ['かな', 'カナ', 'ていせい', 'けってい'];
-
   const getGroupedCells = () => {
     const cells: {
       char: string;
@@ -19,7 +18,7 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({ grid, currentPosit
     }[] = [];
 
     grid.grid.forEach((char) => {
-      if (groupableChars.includes(char.char)) {
+      if (GROUPABLE_CHARS.includes(char.char)) {
         const existingGroup = cells.find(
           cell => cell.char === char.char && cell.y === char.y
         );

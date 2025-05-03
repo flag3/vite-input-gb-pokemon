@@ -1,26 +1,12 @@
 import React from 'react';
 import { InputPath } from '../types';
+import { DAKUTEN_REVERSE_MAP } from '../utils/constants';
 
 interface InputSequenceProps {
   sequences: InputPath[];
   currentStep: number;
   currentCharIndex: number;
 }
-
-
-const dakutenReverseMap: Record<string, Record<string, string>> = {
-  'か': { '゛': 'が' }, 'き': { '゛': 'ぎ' }, 'く': { '゛': 'ぐ' }, 'け': { '゛': 'げ' }, 'こ': { '゛': 'ご' },
-  'さ': { '゛': 'ざ' }, 'し': { '゛': 'じ' }, 'す': { '゛': 'ず' }, 'せ': { '゛': 'ぜ' }, 'そ': { '゛': 'ぞ' },
-  'た': { '゛': 'だ' }, 'ち': { '゛': 'ぢ' }, 'つ': { '゛': 'づ' }, 'て': { '゛': 'で' }, 'と': { '゛': 'ど' },
-  'は': { '゛': 'ば', '゜': 'ぱ' }, 'ひ': { '゛': 'び', '゜': 'ぴ' },
-  'ふ': { '゛': 'ぶ', '゜': 'ぷ' }, 'へ': { '゛': 'べ', '゜': 'ぺ' }, 'ほ': { '゛': 'ぼ', '゜': 'ぽ' },
-  'カ': { '゛': 'ガ' }, 'キ': { '゛': 'ギ' }, 'ク': { '゛': 'グ' }, 'ケ': { '゛': 'ゲ' }, 'コ': { '゛': 'ゴ' },
-  'サ': { '゛': 'ザ' }, 'シ': { '゛': 'ジ' }, 'ス': { '゛': 'ズ' }, 'セ': { '゛': 'ゼ' }, 'ソ': { '゛': 'ゾ' },
-  'タ': { '゛': 'ダ' }, 'チ': { '゛': 'ヂ' }, 'ツ': { '゛': 'ヅ' }, 'テ': { '゛': 'デ' }, 'ト': { '゛': 'ド' },
-  'ハ': { '゛': 'バ', '゜': 'パ' }, 'ヒ': { '゛': 'ビ', '゜': 'ピ' },
-  'フ': { '゛': 'ブ', '゜': 'プ' }, 'ヘ': { '゛': 'ベ', '゜': 'ペ' }, 'ホ': { '゛': 'ボ', '゜': 'ポ' }
-};
-
 
 const getCurrentText = (sequences: InputPath[], currentStep: number): string => {
   let text = '';
@@ -39,8 +25,8 @@ const getCurrentText = (sequences: InputPath[], currentStep: number): string => 
       const actionIndex = currentStep - stepCount - 1;
       if (actionIndex >= 0 && sequence.actions[actionIndex] === 'A') {
         if (sequence.char === '゛' || sequence.char === '゜') {
-          if (lastBaseChar && dakutenReverseMap[lastBaseChar]?.[sequence.char]) {
-            text = text.slice(0, -1) + dakutenReverseMap[lastBaseChar][sequence.char];
+          if (lastBaseChar && DAKUTEN_REVERSE_MAP[lastBaseChar]?.[sequence.char]) {
+            text = text.slice(0, -1) + DAKUTEN_REVERSE_MAP[lastBaseChar][sequence.char];
           }
         } else {
           text += sequence.char;
@@ -52,8 +38,8 @@ const getCurrentText = (sequences: InputPath[], currentStep: number): string => 
       const lastAction = sequence.actions[sequence.actions.length - 1];
       if (lastAction === 'A') {
         if (sequence.char === '゛' || sequence.char === '゜') {
-          if (lastBaseChar && dakutenReverseMap[lastBaseChar]?.[sequence.char]) {
-            text = text.slice(0, -1) + dakutenReverseMap[lastBaseChar][sequence.char];
+          if (lastBaseChar && DAKUTEN_REVERSE_MAP[lastBaseChar]?.[sequence.char]) {
+            text = text.slice(0, -1) + DAKUTEN_REVERSE_MAP[lastBaseChar][sequence.char];
           }
         } else {
           text += sequence.char;

@@ -3,8 +3,10 @@ import { CharacterGrid } from './components/CharacterGrid';
 import { InputSequence } from './components/InputSequence';
 import { GRIDS, createGrid } from './data/characterGrids';
 import { findInputSequence } from './utils/pathfinder';
-import { decomposeTextWithMode } from './utils/characterMapping';
+import { decomposeTextWithMode, normalizeSpaces } from './utils/characterMapping';
 import { GameVersion, InputAction } from './types';
+import { MAX_CHAR_LIMITS } from './utils/constants';
+import { calculateNextPosition, getConfirmButtonPosition } from './utils/gridNavigation';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
@@ -12,13 +14,6 @@ import SpeedIcon from '@mui/icons-material/Speed';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { IconButton, Slider, Tooltip } from '@mui/material';
-
-const MAX_CHAR_LIMITS: Record<GameVersion, number> = {
-  GEN1: 5,
-  GEN2_NICKNAME: 5,
-  GEN2_BOX: 8,
-  GEN2_MAIL: 32
-};
 
 interface StateHistory {
   position: { x: number; y: number };
@@ -75,124 +70,16 @@ function App() {
             newPosition.y = 4;
           }
         } else if (action === 'A') {
-          if (currentVersion === 'GEN1') {
-            if (inputCharCount === MAX_CHAR_LIMITS[currentVersion]) {
-              const grid = createGrid(currentVersion, newIsHiragana);
-              newPosition.x = grid.width - 1;
-              newPosition.y = grid.height - 2;
-            }
-          } else {
-            const charLimit = MAX_CHAR_LIMITS[currentVersion];
-            if (inputCharCount === charLimit) {
-              if (currentVersion === 'GEN2_NICKNAME' || currentVersion === 'GEN2_BOX') {
-                newPosition.x = 14;
-                newPosition.y = 4;
-              } else {
-                newPosition.x = 15;
-                newPosition.y = 4;
-              }
-            }
+          if (inputCharCount === MAX_CHAR_LIMITS[currentVersion]) {
+            const confirmPos = getConfirmButtonPosition(currentVersion);
+            newPosition.x = confirmPos.x;
+            newPosition.y = confirmPos.y;
           }
-        } else {
+        } else if (action === '↑' || action === '↓' || action === '←' || action === '→') {
           const grid = createGrid(currentVersion, newIsHiragana);
-          const currentRow = grid.grid.filter(pos => pos.y === newPosition.y);
-
-          switch (action) {
-            case '↑':
-              if (currentVersion === 'GEN1') {
-                if (newPosition.y === 0) {
-                  newPosition.y = 6;
-                  newPosition.x = 0;
-                } else {
-                  newPosition.y = Math.max(0, newPosition.y - 1);
-                }
-              } else {
-                if (newPosition.y === 0) {
-                  newPosition.y = 4;
-                } else {
-                  newPosition.y = Math.max(0, newPosition.y - 1);
-                }
-              }
-              break;
-            case '↓':
-              if (currentVersion === 'GEN1') {
-                if (newPosition.y === 5) {
-                  newPosition.x = 0;
-                  newPosition.y = 6;
-                } else if (newPosition.y === 6) {
-                  newPosition.y = 0;
-                } else {
-                  newPosition.y = Math.min(5, newPosition.y + 1);
-                }
-              } else {
-                if (newPosition.y === 4) {
-                  newPosition.y = 0;
-                } else {
-                  newPosition.y = Math.min(4, newPosition.y + 1);
-                }
-              }
-              break;
-            case '←':
-              if (currentVersion === 'GEN1' && newPosition.y === 6) {
-                newPosition.x = 0;
-              } else if (currentVersion !== 'GEN1' && newPosition.y === 4) {
-                if (currentVersion === 'GEN2_MAIL') {
-                  if (newPosition.x >= 0 && newPosition.x <= 5) {
-                    newPosition.x = 12;
-                  } else if (newPosition.x >= 6 && newPosition.x <= 11) {
-                    newPosition.x = 0;
-                  } else if (newPosition.x >= 12 && newPosition.x <= 17) {
-                    newPosition.x = 6;
-                  }
-                } else {
-                  if (newPosition.x >= 0 && newPosition.x <= 4) {
-                    newPosition.x = 10;
-                  } else if (newPosition.x >= 5 && newPosition.x <= 9) {
-                    newPosition.x = 0;
-                  } else if (newPosition.x >= 10 && newPosition.x <= 14) {
-                    newPosition.x = 5;
-                  }
-                }
-              } else {
-                const positions = currentRow.map(pos => pos.x).sort((a, b) => a - b);
-                if (newPosition.x === positions[0]) {
-                  newPosition.x = positions[positions.length - 1];
-                } else {
-                  newPosition.x = positions[positions.findIndex(x => x === newPosition.x) - 1];
-                }
-              }
-              break;
-            case '→':
-              if (currentVersion === 'GEN1' && newPosition.y === 6) {
-                newPosition.x = 0;
-              } else if (currentVersion !== 'GEN1' && newPosition.y === 4) {
-                if (currentVersion === 'GEN2_MAIL') {
-                  if (newPosition.x >= 0 && newPosition.x <= 5) {
-                    newPosition.x = 6;
-                  } else if (newPosition.x >= 6 && newPosition.x <= 11) {
-                    newPosition.x = 12;
-                  } else if (newPosition.x >= 12 && newPosition.x <= 17) {
-                    newPosition.x = 0;
-                  }
-                } else {
-                  if (newPosition.x >= 0 && newPosition.x <= 4) {
-                    newPosition.x = 5;
-                  } else if (newPosition.x >= 5 && newPosition.x <= 9) {
-                    newPosition.x = 10;
-                  } else if (newPosition.x >= 10 && newPosition.x <= 14) {
-                    newPosition.x = 0;
-                  }
-                }
-              } else {
-                const positions = currentRow.map(pos => pos.x).sort((a, b) => a - b);
-                if (newPosition.x === positions[positions.length - 1]) {
-                  newPosition.x = positions[0];
-                } else {
-                  newPosition.x = positions[positions.findIndex(x => x === newPosition.x) + 1];
-                }
-              }
-              break;
-          }
+          const nextPos = calculateNextPosition(newPosition, action, grid, inputCharCount);
+          newPosition.x = nextPos.x;
+          newPosition.y = nextPos.y;
         }
 
         setCurrentAction(action);
@@ -250,7 +137,7 @@ function App() {
   }, [sequences]);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value.replace(/　/g, ' ');
+    const text = normalizeSpaces(e.target.value);
     const maxLength = MAX_CHAR_LIMITS[currentVersion];
     const truncatedText = text.slice(0, maxLength);
 
