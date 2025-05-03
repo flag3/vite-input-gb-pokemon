@@ -6,7 +6,7 @@ import { setupMatchers, InputTestCase } from './matchers';
 import { InputAction } from '../types';
 
 function formatActions(actions: InputAction[]): string {
-  return actions.join(' → ');
+  return actions.join('');
 }
 
 beforeAll(() => {
@@ -107,6 +107,26 @@ describe('入力シーケンステスト', () => {
         'A'
       ]
     },
+    {
+      input: 'コ サ',
+      version: 'GEN2_MAIL',
+      expectedActions: [
+        '↑', '←', '↓', '←', '←', 'A',
+        '→', 'A',
+        '→', 'A',
+        'S', 'A'
+      ]
+    },
+    {
+      input: '９ ９',
+      version: 'GEN2_MAIL',
+      expectedActions: [
+        's', 'S', '↑', 'A',
+        's', 'A',
+        's', 'A',
+        'S', 'A'
+      ]
+    },
   ];
 
   testCases.forEach((testCase, index) => {
@@ -126,6 +146,8 @@ describe('入力シーケンステスト', () => {
 
       if (actualTotalSteps !== expectedSteps) {
         console.error(`❌ エラー: 総ステップ数が一致しません。期待: ${expectedSteps}, 実際: ${actualTotalSteps}`);
+        console.warn(`  期待: ${formatActions(expectedActions)}`);
+        console.warn(`  実際: ${formatActions(actualActions)}`);
         expect(actualTotalSteps).toBe(expectedSteps);
       } else if (JSON.stringify(actualActions) !== JSON.stringify(expectedActions)) {
         console.warn(`⚠️ 警告: 総ステップ数は一致しますが、キー入力が異なります。`);

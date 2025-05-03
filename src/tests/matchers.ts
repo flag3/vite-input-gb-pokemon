@@ -8,8 +8,8 @@ interface CustomMatchers<R = unknown> {
 declare global {
   // @ts-ignore
   namespace Vi {
-    interface Assertion extends CustomMatchers {}
-    interface AsymmetricMatchersContaining extends CustomMatchers {}
+    interface Assertion extends CustomMatchers { }
+    interface AsymmetricMatchersContaining extends CustomMatchers { }
   }
 }
 
@@ -18,7 +18,7 @@ export function setupMatchers() {
     toHaveSameStepsButDifferentActions(actualActions: InputAction[], expectedActions: InputAction[]) {
       // 配列の長さが同じかどうかをチェック（ステップ数が同じ）
       const hasSameLength = actualActions.length === expectedActions.length;
-      
+
       // 配列の内容が異なるかどうかをチェック
       let hasDifferentContent = false;
       for (let i = 0; i < actualActions.length; i++) {
@@ -27,9 +27,9 @@ export function setupMatchers() {
           break;
         }
       }
-      
+
       const pass = hasSameLength && hasDifferentContent;
-      
+
       return {
         pass,
         message: () => pass

@@ -54,7 +54,7 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
         sequences.push({
           char: currentChar,
           actions: optimalActions,
-          totalSteps
+          totalSteps: grid.version === 'GEN2_MAIL' ? optimalActions.length : totalSteps
         });
 
         currentPosition = optimalSpacePosition;
@@ -96,7 +96,7 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
         const dakutenResult = findCharacterPosition(text[i + 1], grid);
         if (dakutenResult) {
           const dakutenActions: InputAction[] = [];
-           
+
           // 文字数制限に達した場合の特別処理
           const isAtCharLimit = inputCharCount === MAX_CHAR_LIMITS[grid.version];
           if (isAtCharLimit) {
@@ -130,12 +130,20 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
   // 最後の確定処理
   if (sequences.length > 0) {
     const isAtCharLimit = inputCharCount === MAX_CHAR_LIMITS[grid.version];
-    
+
     if (grid.version === 'GEN1') {
       sequences.push({
         char: 'END',
         actions: [isAtCharLimit ? 'A' : 'S'],
         totalSteps: 1
+      });
+    } else if (grid.version === 'GEN2_MAIL' && !isAtCharLimit) {
+      // GEN2_MAILの場合は特別な処理
+      const actions: InputAction[] = ['S', 'A'];
+      sequences.push({
+        char: 'END',
+        actions,
+        totalSteps: actions.length  // actionsの長さと同じにする
       });
     } else if (!isAtCharLimit) {
       sequences.push({
