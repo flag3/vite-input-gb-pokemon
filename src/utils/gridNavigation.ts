@@ -59,7 +59,7 @@ export const calculateNextPosition = (
 /**
  * GEN1のグリッドナビゲーションロジック
  */
-export const calculateGen1NextPosition = (
+const calculateGen1NextPosition = (
   pos: Position,
   action: InputAction,
   grid: CharacterGrid
@@ -110,7 +110,7 @@ export const calculateGen1NextPosition = (
 /**
  * GEN2のグリッドナビゲーションロジック
  */
-export const calculateGen2NextPosition = (
+const calculateGen2NextPosition = (
   pos: Position,
   action: InputAction,
   grid: CharacterGrid

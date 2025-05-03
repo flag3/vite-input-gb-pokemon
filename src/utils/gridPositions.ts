@@ -1,4 +1,5 @@
 import { CharacterPosition, Position, GameVersion } from '../types';
+import { createGrid } from '../data/characterGrids';
 
 /**
  * ひらがな/カタカナの対応マップ
@@ -14,54 +15,16 @@ export const HIRAGANA_KATAKANA_MAP: Record<string, string[]> = {
  * 各ゲームバージョンのスペース位置を取得する
  */
 export const getSpacePositions = (version: GameVersion): { hiraganaSpaces: CharacterPosition[], katakanaSpaces: CharacterPosition[] } => {
-  const hiraganaSpaces: CharacterPosition[] = [];
-  const katakanaSpaces: CharacterPosition[] = [];
-  
-  if (version === 'GEN1') {
-    hiraganaSpaces.push(
-      { char: ' ', x: 7, y: 5 }
-    );
-    katakanaSpaces.push(
-      { char: ' ', x: 7, y: 5 }
-    );
-  } else if (version === 'GEN2_NICKNAME' || version === 'GEN2_BOX') {
-    hiraganaSpaces.push(
-      { char: ' ', x: 12, y: 3 },
-      { char: ' ', x: 13, y: 0 },
-      { char: ' ', x: 13, y: 1 },
-      { char: ' ', x: 13, y: 3 },
-      { char: ' ', x: 14, y: 3 }
-    );
-    katakanaSpaces.push(
-      { char: ' ', x: 13, y: 0 },
-      { char: ' ', x: 13, y: 1 }
-    );
-  } else if (version === 'GEN2_MAIL') {
-    hiraganaSpaces.push(
-      { char: ' ', x: 5, y: 0 },
-      { char: ' ', x: 5, y: 1 },
-      { char: ' ', x: 5, y: 2 },
-      { char: ' ', x: 5, y: 3 },
-      { char: ' ', x: 11, y: 0 },
-      { char: ' ', x: 11, y: 1 },
-      { char: ' ', x: 11, y: 2 },
-      { char: ' ', x: 11, y: 3 },
-      { char: ' ', x: 17, y: 3 }
-    );
-    katakanaSpaces.push(
-      { char: ' ', x: 5, y: 0 },
-      { char: ' ', x: 5, y: 1 },
-      { char: ' ', x: 5, y: 2 },
-      { char: ' ', x: 5, y: 3 },
-      { char: ' ', x: 11, y: 0 },
-      { char: ' ', x: 11, y: 1 },
-      { char: ' ', x: 11, y: 2 },
-      { char: ' ', x: 11, y: 3 },
-      { char: ' ', x: 15, y: 3 },
-      { char: ' ', x: 16, y: 3 },
-      { char: ' ', x: 17, y: 3 }
-    );
-  }
+  // ひらがなとカタカナのグリッドを取得
+  const hiraganaGrid = createGrid(version, true);
+  const katakanaGrid = createGrid(version, false);
+
+  // グリッドから空白の位置を抽出
+  const hiraganaSpaces = hiraganaGrid.grid.filter(pos => pos.char === ' ')
+    .map(pos => ({ char: ' ', x: pos.x, y: pos.y }));
+
+  const katakanaSpaces = katakanaGrid.grid.filter(pos => pos.char === ' ')
+    .map(pos => ({ char: ' ', x: pos.x, y: pos.y }));
 
   return { hiraganaSpaces, katakanaSpaces };
 };

@@ -108,7 +108,7 @@ describe('入力シーケンステスト', () => {
       ]
     },
     {
-      input: 'コ サ',
+      input: 'コ　サ',
       version: 'GEN2_MAIL',
       expectedActions: [
         '↑', '←', '↓', '←', '←', 'A',
@@ -118,7 +118,7 @@ describe('入力シーケンステスト', () => {
       ]
     },
     {
-      input: '９ ９',
+      input: '９　９',
       version: 'GEN2_MAIL',
       expectedActions: [
         's', 'S', '↑', 'A',

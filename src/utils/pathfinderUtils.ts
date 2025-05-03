@@ -13,7 +13,7 @@ export interface InternalPosition extends Position {
 /**
  * 位置と操作の組み合わせの型
  */
-export interface PositionWithActions {
+interface PositionWithActions {
   position: InternalPosition;
   actions: InputAction[];
 }

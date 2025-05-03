@@ -1,10 +1,16 @@
 import { hiraganaGrid, katakanaGrid, twoGenBoxHiraganaGrid, twoGenBoxKatakanaGrid, twoGenMailHiraganaGrid, twoGenMailKatakanaGrid } from '../data/characterGrids';
 import { GameVersion } from '../types';
-import { DAKUTEN_MAP, isDiacriticalMark, isControlChar } from './constants';
+import { DAKUTEN_MAP, isDiacriticalMark, isControlChar, SPACE_CHARS } from './constants';
 
 // スペース文字を正規化する関数
 export const normalizeSpaces = (text: string): string => {
-  return text.replace(/[　\s]/g, ' ');
+  let result = text;
+  for (const char of SPACE_CHARS) {
+    if (char !== ' ') {
+      result = result.replace(new RegExp(char, 'g'), ' ');
+    }
+  }
+  return result;
 };
 
 const excludeSpecialChars = (char: string): boolean => {
