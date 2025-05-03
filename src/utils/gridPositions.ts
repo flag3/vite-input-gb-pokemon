@@ -20,11 +20,11 @@ export const getSpacePositions = (version: GameVersion): { hiraganaSpaces: Chara
   const katakanaGrid = createGrid(version, false);
 
   // グリッドから空白の位置を抽出
-  const hiraganaSpaces = hiraganaGrid.grid.filter(pos => pos.char === ' ')
-    .map(pos => ({ char: ' ', x: pos.x, y: pos.y }));
+  const hiraganaSpaces = hiraganaGrid.grid.filter(pos => pos.char === '　')
+    .map(pos => ({ char: '　', x: pos.x, y: pos.y }));
 
-  const katakanaSpaces = katakanaGrid.grid.filter(pos => pos.char === ' ')
-    .map(pos => ({ char: ' ', x: pos.x, y: pos.y }));
+  const katakanaSpaces = katakanaGrid.grid.filter(pos => pos.char === '　')
+    .map(pos => ({ char: '　', x: pos.x, y: pos.y }));
 
   return { hiraganaSpaces, katakanaSpaces };
 };

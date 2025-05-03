@@ -6,15 +6,15 @@ import { DAKUTEN_MAP, isDiacriticalMark, isControlChar, SPACE_CHARS } from './co
 export const normalizeSpaces = (text: string): string => {
   let result = text;
   for (const char of SPACE_CHARS) {
-    if (char !== ' ') {
-      result = result.replace(new RegExp(char, 'g'), ' ');
+    if (char !== '　') {
+      result = result.replace(new RegExp(char, 'g'), '　');
     }
   }
   return result;
 };
 
 const excludeSpecialChars = (char: string): boolean => {
-  return !isControlChar(char) && !isDiacriticalMark(char) && char !== ' ';
+  return !isControlChar(char) && !isDiacriticalMark(char) && char !== '　';
 };
 
 // 各グリッドで使用可能な文字のセットを作成
@@ -22,12 +22,12 @@ const gen1HiraganaChars = new Set(hiraganaGrid.flat().filter(excludeSpecialChars
 const gen1KatakanaChars = new Set(katakanaGrid.flat().filter(excludeSpecialChars));
 
 const gen2BoxHiraganaChars = new Set(twoGenBoxHiraganaGrid.flat().filter(char =>
-  !isControlChar(char) && !isDiacriticalMark(char) && char !== ' '
+  !isControlChar(char) && !isDiacriticalMark(char) && char !== '　'
 ));
 
 
 const gen2BoxKatakanaChars = new Set(twoGenBoxKatakanaGrid.flat().filter(char =>
-  !isControlChar(char) && !isDiacriticalMark(char) && char !== ' '
+  !isControlChar(char) && !isDiacriticalMark(char) && char !== '　'
 ));
 
 const gen2MailHiraganaChars = new Set(twoGenMailHiraganaGrid.flat().filter(excludeSpecialChars));
@@ -80,7 +80,7 @@ export const decomposeTextWithMode = (text: string, initialIsHiragana: boolean, 
     const chars = decomposed ? [decomposed[0], decomposed[1]] : [char];
 
     for (const c of chars) {
-      if (c === ' ' || c === 'ED') {
+      if (c === '　' || c === 'ED') {
         result.push(c);
         modes.push(currentIsHiragana);
         continue;

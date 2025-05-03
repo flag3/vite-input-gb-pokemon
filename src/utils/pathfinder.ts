@@ -26,7 +26,7 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
       inputCharCount++;
 
       // スペースの処理
-      if (currentChar === ' ') {
+      if (currentChar === '　') {
         let nextCharPosition: InternalPosition | null = null;
         if (i + 1 < text.length && text[i + 1] !== '゛' && text[i + 1] !== '゜') {
           const nextChar = text[i + 1];

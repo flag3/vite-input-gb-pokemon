@@ -16,7 +16,7 @@ export const findOptimalSpacePosition = (
 
   if (spacePositions.hiraganaSpaces.length === 0 && spacePositions.katakanaSpaces.length === 0) {
     return {
-      position: { char: ' ', x: currentPosition.x, y: currentPosition.y },
+      position: { char: '　', x: currentPosition.x, y: currentPosition.y },
       actions: ['A'],
       totalSteps: 1
     };
@@ -44,7 +44,7 @@ export const findOptimalSpacePosition = (
       const spaceToNextPosition: InternalPosition = {
         x: spacePos.x,
         y: spacePos.y,
-        char: ' '
+        char: '　'
       };
 
       const { distance: nextDistance } = calculateDistance(
@@ -84,7 +84,7 @@ export const findOptimalSpacePosition = (
       const spaceToNextPosition: InternalPosition = {
         x: spacePos.x,
         y: spacePos.y,
-        char: ' '
+        char: '　'
       };
 
       const { distance: nextDistance } = calculateDistance(
