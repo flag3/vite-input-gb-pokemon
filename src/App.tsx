@@ -234,6 +234,13 @@ function App() {
       setCurrentPosition({ x: 0, y: 0 });
       setCurrentCharIndex(0);
       setIsHiragana(false);
+      setStateHistory([{
+        position: { x: 0, y: 0 },
+        isHiragana: false,
+        charIndex: 0,
+        action: null,
+        inputChar: null
+      }]);
     }
     setIsPlaying(!isPlaying);
   };
