@@ -5,7 +5,7 @@ import { GRIDS, createGrid } from './data/characterGrids';
 import { findInputSequence } from './utils/pathfinder';
 import { decomposeTextWithMode, normalizeSpaces } from './utils/characterMapping';
 import { GameVersion, InputAction } from './types';
-import { MAX_CHAR_LIMITS } from './utils/constants';
+import { MAX_CHAR_LIMITS, DAKUTEN_REVERSE_MAP } from './utils/constants';
 import { calculateNextPosition, getConfirmButtonPosition } from './utils/gridNavigation';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -20,6 +20,7 @@ interface StateHistory {
   isHiragana: boolean;
   charIndex: number;
   action: InputAction | null;
+  inputChar: string | null;
 }
 
 function App() {
@@ -46,6 +47,35 @@ function App() {
     let inputCharCount = 0;
     const newPosition = { ...currentPosition };
     let newIsHiragana = isHiragana;
+    let currentInputChar: string | null = null;
+
+    const calculateDisplayTextLength = (history: StateHistory[]): number => {
+      let text = '';
+      let lastChar = '';
+
+      for (let i = 0; i < history.length; i++) {
+        const state = history[i];
+
+        if (state.action === 'B') {
+          if (text.length > 0) {
+            text = text.substring(0, text.length - 1);
+            lastChar = text.length > 0 ? text[text.length - 1] : '';
+          }
+        } else if (state.action === 'A' && state.inputChar) {
+          if (state.inputChar === '゛' || state.inputChar === '゜') {
+            if (lastChar && DAKUTEN_REVERSE_MAP[lastChar]?.[state.inputChar]) {
+              text = text.substring(0, text.length - 1) + DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
+              lastChar = DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
+            }
+          } else if (state.inputChar !== 'ED' && state.inputChar !== 'かな' && state.inputChar !== 'カナ') {
+            text += state.inputChar;
+            lastChar = state.inputChar;
+          }
+        }
+      }
+
+      return text.length;
+    };
 
     for (let i = 0; i < sequences.length; i++) {
       const sequence = sequences[i];
@@ -70,11 +100,36 @@ function App() {
             newPosition.y = 4;
           }
         } else if (action === 'A') {
-          if (inputCharCount === MAX_CHAR_LIMITS[currentVersion]) {
+          const grid = createGrid(currentVersion, newIsHiragana);
+          const charAtPosition = grid.grid.find(
+            item => item.x === newPosition.x && item.y === newPosition.y
+          );
+
+          if (charAtPosition) {
+            currentInputChar = charAtPosition.char;
+          }
+
+          const tempHistory = [...stateHistory, {
+            position: { ...newPosition },
+            isHiragana: newIsHiragana,
+            charIndex,
+            action,
+            inputChar: currentInputChar
+          }];
+
+          const newTextLength = calculateDisplayTextLength(tempHistory);
+
+          if (newTextLength >= MAX_CHAR_LIMITS[currentVersion] &&
+            currentInputChar &&
+            currentInputChar !== 'ED' &&
+            currentInputChar !== 'かな' &&
+            currentInputChar !== 'カナ') {
             const confirmPos = getConfirmButtonPosition(currentVersion);
             newPosition.x = confirmPos.x;
             newPosition.y = confirmPos.y;
           }
+        } else if (action === 'B') {
+          currentInputChar = "DELETE";
         } else if (action === '↑' || action === '↓' || action === '←' || action === '→') {
           const grid = createGrid(currentVersion, newIsHiragana);
           const nextPos = calculateNextPosition(newPosition, action, grid, inputCharCount);
@@ -88,7 +143,8 @@ function App() {
           position: { ...newPosition },
           isHiragana: newIsHiragana,
           charIndex,
-          action
+          action,
+          inputChar: currentInputChar
         }]);
 
         break;
@@ -101,7 +157,7 @@ function App() {
     setCurrentCharIndex(charIndex);
     setCurrentPosition(newPosition);
     setIsHiragana(newIsHiragana);
-  }, [currentStep, totalSteps, currentPosition, isHiragana, sequences, currentVersion]);
+  }, [currentStep, totalSteps, currentPosition, isHiragana, sequences, currentVersion, stateHistory]);
 
   useEffect(() => {
     if (!isPlaying || currentStep >= totalSteps) {
@@ -131,7 +187,8 @@ function App() {
         position: { x: 0, y: 0 },
         isHiragana: false,
         charIndex: 0,
-        action: null
+        action: null,
+        inputChar: null
       }]);
     }
   }, [sequences]);
@@ -365,6 +422,7 @@ function App() {
           sequences={sequences}
           currentStep={currentStep}
           currentCharIndex={currentCharIndex}
+          stateHistory={stateHistory}
         />
       </div>
     </div>

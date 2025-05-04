@@ -2,52 +2,57 @@ import React from 'react';
 import { InputPath } from '../types';
 import { DAKUTEN_REVERSE_MAP } from '../utils/constants';
 
+interface StateHistory {
+  position: { x: number; y: number };
+  isHiragana: boolean;
+  charIndex: number;
+  action: string | null;
+  inputChar: string | null;
+}
+
 interface InputSequenceProps {
   sequences: InputPath[];
   currentStep: number;
   currentCharIndex: number;
+  stateHistory: StateHistory[];
 }
 
-const getCurrentText = (sequences: InputPath[], currentStep: number): string => {
+const getCurrentText = (stateHistory: StateHistory[]): string => {
   let text = '';
-  let stepCount = 0;
-  let lastBaseChar = '';
+  let lastChar = '';
 
-  for (let i = 0; i < sequences.length; i++) {
-    const sequence = sequences[i];
-    const sequenceStepCount = stepCount + sequence.actions.length;
+  // stateHistoryからAアクションの入力文字と削除操作を追跡
+  for (let i = 0; i < stateHistory.length; i++) {
+    const state = stateHistory[i];
 
-    if (sequence.char === 'END') {
-      continue;
-    }
-
-    if (sequenceStepCount > currentStep) {
-      const actionIndex = currentStep - stepCount - 1;
-      if (actionIndex >= 0 && sequence.actions[actionIndex] === 'A') {
-        if (sequence.char === '゛' || sequence.char === '゜') {
-          if (lastBaseChar && DAKUTEN_REVERSE_MAP[lastBaseChar]?.[sequence.char]) {
-            text = text.slice(0, -1) + DAKUTEN_REVERSE_MAP[lastBaseChar][sequence.char];
-          }
-        } else {
-          text += sequence.char;
-          lastBaseChar = sequence.char;
-        }
+    if (state.action === 'B') {
+      // Bボタンで削除操作
+      if (text.length > 0) {
+        text = text.substring(0, text.length - 1);
+        // 最後の文字も更新
+        lastChar = text.length > 0 ? text[text.length - 1] : '';
       }
-      break;
-    } else {
-      const lastAction = sequence.actions[sequence.actions.length - 1];
-      if (lastAction === 'A') {
-        if (sequence.char === '゛' || sequence.char === '゜') {
-          if (lastBaseChar && DAKUTEN_REVERSE_MAP[lastBaseChar]?.[sequence.char]) {
-            text = text.slice(0, -1) + DAKUTEN_REVERSE_MAP[lastBaseChar][sequence.char];
+    } else if (state.action === 'A' && state.inputChar) {
+      // 濁点・半濁点の処理
+      if (state.inputChar === '゛' || state.inputChar === '゜') {
+        // 最後の文字に濁点・半濁点を適用できるかチェック
+        if (lastChar && DAKUTEN_REVERSE_MAP[lastChar]?.[state.inputChar]) {
+          // 最後の文字を濁点・半濁点付きの文字に置き換える
+          text = text.substring(0, text.length - 1) + DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
+          lastChar = DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
+        }
+        // 適用できない場合は何もしない
+      } else {
+        // EDは終了ボタンなので表示しない
+        if (state.inputChar !== 'ED' && state.inputChar !== 'けってい') {
+          // かな/カナ切り替えボタンも表示しない
+          if (state.inputChar !== 'かな' && state.inputChar !== 'カナ') {
+            text += state.inputChar;
+            lastChar = state.inputChar;
           }
-        } else {
-          text += sequence.char;
-          lastBaseChar = sequence.char;
         }
       }
     }
-    stepCount = sequenceStepCount;
   }
 
   return text;
@@ -56,9 +61,10 @@ const getCurrentText = (sequences: InputPath[], currentStep: number): string => 
 export const InputSequence: React.FC<InputSequenceProps> = ({
   sequences,
   currentStep,
-  currentCharIndex
+  currentCharIndex,
+  stateHistory
 }) => {
-  const currentText = getCurrentText(sequences, currentStep);
+  const currentText = getCurrentText(stateHistory);
 
   const formatText = (text: string) => {
     const lines = text.match(/.{1,16}/g) || [];
@@ -77,7 +83,7 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
         whiteSpace: 'pre-wrap',
         wordBreak: 'break-all'
       }}
-      className="sequence-display">
+        className="sequence-display">
         <div>{formatText(currentText)}<span style={{ animation: 'blink 1s infinite' }}>|</span></div>
       </div>
 
@@ -97,7 +103,7 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
               borderRadius: '4px',
               transition: 'background-color 0.3s'
             }}
-            className={`sequence-item ${isCurrentSequence ? 'current' : ''}`}>
+              className={`sequence-item ${isCurrentSequence ? 'current' : ''}`}>
               <span style={{
                 marginRight: '8px',
                 fontWeight: 'bold',
