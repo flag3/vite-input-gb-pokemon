@@ -79,9 +79,34 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
       const targetPosition = targetIsHiragana ? hiraganaResult!.position : katakanaResult!.position;
 
       // 移動アクションを追加
-      const { actions: moveActions } = calculateDistance(currentPosition, targetPosition, grid, inputCharCount);
-      currentActions.push(...moveActions);
-      currentActions.push('A');
+      const { actions: directMoveActions } = calculateDistance(currentPosition, targetPosition, grid, inputCharCount);
+      const directActions: InputAction[] = [...directMoveActions, 'A'];
+
+      let chosenActions = directActions;
+
+      // GEN1かつ5文字目または4文字目で連続文字の場合にED→削除ハックを検討
+      if (grid.version === 'GEN1') {
+        const limit = MAX_CHAR_LIMITS[grid.version];
+        // 5文字目到達時 (最後の文字) のハック
+        if (inputCharCount === limit) {
+          const prev = text[i - 1];
+          if (prev !== '゛' && prev !== '゜') {
+            const fixedPos: InternalPosition = { ...getFixedPositionForDakuten(grid.version), char: currentPosition.char };
+            const { actions: moveFromED } = calculateDistance(fixedPos, targetPosition, grid, inputCharCount);
+            const hack: InputAction[] = ['A', 'B', ...moveFromED, 'A'];
+            if (hack.length < directActions.length) chosenActions = hack;
+          }
+        }
+        // 4文字目で次文字(5文字目)が同じ場合のハック
+        if (inputCharCount === limit - 1 && text[i] === text[i + 1]) {
+          const fixedPos: InternalPosition = { ...getFixedPositionForDakuten(grid.version), char: currentPosition.char };
+          const { actions: moveFromED } = calculateDistance(fixedPos, targetPosition, grid, inputCharCount);
+          const hack: InputAction[] = ['A', 'A', 'B', 'B', ...moveFromED, 'A'];
+          if (hack.length < directActions.length) chosenActions = hack;
+        }
+      }
+
+      currentActions.push(...chosenActions);
 
       sequences.push({
         char: currentChar,
@@ -95,31 +120,28 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
       if (i + 1 < text.length && (text[i + 1] === '゛' || text[i + 1] === '゜')) {
         const dakutenResult = findCharacterPosition(text[i + 1], grid);
         if (dakutenResult) {
-          const dakutenActions: InputAction[] = [];
-
-          // 文字数制限に達した場合の特別処理
+          // 標準ルート: 制限到達時はED起点、未達時は現在位置起点
           const isAtCharLimit = inputCharCount === MAX_CHAR_LIMITS[grid.version];
+          let normalActions: InputAction[];
           if (isAtCharLimit) {
-            const fixedStartPosition: InternalPosition = {
-              ...getFixedPositionForDakuten(grid.version),
-              char: currentPosition.char
-            };
-
-            const { actions: optimizedDakutenActions } = calculateDistance(fixedStartPosition, dakutenResult.position, grid, inputCharCount);
-            dakutenActions.push(...optimizedDakutenActions);
+            const fixedStart: InternalPosition = { ...getFixedPositionForDakuten(grid.version), char: currentPosition.char };
+            const { actions: optActions } = calculateDistance(fixedStart, dakutenResult.position, grid, inputCharCount);
+            normalActions = [...optActions, 'A'];
           } else {
-            const { actions: normalDakutenActions } = calculateDistance(currentPosition, dakutenResult.position, grid, inputCharCount);
-            dakutenActions.push(...normalDakutenActions);
+            const { actions: normalMoves } = calculateDistance(currentPosition, dakutenResult.position, grid, inputCharCount);
+            normalActions = [...normalMoves, 'A'];
           }
-
-          dakutenActions.push('A');
-
-          sequences.push({
-            char: text[i + 1],
-            actions: dakutenActions,
-            totalSteps: dakutenActions.length
-          });
-
+          // limit-1の場合にED削除ハックを検討
+          let chosenDakutenActions = normalActions;
+          if (grid.version === 'GEN1' && inputCharCount === MAX_CHAR_LIMITS[grid.version] - 1) {
+            const fixedPos: InternalPosition = { ...getFixedPositionForDakuten(grid.version), char: currentPosition.char };
+            const { actions: hackMoves } = calculateDistance(fixedPos, dakutenResult.position, grid, inputCharCount);
+            const hackActions: InputAction[] = ['A', 'B', ...hackMoves, 'A'];
+            if (hackActions.length < normalActions.length) {
+              chosenDakutenActions = hackActions;
+            }
+          }
+          sequences.push({ char: text[i + 1], actions: chosenDakutenActions, totalSteps: chosenDakutenActions.length });
           currentPosition = dakutenResult.position;
           i++;
         }
