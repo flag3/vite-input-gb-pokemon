@@ -97,8 +97,7 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
             if (hack.length < directActions.length) chosenActions = hack;
           }
         }
-        // 4文字目で次文字(5文字目)が同じ場合のハック
-        if (inputCharCount === limit - 1 && text[i] === text[i + 1]) {
+        if (inputCharCount === limit - 1) {
           const fixedPos: InternalPosition = { ...getFixedPositionForDakuten(grid.version), char: currentPosition.char };
           const { actions: moveFromED } = calculateDistance(fixedPos, targetPosition, grid, inputCharCount);
           const hack: InputAction[] = ['A', 'A', 'B', 'B', ...moveFromED, 'A'];
