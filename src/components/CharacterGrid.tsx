@@ -1,6 +1,7 @@
 import React from 'react';
 import { CharacterGrid as CharacterGridType, InputAction } from '../types';
 import { GROUPABLE_CHARS } from '../utils/constants';
+import { UI_CONSTANTS } from '../constants/ui';
 
 interface CharacterGridProps {
   grid: CharacterGridType;
@@ -53,33 +54,33 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({ grid, currentPosit
     <div style={{ position: 'relative' }}>
       <div className="grid-container" style={{
         display: 'grid',
-        gridTemplateColumns: `repeat(${grid.width}, 40px)`,
-        gap: '4px',
-        padding: '8px',
-        backgroundColor: '#f0f0f0',
-        borderRadius: '8px'
+        gridTemplateColumns: `repeat(${grid.width}, ${UI_CONSTANTS.GRID.CELL_SIZE}px)`,
+        gap: `${UI_CONSTANTS.GRID.GAP}px`,
+        padding: `${UI_CONSTANTS.GRID.PADDING}px`,
+        backgroundColor: UI_CONSTANTS.COLORS.BACKGROUND_LIGHT,
+        borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS * 2}px`
       }}>
         {groupedCells.map((cell, index) => (
           <div
             key={index}
             style={{
-              width: `${cell.width * 40 + (cell.width - 1) * 4}px`,
-              height: '40px',
+              width: `${cell.width * UI_CONSTANTS.GRID.CELL_SIZE + (cell.width - 1) * UI_CONSTANTS.GRID.GAP}px`,
+              height: `${UI_CONSTANTS.GRID.CELL_SIZE}px`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: cell.x.includes(currentPosition.x) && cell.y === currentPosition.y
-                ? '#2196f3'
+                ? UI_CONSTANTS.COLORS.PRIMARY
                 : 'white',
               color: cell.x.includes(currentPosition.x) && cell.y === currentPosition.y
                 ? 'white'
                 : 'black',
-              borderRadius: '4px',
+              borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS}px`,
               cursor: 'pointer',
               userSelect: 'none',
-              fontSize: '16px',
+              fontSize: `${UI_CONSTANTS.TYPOGRAPHY.FONT_SIZE_INPUT}px`,
               position: 'relative',
-              transition: 'background-color 0.2s',
+              transition: `background-color ${UI_CONSTANTS.ANIMATION.TRANSITION_DURATION}`,
               gridColumn: `${cell.x[0] + 1} / span ${cell.width}`
             }}
             className={`character-cell ${cell.x.includes(currentPosition.x) && cell.y === currentPosition.y ? 'active' : ''}`}
@@ -91,12 +92,12 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({ grid, currentPosit
                 top: '-20px',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                backgroundColor: '#4caf50',
+                backgroundColor: UI_CONSTANTS.COLORS.SUCCESS,
                 color: 'white',
                 padding: '2px 6px',
                 borderRadius: '4px',
-                fontSize: '12px',
-                animation: 'fadeOut 0.5s forwards'
+                fontSize: `${UI_CONSTANTS.TYPOGRAPHY.FONT_SIZE_SMALL}px`,
+                animation: `fadeOut ${UI_CONSTANTS.ANIMATION.FADE_OUT_DURATION} forwards`
               }}>
                 A
               </div>
@@ -108,14 +109,14 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({ grid, currentPosit
         {`
           @media (prefers-color-scheme: dark) {
             .grid-container {
-              background-color: #2a2a2a !important;
+              background-color: ${UI_CONSTANTS.COLORS.BACKGROUND_DARK} !important;
             }
             .character-cell {
-              background-color: #333 !important;
+              background-color: ${UI_CONSTANTS.COLORS.CARD_DARK} !important;
               color: rgba(255, 255, 255, 0.95) !important;
             }
             .character-cell.active {
-              background-color: #4a90e2 !important;
+              background-color: ${UI_CONSTANTS.COLORS.SECONDARY} !important;
               color: white !important;
             }
           }

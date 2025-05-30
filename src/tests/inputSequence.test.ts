@@ -245,7 +245,6 @@ describe('入力シーケンステスト', () => {
         console.warn(`  期待: ${formatActions(expectedActions)}`);
         console.warn(`  実際: ${formatActions(actualActions)}`);
 
-        // @ts-expect-error カスタムマッチャーの型定義
         expect(actualActions).toHaveSameStepsButDifferentActions(expectedActions);
       } else {
         expect(actualActions).toEqual(expectedActions);

@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { type FC } from 'react';
 import { CharacterGrid } from './components/CharacterGrid';
 import { InputSequence } from './components/InputSequence';
-import { GRIDS, createGrid } from './data/characterGrids';
-import { findInputSequence } from './utils/pathfinder';
-import { decomposeTextWithMode, normalizeSpaces } from './utils/characterMapping';
-import { GameVersion, InputAction } from './types';
-import { MAX_CHAR_LIMITS, DAKUTEN_REVERSE_MAP } from './utils/constants';
-import { calculateNextPosition, getConfirmButtonPosition } from './utils/gridNavigation';
+import { createGrid } from './data/characterGrids';
+import { UI_CONSTANTS } from './constants/ui';
+import { useInputProcessing } from './hooks/useInputProcessing';
+import { usePlayback } from './hooks/usePlayback';
+import { useResponsive } from './hooks/useResponsive';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
@@ -15,271 +14,36 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { IconButton, Slider, Tooltip } from '@mui/material';
 
-interface StateHistory {
-  position: { x: number; y: number };
-  isHiragana: boolean;
-  charIndex: number;
-  action: InputAction | null;
-  inputChar: string | null;
-}
 
-function App() {
-  const [inputText, setInputText] = useState('');
-  const [currentVersion, setCurrentVersion] = useState<GameVersion>('GEN1');
-  const [isHiragana, setIsHiragana] = useState(false);
-  const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
-  const [sequences, setSequences] = useState<ReturnType<typeof findInputSequence>>([]);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [currentCharIndex, setCurrentCharIndex] = useState(0);
-  const [currentAction, setCurrentAction] = useState<InputAction | null>(null);
-  const [playbackSpeed, setPlaybackSpeed] = useState(500);
-  const [stateHistory, setStateHistory] = useState<StateHistory[]>([]);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+const App: FC = () => {
+  const { inputText, currentVersion, sequences, handleTextChange, handleVersionChange } = useInputProcessing();
+  const {
+    isPlaying,
+    currentStep,
+    currentCharIndex,
+    currentAction,
+    playbackSpeed,
+    stateHistory,
+    currentPosition,
+    isHiragana,
+    totalSteps,
+    handleStepForward,
+    handleStepBackward,
+    handlePlayPause,
+    handleReset,
+    handleSpeedChange
+  } = usePlayback(inputText, currentVersion, sequences);
+  const { isMobile } = useResponsive();
 
-  const totalSteps = sequences.reduce((sum, seq) => sum + seq.actions.length, 0);
-
-  const handleStepForward = useCallback(() => {
-    if (currentStep >= totalSteps) return;
-
-    let stepCount = 0;
-    let charIndex = 0;
-    let inputCharCount = 0;
-    const newPosition = { ...currentPosition };
-    let newIsHiragana = isHiragana;
-    let currentInputChar: string | null = null;
-
-    const calculateDisplayTextLength = (history: StateHistory[]): number => {
-      let text = '';
-      let lastChar = '';
-
-      for (let i = 0; i < history.length; i++) {
-        const state = history[i];
-
-        if (state.action === 'B') {
-          if (text.length > 0) {
-            text = text.substring(0, text.length - 1);
-            lastChar = text.length > 0 ? text[text.length - 1] : '';
-          }
-        } else if (state.action === 'A' && state.inputChar) {
-          if (state.inputChar === '゛' || state.inputChar === '゜') {
-            if (lastChar && DAKUTEN_REVERSE_MAP[lastChar]?.[state.inputChar]) {
-              text = text.substring(0, text.length - 1) + DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
-              lastChar = DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
-            }
-          } else if (state.inputChar !== 'ED' && state.inputChar !== 'かな' && state.inputChar !== 'カナ') {
-            text += state.inputChar;
-            lastChar = state.inputChar;
-          }
-        }
-      }
-
-      return text.length;
-    };
-
-    for (let i = 0; i < sequences.length; i++) {
-      const sequence = sequences[i];
-      if (sequence.char !== '゛' && sequence.char !== '゜') {
-        inputCharCount++;
-      }
-      if (stepCount + sequence.actions.length > currentStep) {
-        charIndex = i;
-        const actionIndex = currentStep - stepCount;
-        const action = sequence.actions[actionIndex];
-
-        setCurrentAction(action);
-
-        if (action === 's') {
-          newIsHiragana = !newIsHiragana;
-        } else if (action === 'S' && currentVersion !== 'GEN1') {
-          if (currentVersion === 'GEN2_NICKNAME' || currentVersion === 'GEN2_BOX') {
-            newPosition.x = 14;
-            newPosition.y = 4;
-          } else if (currentVersion === 'GEN2_MAIL') {
-            newPosition.x = 15;
-            newPosition.y = 4;
-          }
-        } else if (action === 'A') {
-          const grid = createGrid(currentVersion, newIsHiragana);
-          const charAtPosition = grid.grid.find(
-            item => item.x === newPosition.x && item.y === newPosition.y
-          );
-
-          if (charAtPosition) {
-            currentInputChar = charAtPosition.char;
-          }
-
-          const tempHistory = [...stateHistory, {
-            position: { ...newPosition },
-            isHiragana: newIsHiragana,
-            charIndex,
-            action,
-            inputChar: currentInputChar
-          }];
-
-          const newTextLength = calculateDisplayTextLength(tempHistory);
-
-          if (newTextLength >= MAX_CHAR_LIMITS[currentVersion] &&
-            currentInputChar &&
-            currentInputChar !== 'ED' &&
-            currentInputChar !== 'かな' &&
-            currentInputChar !== 'カナ') {
-            const confirmPos = getConfirmButtonPosition(currentVersion);
-            newPosition.x = confirmPos.x;
-            newPosition.y = confirmPos.y;
-          }
-        } else if (action === 'B') {
-          currentInputChar = "DELETE";
-        } else if (action === '↑' || action === '↓' || action === '←' || action === '→') {
-          const grid = createGrid(currentVersion, newIsHiragana);
-          const nextPos = calculateNextPosition(newPosition, action, grid, inputCharCount);
-          newPosition.x = nextPos.x;
-          newPosition.y = nextPos.y;
-        }
-
-        setCurrentAction(action);
-
-        setStateHistory(prev => [...prev, {
-          position: { ...newPosition },
-          isHiragana: newIsHiragana,
-          charIndex,
-          action,
-          inputChar: currentInputChar
-        }]);
-
-        break;
-      }
-
-      stepCount += sequence.actions.length;
-    }
-
-    setCurrentStep(prev => prev + 1);
-    setCurrentCharIndex(charIndex);
-    setCurrentPosition(newPosition);
-    setIsHiragana(newIsHiragana);
-  }, [currentStep, totalSteps, currentPosition, isHiragana, sequences, currentVersion, stateHistory]);
-
-  useEffect(() => {
-    if (!isPlaying || currentStep >= totalSteps) {
-      setIsPlaying(false);
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      handleStepForward();
-    }, playbackSpeed);
-
-    return () => clearTimeout(timer);
-  }, [isPlaying, currentStep, totalSteps, playbackSpeed, handleStepForward]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    if (sequences.length > 0) {
-      setStateHistory([{
-        position: { x: 0, y: 0 },
-        isHiragana: false,
-        charIndex: 0,
-        action: null,
-        inputChar: null
-      }]);
-    }
-  }, [sequences]);
-
-  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const text = normalizeSpaces(e.target.value);
-    const maxLength = MAX_CHAR_LIMITS[currentVersion];
-    const truncatedText = text.slice(0, maxLength);
-
-    setInputText(truncatedText);
-    setCurrentStep(0);
-    setCurrentCharIndex(0);
-    setCurrentPosition({ x: 0, y: 0 });
-    setIsPlaying(false);
-    setIsHiragana(false);
-    if (truncatedText) {
-      const grid = { ...GRIDS[currentVersion], isHiragana: false };
-      const { chars, modes } = decomposeTextWithMode(truncatedText, false, currentVersion);
-      const newSequences = findInputSequence(grid, chars.join(''), modes);
-      setSequences(newSequences);
-    }
-  };
-
-  const handleVersionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const version = e.target.value as GameVersion;
-    setCurrentVersion(version);
-    setCurrentPosition({ x: 0, y: 0 });
-    setCurrentStep(0);
-    setCurrentCharIndex(0);
-    setIsPlaying(false);
-    setIsHiragana(false);
-    if (inputText) {
-      const grid = { ...GRIDS[version], isHiragana: false };
-      const { chars, modes } = decomposeTextWithMode(inputText, false, version);
-      const newSequences = findInputSequence(grid, chars.join(''), modes);
-      setSequences(newSequences);
-    }
-  };
-
-  const handlePlayPause = () => {
-    if (currentStep >= totalSteps) {
-      setCurrentStep(0);
-      setCurrentPosition({ x: 0, y: 0 });
-      setCurrentCharIndex(0);
-      setIsHiragana(false);
-      setStateHistory([{
-        position: { x: 0, y: 0 },
-        isHiragana: false,
-        charIndex: 0,
-        action: null,
-        inputChar: null
-      }]);
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const handleReset = () => {
-    setCurrentStep(0);
-    setCurrentPosition({ x: 0, y: 0 });
-    setCurrentCharIndex(0);
-    setIsPlaying(false);
-    setIsHiragana(false);
-  };
-
-  const handleSpeedChange = (_event: Event, value: number | number[]) => {
-    setPlaybackSpeed(1000 - (Array.isArray(value) ? value[0] : value));
-  };
-
-  const handleStepBackward = () => {
-    if (currentStep <= 0) return;
-
-    const newStep = currentStep - 1;
-    const previousState = stateHistory[newStep];
-
-    setCurrentStep(newStep);
-    setCurrentCharIndex(previousState.charIndex);
-    setCurrentPosition(previousState.position);
-    setIsHiragana(previousState.isHiragana);
-    setCurrentAction(previousState.action);
-
-    setStateHistory(prev => prev.slice(0, -1));
-  };
 
   return (
     <div style={{
-      maxWidth: '1200px',
+      maxWidth: `${UI_CONSTANTS.LAYOUT.MAX_WIDTH}px`,
       margin: '0 auto',
-      padding: '20px',
+      padding: `${UI_CONSTANTS.LAYOUT.CONTAINER_PADDING}px`,
       display: 'grid',
-      gridTemplateColumns: isMobile ? '1fr' : '1fr 400px',
-      gap: '40px'
+      gridTemplateColumns: isMobile ? '1fr' : `1fr ${UI_CONSTANTS.LAYOUT.SIDEBAR_WIDTH}px`,
+      gap: `${UI_CONSTANTS.LAYOUT.SECTION_GAP}px`
     }}>
       <div>
         <div style={{
@@ -316,9 +80,9 @@ function App() {
             placeholder={(currentVersion === 'GEN1' || currentVersion === "GEN2_NICKNAME") ? "Enter nickname" : currentVersion === 'GEN2_BOX' ? "Enter box name" : "Enter mail"}
             style={{
               width: '100%',
-              padding: '8px',
-              fontSize: '16px',
-              borderRadius: '4px',
+              padding: `${UI_CONSTANTS.GRID.PADDING}px`,
+              fontSize: `${UI_CONSTANTS.TYPOGRAPHY.FONT_SIZE_INPUT}px`,
+              borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS}px`,
               border: '1px solid #ccc'
             }}
           />
@@ -405,7 +169,7 @@ function App() {
           </div>
 
           <div style={{
-            color: '#666',
+            color: UI_CONSTANTS.COLORS.TEXT_MUTED,
             textAlign: isMobile ? 'center' : 'left'
           }}>
             Step: {currentStep} / {totalSteps}
@@ -434,6 +198,6 @@ function App() {
       </div>
     </div>
   );
-}
+};
 
 export default App;

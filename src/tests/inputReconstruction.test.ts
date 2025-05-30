@@ -128,11 +128,12 @@ describe('入力シーケンス検証テスト', () => {
 
       // バージョンに応じた追加のアサーション
       switch (version) {
-        case 'GEN1':
+        case 'GEN1': {
           // GEN1では決定キー(A)またはEND選択が最後に必要
           const lastAction = allActions[allActions.length - 1];
           expect(['A', 'S']).toContain(lastAction);
           break;
+        }
         case 'GEN2_NICKNAME':
         case 'GEN2_BOX':
         case 'GEN2_MAIL':
@@ -200,12 +201,10 @@ describe('入力シーケンス検証テスト', () => {
 
       // 各文字について、基本文字と濁点/半濁点が正しく含まれているか検証
       const expectedDakutenMark = input.includes('ぱ') || input.includes('パ') ? '゜' : '゛';
-      let dakutenCount = 0;
 
       for (const baseChar of baseChars) {
         const charCount = actualSequence.filter(char => char === baseChar).length;
         expect(charCount).toBeGreaterThan(0);
-        dakutenCount += charCount;
       }
 
       const markCount = actualSequence.filter(char => char === expectedDakutenMark).length;

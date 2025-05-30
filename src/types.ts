@@ -18,6 +18,32 @@ export interface CharacterGrid {
   grid: CharacterPosition[];
 }
 
+export interface StateHistory {
+  position: Position;
+  isHiragana: boolean;
+  charIndex: number;
+  action: InputAction | null;
+  inputChar: string | null;
+}
+
+export interface PlaybackState {
+  isPlaying: boolean;
+  currentStep: number;
+  currentCharIndex: number;
+  currentAction: InputAction | null;
+  playbackSpeed: number;
+  stateHistory: StateHistory[];
+  currentPosition: Position;
+  isHiragana: boolean;
+  totalSteps: number;
+}
+
+export interface InputProcessingState {
+  inputText: string;
+  currentVersion: GameVersion;
+  sequences: InputPath[];
+}
+
 export type InputPath = {
   char: string;
   actions: InputAction[];

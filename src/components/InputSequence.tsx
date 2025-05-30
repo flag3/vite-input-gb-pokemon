@@ -1,14 +1,7 @@
 import React from 'react';
-import { InputPath } from '../types';
+import { InputPath, StateHistory } from '../types';
 import { DAKUTEN_REVERSE_MAP } from '../utils/constants';
-
-interface StateHistory {
-  position: { x: number; y: number };
-  isHiragana: boolean;
-  charIndex: number;
-  action: string | null;
-  inputChar: string | null;
-}
+import { UI_CONSTANTS } from '../constants/ui';
 
 interface InputSequenceProps {
   sequences: InputPath[];
@@ -76,9 +69,9 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
       <div style={{
         marginBottom: '20px',
         padding: '10px',
-        backgroundColor: '#f5f5f5',
-        borderRadius: '4px',
-        fontSize: '18px',
+        backgroundColor: UI_CONSTANTS.COLORS.CARD_LIGHT,
+        borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS}px`,
+        fontSize: `${UI_CONSTANTS.TYPOGRAPHY.FONT_SIZE_DISPLAY}px`,
         fontFamily: 'monospace',
         whiteSpace: 'pre-wrap',
         wordBreak: 'break-all'
@@ -100,8 +93,8 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
               marginBottom: '8px',
               padding: '8px',
               backgroundColor: isCurrentSequence ? '#e3f2fd' : 'white',
-              borderRadius: '4px',
-              transition: 'background-color 0.3s'
+              borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS}px`,
+              transition: `background-color ${UI_CONSTANTS.ANIMATION.TRANSITION_DURATION}`
             }}
               className={`sequence-item ${isCurrentSequence ? 'current' : ''}`}>
               <span style={{
@@ -121,11 +114,11 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
                       key={actionIndex}
                       style={{
                         padding: '4px 8px',
-                        backgroundColor: isCurrentAction ? '#2196f3' : isCompleted ? '#a5d6a7' : '#e3f2fd',
+                        backgroundColor: isCurrentAction ? UI_CONSTANTS.COLORS.PRIMARY : isCompleted ? '#a5d6a7' : '#e3f2fd',
                         color: isCurrentAction ? 'white' : 'black',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        transition: 'all 0.3s'
+                        borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS}px`,
+                        fontSize: `${UI_CONSTANTS.TYPOGRAPHY.FONT_SIZE_BODY}px`,
+                        transition: `all ${UI_CONSTANTS.ANIMATION.TRANSITION_DURATION}`
                       }}
                       className={`action-step ${isCurrentAction ? 'current' : ''} ${isCompleted ? 'completed' : ''}`}
                     >
@@ -134,25 +127,25 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
                   );
                 })}
               </div>
-              <span style={{ marginLeft: 'auto', color: '#666' }}>
+              <span style={{ marginLeft: 'auto', color: UI_CONSTANTS.COLORS.TEXT_MUTED }}>
                 {sequence.actions.length} steps
               </span>
             </div>
           );
         })}
       </div>
-      <div style={{ color: '#666' }}>
+      <div style={{ color: UI_CONSTANTS.COLORS.TEXT_MUTED }}>
         Total steps: {sequences.reduce((sum, seq) => sum + seq.actions.length, 0)}
       </div>
       <style>
         {`
           @media (prefers-color-scheme: dark) {
             .sequence-display {
-              background-color: #2a2a2a !important;
+              background-color: ${UI_CONSTANTS.COLORS.BACKGROUND_DARK} !important;
               color: rgba(255, 255, 255, 0.95) !important;
             }
             .sequence-item {
-              background-color: #333 !important;
+              background-color: ${UI_CONSTANTS.COLORS.CARD_DARK} !important;
               color: rgba(255, 255, 255, 0.95) !important;
             }
             .sequence-item.current {
@@ -163,7 +156,7 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
               color: rgba(255, 255, 255, 0.95) !important;
             }
             .action-step.current {
-              background-color: #4a90e2 !important;
+              background-color: ${UI_CONSTANTS.COLORS.SECONDARY} !important;
               color: white !important;
             }
             .action-step.completed {

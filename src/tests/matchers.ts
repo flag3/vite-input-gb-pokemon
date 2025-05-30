@@ -5,12 +5,10 @@ interface CustomMatchers<R = unknown> {
   toHaveSameStepsButDifferentActions(expectedActions: InputAction[]): R;
 }
 
-declare global {
-  // @ts-ignore
-  namespace Vi {
-    interface Assertion extends CustomMatchers { }
-    interface AsymmetricMatchersContaining extends CustomMatchers { }
-  }
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+declare module 'vitest' {
+  interface Assertion extends CustomMatchers { }
+  interface AsymmetricMatchersContaining extends CustomMatchers { }
 }
 
 export function setupMatchers() {
