@@ -218,6 +218,33 @@ describe('入力シーケンステスト', () => {
         'S', 'A'
       ]
     },
+    {
+      input: '123',
+      version: 'GEN2_MAIL',
+      expectedActions: [
+        's', 'S', '↑', '→', 'A',
+        '→', 'A',
+        '→', 'A',
+        'S', 'A'
+      ]
+    },
+    {
+      input: '0123456789',
+      version: 'GEN2_MAIL',
+      expectedActions: [
+        's', 'S', '↑', '→', 'A',
+        '↓', '←', '↑', 'A',
+        '→', 'A',
+        '→', 'A',
+        '→', 'A',
+        '→', 'A',
+        '→', '→', 'A',
+        '→', 'A',
+        '→', 'A',
+        '→', 'A',
+        'S', 'A'
+      ]
+    },
   ];
 
   testCases.forEach((testCase, index) => {

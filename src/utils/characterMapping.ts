@@ -2,6 +2,23 @@ import { hiraganaGrid, katakanaGrid, twoGenBoxHiraganaGrid, twoGenBoxKatakanaGri
 import { GameVersion } from '../types';
 import { DAKUTEN_MAP, isDiacriticalMark, isControlChar, SPACE_CHARS } from './constants';
 
+// 半角から全角への変換マップ
+const HALFWIDTH_TO_FULLWIDTH_MAP: { [key: string]: string } = {
+  '!': '！',
+  '?': '？',
+  '/': '／',
+  '0': '０',
+  '1': '１',
+  '2': '２',
+  '3': '３',
+  '4': '４',
+  '5': '５',
+  '6': '６',
+  '7': '７',
+  '8': '８',
+  '9': '９'
+};
+
 // スペース文字を正規化する関数
 export const normalizeSpaces = (text: string): string => {
   let result = text;
@@ -9,6 +26,15 @@ export const normalizeSpaces = (text: string): string => {
     if (char !== '　') {
       result = result.replace(new RegExp(char, 'g'), '　');
     }
+  }
+  return result;
+};
+
+// 半角文字を全角に変換する関数
+export const normalizeHalfwidthChars = (text: string): string => {
+  let result = '';
+  for (const char of text) {
+    result += HALFWIDTH_TO_FULLWIDTH_MAP[char] || char;
   }
   return result;
 };
@@ -72,8 +98,8 @@ export const decomposeTextWithMode = (text: string, initialIsHiragana: boolean, 
   const modes: boolean[] = [];
   let currentIsHiragana = initialIsHiragana;
 
-  // スペースを正規化
-  const normalizedText = normalizeSpaces(text);
+  // スペースを正規化し、半角文字を全角に変換
+  const normalizedText = normalizeSpaces(normalizeHalfwidthChars(text));
 
   for (const char of normalizedText) {
     const decomposed = DAKUTEN_MAP[char];
