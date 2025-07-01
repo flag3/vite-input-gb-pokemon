@@ -6,7 +6,7 @@ import { calculateNextPosition, getConfirmButtonPosition } from '../utils/gridNa
 import { createGrid } from '../data/characterGrids';
 
 export const usePlayback = (
-  _inputText: string,
+  inputText: string,
   currentVersion: GameVersion,
   sequences: ReturnType<typeof findInputSequence>
 ) => {
@@ -180,6 +180,13 @@ export const usePlayback = (
     setCurrentCharIndex(0);
     setIsPlaying(false);
     setIsHiragana(false);
+    setStateHistory([{
+      position: { x: 0, y: 0 },
+      isHiragana: false,
+      charIndex: 0,
+      action: null,
+      inputChar: null
+    }]);
   }, []);
 
   const handleSpeedChange = useCallback((_event: Event, value: number | number[]) => {
@@ -210,6 +217,10 @@ export const usePlayback = (
       }]);
     }
   }, [sequences]);
+
+  useEffect(() => {
+    handleReset();
+  }, [inputText, currentVersion]);
 
   return {
     isPlaying,
