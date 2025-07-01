@@ -222,7 +222,7 @@ describe('入力シーケンステスト', () => {
       input: '123',
       version: 'GEN2_MAIL',
       expectedActions: [
-        's', 'S', '↑', '→', 'A',
+        's', '↑', '→', '↑', 'A',
         '→', 'A',
         '→', 'A',
         'S', 'A'
