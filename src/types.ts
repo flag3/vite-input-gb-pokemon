@@ -1,5 +1,5 @@
-export type GameVersion = 'GEN1' | 'GEN2_NICKNAME' | 'GEN2_BOX' | 'GEN2_MAIL';
-export type InputAction = 'A' | 'B' | 's' | 'S' | '→' | '←' | '↑' | '↓';
+export type GameVersion = "GEN1" | "GEN2_NICKNAME" | "GEN2_BOX" | "GEN2_MAIL";
+export type InputAction = "A" | "B" | "s" | "S" | "→" | "←" | "↑" | "↓";
 
 export interface Position {
   x: number;
@@ -48,4 +48,4 @@ export type InputPath = {
   char: string;
   actions: InputAction[];
   totalSteps: number;
-}; 
+};

@@ -1,7 +1,14 @@
-import { CharacterGrid, CharacterPosition, InputAction, Position } from '../types';
-import { calculateNextPosition } from './gridNavigation';
-import { HIRAGANA_KATAKANA_MAP } from './gridPositions';
-import { hiraganaGrid, katakanaGrid, twoGenBoxHiraganaGrid, twoGenBoxKatakanaGrid, twoGenMailHiraganaGrid, twoGenMailKatakanaGrid } from '../data/characterGrids';
+import {
+  hiraganaGrid,
+  katakanaGrid,
+  twoGenBoxHiraganaGrid,
+  twoGenBoxKatakanaGrid,
+  twoGenMailHiraganaGrid,
+  twoGenMailKatakanaGrid,
+} from "../data/characterGrids";
+import { CharacterGrid, CharacterPosition, InputAction, Position } from "../types";
+import { calculateNextPosition } from "./gridNavigation";
+import { HIRAGANA_KATAKANA_MAP } from "./gridPositions";
 
 /**
  * 内部で使用する位置情報の型
@@ -21,24 +28,27 @@ interface PositionWithActions {
 /**
  * 文字の位置を見つける
  */
-export const findCharacterPosition = (char: string, grid: CharacterGrid): { position: CharacterPosition, needsModeChange: boolean } | null => {
+export const findCharacterPosition = (
+  char: string,
+  grid: CharacterGrid,
+): { position: CharacterPosition; needsModeChange: boolean } | null => {
   let hiraganaBaseGrid: string[][];
   let katakanaBaseGrid: string[][];
 
   switch (grid.version) {
-    case 'GEN1':
+    case "GEN1":
       hiraganaBaseGrid = hiraganaGrid;
       katakanaBaseGrid = katakanaGrid;
       break;
-    case 'GEN2_NICKNAME':
+    case "GEN2_NICKNAME":
       hiraganaBaseGrid = twoGenBoxHiraganaGrid;
       katakanaBaseGrid = twoGenBoxKatakanaGrid;
       break;
-    case 'GEN2_BOX':
+    case "GEN2_BOX":
       hiraganaBaseGrid = twoGenBoxHiraganaGrid;
       katakanaBaseGrid = twoGenBoxKatakanaGrid;
       break;
-    case 'GEN2_MAIL':
+    case "GEN2_MAIL":
       hiraganaBaseGrid = twoGenMailHiraganaGrid;
       katakanaBaseGrid = twoGenMailKatakanaGrid;
       break;
@@ -51,13 +61,13 @@ export const findCharacterPosition = (char: string, grid: CharacterGrid): { posi
       if (currentGrid[y][x] === char) {
         return {
           position: { char, x, y },
-          needsModeChange: false
+          needsModeChange: false,
         };
       }
       if (HIRAGANA_KATAKANA_MAP[char]?.includes(currentGrid[y][x])) {
         return {
           position: { char: currentGrid[y][x], x, y },
-          needsModeChange: false
+          needsModeChange: false,
         };
       }
     }
@@ -70,13 +80,13 @@ export const findCharacterPosition = (char: string, grid: CharacterGrid): { posi
       if (otherGrid[y][x] === char) {
         return {
           position: { char, x, y },
-          needsModeChange: true
+          needsModeChange: true,
         };
       }
       if (HIRAGANA_KATAKANA_MAP[char]?.includes(otherGrid[y][x])) {
         return {
           position: { char: otherGrid[y][x], x, y },
-          needsModeChange: true
+          needsModeChange: true,
         };
       }
     }
@@ -88,13 +98,18 @@ export const findCharacterPosition = (char: string, grid: CharacterGrid): { posi
 /**
  * 2点間の最短経路を計算する
  */
-export const calculateDistance = (from: InternalPosition, to: InternalPosition, grid: CharacterGrid, inputCharCount?: number): { distance: number, actions: InputAction[] } => {
+export const calculateDistance = (
+  from: InternalPosition,
+  to: InternalPosition,
+  grid: CharacterGrid,
+  inputCharCount?: number,
+): { distance: number; actions: InputAction[] } => {
   const queue: PositionWithActions[] = [{ position: from, actions: [] }];
   const visited = new Set<string>();
-  const directions: InputAction[] = ['↑', '↓', '←', '→'];
+  const directions: InputAction[] = ["↑", "↓", "←", "→"];
 
-  if (grid.version !== 'GEN1') {
-    directions.push('S');
+  if (grid.version !== "GEN1") {
+    directions.push("S");
   }
 
   visited.add(`${from.x},${from.y}`);
@@ -106,7 +121,7 @@ export const calculateDistance = (from: InternalPosition, to: InternalPosition, 
     if (position.x === to.x && position.y === to.y) {
       return {
         distance: actions.length,
-        actions
+        actions,
       };
     }
 
@@ -118,7 +133,7 @@ export const calculateDistance = (from: InternalPosition, to: InternalPosition, 
         visited.add(key);
         queue.push({
           position: { ...nextPosition, char: position.char },
-          actions: [...actions, direction]
+          actions: [...actions, direction],
         });
       }
     }
@@ -126,6 +141,6 @@ export const calculateDistance = (from: InternalPosition, to: InternalPosition, 
 
   return {
     distance: 0,
-    actions: []
+    actions: [],
   };
-}; 
+};
