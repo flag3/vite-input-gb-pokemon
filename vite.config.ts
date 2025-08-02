@@ -3,6 +3,6 @@ import { defineConfig } from "vite";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/vite-input-GB-Pokemon/",
+  base: "/vite-input-gb-pokemon/",
   plugins: [react()],
 });
