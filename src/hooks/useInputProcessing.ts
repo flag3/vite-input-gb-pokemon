@@ -1,7 +1,7 @@
-import { GRIDS } from "../data/characterGrids";
+import { GRIDS } from "../constants/characterGrids";
+import { MAX_CHAR_LIMITS } from "../constants/gameConstants";
 import { GameVersion } from "../types";
 import { decomposeTextWithMode, normalizeSpaces } from "../utils/characterMapping";
-import { MAX_CHAR_LIMITS } from "../utils/constants";
 import { findInputSequence } from "../utils/pathfinder";
 import { useState, useCallback } from "react";
 

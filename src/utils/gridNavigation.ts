@@ -1,5 +1,5 @@
+import { MAX_CHAR_LIMITS } from "../constants/gameConstants";
 import { InputAction, CharacterGrid, Position } from "../types";
-import { MAX_CHAR_LIMITS } from "./constants";
 
 /**
  * キー操作に応じた次の位置を計算します

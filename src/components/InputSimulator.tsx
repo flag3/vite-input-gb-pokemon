@@ -1,5 +1,5 @@
+import { createGrid } from "../constants/characterGrids";
 import { UI_CONSTANTS } from "../constants/ui";
-import { createGrid } from "../data/characterGrids";
 import { useInputProcessing } from "../hooks/useInputProcessing";
 import { usePlayback } from "../hooks/usePlayback";
 import { useResponsive } from "../hooks/useResponsive";

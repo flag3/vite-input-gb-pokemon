@@ -1,4 +1,4 @@
-import { GameVersion, InputAction } from "../types";
+import { InputAction } from "../../types";
 import { expect } from "vitest";
 
 interface CustomMatchers<R = unknown> {
@@ -11,7 +11,7 @@ declare module "vitest" {
   interface AsymmetricMatchersContaining extends CustomMatchers {}
 }
 
-export function setupMatchers() {
+export function setupCustomMatchers() {
   expect.extend({
     toHaveSameStepsButDifferentActions(actualActions: InputAction[], expectedActions: InputAction[]) {
       // 配列の長さが同じかどうかをチェック（ステップ数が同じ）
@@ -37,14 +37,4 @@ export function setupMatchers() {
       };
     },
   });
-}
-
-/**
- * 入力テストケースのインターフェース
- */
-export interface InputTestCase {
-  input: string;
-  version: GameVersion;
-  expectedActions: InputAction[];
-  expectedTotalSteps?: number;
 }

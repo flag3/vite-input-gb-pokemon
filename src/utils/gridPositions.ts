@@ -1,4 +1,4 @@
-import { createGrid } from "../data/characterGrids";
+import { createGrid } from "../constants/characterGrids";
 import { CharacterPosition, Position, GameVersion } from "../types";
 
 /**

@@ -5,9 +5,9 @@ import {
   twoGenBoxKatakanaGrid,
   twoGenMailHiraganaGrid,
   twoGenMailKatakanaGrid,
-} from "../data/characterGrids";
+} from "../constants/characterGrids";
+import { DAKUTEN_MAP, isDiacriticalMark, isControlChar, SPACE_CHARS } from "../constants/gameConstants";
 import { GameVersion } from "../types";
-import { DAKUTEN_MAP, isDiacriticalMark, isControlChar, SPACE_CHARS } from "./constants";
 
 // 半角から全角への変換マップ
 const HALFWIDTH_TO_FULLWIDTH_MAP: { [key: string]: string } = {

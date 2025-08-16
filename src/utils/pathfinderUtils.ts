@@ -5,7 +5,7 @@ import {
   twoGenBoxKatakanaGrid,
   twoGenMailHiraganaGrid,
   twoGenMailKatakanaGrid,
-} from "../data/characterGrids";
+} from "../constants/characterGrids";
 import { CharacterGrid, CharacterPosition, InputAction, Position } from "../types";
 import { calculateNextPosition } from "./gridNavigation";
 import { HIRAGANA_KATAKANA_MAP } from "./gridPositions";

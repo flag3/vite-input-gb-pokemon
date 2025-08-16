@@ -1,5 +1,5 @@
+import { MAX_CHAR_LIMITS } from "../constants/gameConstants";
 import { CharacterGrid, InputAction, InputPath } from "../types";
-import { MAX_CHAR_LIMITS } from "./constants";
 import { getFixedPositionForDakuten } from "./gridPositions";
 import { InternalPosition, findCharacterPosition, calculateDistance } from "./pathfinderUtils";
 import { findOptimalSpacePosition } from "./spacePathfinder";
