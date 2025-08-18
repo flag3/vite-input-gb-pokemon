@@ -6,7 +6,12 @@ import {
   twoGenMailHiraganaGrid,
   twoGenMailKatakanaGrid,
 } from "../constants/characterGrids";
-import { DAKUTEN_MAP, isDiacriticalMark, isControlChar, SPACE_CHARS } from "../constants/gameConstants";
+import {
+  DAKUTEN_MAP,
+  isDiacriticalMark,
+  isControlChar,
+  SPACE_CHARS,
+} from "../constants/gameConstants";
 import { GameVersion } from "../types";
 
 // 半角から全角への変換マップ
@@ -51,19 +56,37 @@ const excludeSpecialChars = (char: string): boolean => {
 };
 
 // 各グリッドで使用可能な文字のセットを作成
-const gen1HiraganaChars = new Set(hiraganaGrid.flat().filter(excludeSpecialChars));
-const gen1KatakanaChars = new Set(katakanaGrid.flat().filter(excludeSpecialChars));
+const gen1HiraganaChars = new Set(
+  hiraganaGrid.flat().filter(excludeSpecialChars),
+);
+const gen1KatakanaChars = new Set(
+  katakanaGrid.flat().filter(excludeSpecialChars),
+);
 
 const gen2BoxHiraganaChars = new Set(
-  twoGenBoxHiraganaGrid.flat().filter((char) => !isControlChar(char) && !isDiacriticalMark(char) && char !== "　"),
+  twoGenBoxHiraganaGrid
+    .flat()
+    .filter(
+      (char) =>
+        !isControlChar(char) && !isDiacriticalMark(char) && char !== "　",
+    ),
 );
 
 const gen2BoxKatakanaChars = new Set(
-  twoGenBoxKatakanaGrid.flat().filter((char) => !isControlChar(char) && !isDiacriticalMark(char) && char !== "　"),
+  twoGenBoxKatakanaGrid
+    .flat()
+    .filter(
+      (char) =>
+        !isControlChar(char) && !isDiacriticalMark(char) && char !== "　",
+    ),
 );
 
-const gen2MailHiraganaChars = new Set(twoGenMailHiraganaGrid.flat().filter(excludeSpecialChars));
-const gen2MailKatakanaChars = new Set(twoGenMailKatakanaGrid.flat().filter(excludeSpecialChars));
+const gen2MailHiraganaChars = new Set(
+  twoGenMailHiraganaGrid.flat().filter(excludeSpecialChars),
+);
+const gen2MailKatakanaChars = new Set(
+  twoGenMailKatakanaGrid.flat().filter(excludeSpecialChars),
+);
 
 const isHiragana = (char: string, version: GameVersion): boolean => {
   if (isDiacriticalMark(char)) return false;
@@ -131,7 +154,10 @@ export const decomposeTextWithMode = (
       const charIsHiragana = isHiragana(c, version);
       const charIsKatakana = isKatakana(c, version);
 
-      if ((charIsHiragana && !currentIsHiragana) || (charIsKatakana && currentIsHiragana)) {
+      if (
+        (charIsHiragana && !currentIsHiragana) ||
+        (charIsKatakana && currentIsHiragana)
+      ) {
         currentIsHiragana = !currentIsHiragana;
       }
 

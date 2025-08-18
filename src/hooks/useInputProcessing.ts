@@ -1,14 +1,19 @@
 import { GRIDS } from "../constants/characterGrids";
 import { MAX_CHAR_LIMITS } from "../constants/gameConstants";
 import { GameVersion } from "../types";
-import { decomposeTextWithMode, normalizeSpaces } from "../utils/characterMapping";
+import {
+  decomposeTextWithMode,
+  normalizeSpaces,
+} from "../utils/characterMapping";
 import { findInputSequence } from "../utils/pathfinder";
 import { useState, useCallback } from "react";
 
 export const useInputProcessing = () => {
   const [inputText, setInputText] = useState("");
   const [currentVersion, setCurrentVersion] = useState<GameVersion>("GEN1");
-  const [sequences, setSequences] = useState<ReturnType<typeof findInputSequence>>([]);
+  const [sequences, setSequences] = useState<
+    ReturnType<typeof findInputSequence>
+  >([]);
 
   const handleTextChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,7 +25,11 @@ export const useInputProcessing = () => {
 
       if (truncatedText) {
         const grid = { ...GRIDS[currentVersion], isHiragana: false };
-        const { chars, modes } = decomposeTextWithMode(truncatedText, false, currentVersion);
+        const { chars, modes } = decomposeTextWithMode(
+          truncatedText,
+          false,
+          currentVersion,
+        );
         const newSequences = findInputSequence(grid, chars.join(""), modes);
         setSequences(newSequences);
       } else {
@@ -37,7 +46,11 @@ export const useInputProcessing = () => {
 
       if (inputText) {
         const grid = { ...GRIDS[version], isHiragana: false };
-        const { chars, modes } = decomposeTextWithMode(inputText, false, version);
+        const { chars, modes } = decomposeTextWithMode(
+          inputText,
+          false,
+          version,
+        );
         const newSequences = findInputSequence(grid, chars.join(""), modes);
         setSequences(newSequences);
       }

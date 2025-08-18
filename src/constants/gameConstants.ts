@@ -10,11 +10,23 @@ export const MAX_CHAR_LIMITS: Record<GameVersion, number> = {
 
 // 特殊文字の判定
 export const isControlChar = (char: string): boolean => {
-  return char === "ED" || char === "カナ" || char === "かな" || char === "ていせい" || char === "けってい";
+  return (
+    char === "ED" ||
+    char === "カナ" ||
+    char === "かな" ||
+    char === "ていせい" ||
+    char === "けってい"
+  );
 };
 
 export const isDiacriticalMark = (char: string): boolean => {
-  return char === "゛" || char === "゜" || char === "ー" || char === "リ" || char === "へ";
+  return (
+    char === "゛" ||
+    char === "゜" ||
+    char === "ー" ||
+    char === "リ" ||
+    char === "へ"
+  );
 };
 
 export const SPACE_CHARS = [" ", "　"];

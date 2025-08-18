@@ -121,7 +121,15 @@ export const InputControls: FC<InputControlsProps> = ({
             justifyContent: isMobile ? "center" : "flex-start",
           }}
         >
-          <Tooltip title={isPlaying ? "Pause" : currentStep >= totalSteps ? "Play from start" : "Play"}>
+          <Tooltip
+            title={
+              isPlaying
+                ? "Pause"
+                : currentStep >= totalSteps
+                  ? "Play from start"
+                  : "Play"
+            }
+          >
             <IconButton onClick={onPlayPause} color="primary" size="large">
               {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
             </IconButton>
@@ -135,7 +143,12 @@ export const InputControls: FC<InputControlsProps> = ({
 
           <Tooltip title="Previous">
             <span>
-              <IconButton onClick={onStepBackward} disabled={currentStep === 0} color="primary" size="large">
+              <IconButton
+                onClick={onStepBackward}
+                disabled={currentStep === 0}
+                color="primary"
+                size="large"
+              >
                 <ArrowBackIcon />
               </IconButton>
             </span>
@@ -143,7 +156,12 @@ export const InputControls: FC<InputControlsProps> = ({
 
           <Tooltip title="Next">
             <span>
-              <IconButton onClick={onStepForward} disabled={currentStep >= totalSteps} color="primary" size="large">
+              <IconButton
+                onClick={onStepForward}
+                disabled={currentStep >= totalSteps}
+                color="primary"
+                size="large"
+              >
                 <ArrowForwardIcon />
               </IconButton>
             </span>
@@ -168,7 +186,9 @@ export const InputControls: FC<InputControlsProps> = ({
             min={0}
             max={900}
             valueLabelDisplay="auto"
-            valueLabelFormat={(value) => `${((1000 - value) / 1000).toFixed(2)}s`}
+            valueLabelFormat={(value) =>
+              `${((1000 - value) / 1000).toFixed(2)}s`
+            }
           />
         </div>
 

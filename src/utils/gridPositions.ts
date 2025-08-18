@@ -16,7 +16,10 @@ export const HIRAGANA_KATAKANA_MAP: Record<string, string[]> = {
  */
 export const getSpacePositions = (
   version: GameVersion,
-): { hiraganaSpaces: CharacterPosition[]; katakanaSpaces: CharacterPosition[] } => {
+): {
+  hiraganaSpaces: CharacterPosition[];
+  katakanaSpaces: CharacterPosition[];
+} => {
   // ひらがなとカタカナのグリッドを取得
   const hiraganaGrid = createGrid(version, true);
   const katakanaGrid = createGrid(version, false);

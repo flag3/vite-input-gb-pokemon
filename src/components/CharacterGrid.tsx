@@ -9,7 +9,11 @@ interface CharacterGridProps {
   currentAction: InputAction | null;
 }
 
-export const CharacterGrid: React.FC<CharacterGridProps> = ({ grid, currentPosition, currentAction }) => {
+export const CharacterGrid: React.FC<CharacterGridProps> = ({
+  grid,
+  currentPosition,
+  currentAction,
+}) => {
   const getGroupedCells = () => {
     const cells: {
       char: string;
@@ -20,7 +24,9 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({ grid, currentPosit
 
     grid.grid.forEach((char) => {
       if (GROUPABLE_CHARS.includes(char.char)) {
-        const existingGroup = cells.find((cell) => cell.char === char.char && cell.y === char.y);
+        const existingGroup = cells.find(
+          (cell) => cell.char === char.char && cell.y === char.y,
+        );
 
         if (existingGroup) {
           existingGroup.x.push(char.x);
@@ -71,10 +77,15 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({ grid, currentPosit
               alignItems: "center",
               justifyContent: "center",
               backgroundColor:
-                cell.x.includes(currentPosition.x) && cell.y === currentPosition.y
+                cell.x.includes(currentPosition.x) &&
+                cell.y === currentPosition.y
                   ? UI_CONSTANTS.COLORS.PRIMARY
                   : "white",
-              color: cell.x.includes(currentPosition.x) && cell.y === currentPosition.y ? "white" : "black",
+              color:
+                cell.x.includes(currentPosition.x) &&
+                cell.y === currentPosition.y
+                  ? "white"
+                  : "black",
               borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS}px`,
               cursor: "pointer",
               userSelect: "none",
@@ -86,24 +97,26 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({ grid, currentPosit
             className={`character-cell ${cell.x.includes(currentPosition.x) && cell.y === currentPosition.y ? "active" : ""}`}
           >
             {cell.char}
-            {cell.x.includes(currentPosition.x) && cell.y === currentPosition.y && currentAction === "A" && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "-20px",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  backgroundColor: UI_CONSTANTS.COLORS.SUCCESS,
-                  color: "white",
-                  padding: "2px 6px",
-                  borderRadius: "4px",
-                  fontSize: `${UI_CONSTANTS.TYPOGRAPHY.FONT_SIZE_SMALL}px`,
-                  animation: `fadeOut ${UI_CONSTANTS.ANIMATION.FADE_OUT_DURATION} forwards`,
-                }}
-              >
-                A
-              </div>
-            )}
+            {cell.x.includes(currentPosition.x) &&
+              cell.y === currentPosition.y &&
+              currentAction === "A" && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "-20px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    backgroundColor: UI_CONSTANTS.COLORS.SUCCESS,
+                    color: "white",
+                    padding: "2px 6px",
+                    borderRadius: "4px",
+                    fontSize: `${UI_CONSTANTS.TYPOGRAPHY.FONT_SIZE_SMALL}px`,
+                    animation: `fadeOut ${UI_CONSTANTS.ANIMATION.FADE_OUT_DURATION} forwards`,
+                  }}
+                >
+                  A
+                </div>
+              )}
           </div>
         ))}
       </div>

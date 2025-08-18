@@ -59,7 +59,11 @@ export const calculateNextPosition = (
 /**
  * GEN1のグリッドナビゲーションロジック
  */
-const calculateGen1NextPosition = (pos: Position, action: InputAction, grid: CharacterGrid): Position => {
+const calculateGen1NextPosition = (
+  pos: Position,
+  action: InputAction,
+  grid: CharacterGrid,
+): Position => {
   switch (action) {
     case "↑":
       if (pos.y === 0) {
@@ -86,7 +90,10 @@ const calculateGen1NextPosition = (pos: Position, action: InputAction, grid: Cha
         const currentRow = grid.grid.filter((p) => p.y === pos.y);
         const positions = currentRow.map((p) => p.x).sort((a, b) => a - b);
         const currentIndex = positions.indexOf(pos.x);
-        pos.x = currentIndex === 0 ? positions[positions.length - 1] : positions[currentIndex - 1];
+        pos.x =
+          currentIndex === 0
+            ? positions[positions.length - 1]
+            : positions[currentIndex - 1];
       }
       break;
     case "→":
@@ -96,7 +103,10 @@ const calculateGen1NextPosition = (pos: Position, action: InputAction, grid: Cha
         const currentRow = grid.grid.filter((p) => p.y === pos.y);
         const positions = currentRow.map((p) => p.x).sort((a, b) => a - b);
         const currentIndex = positions.indexOf(pos.x);
-        pos.x = currentIndex === positions.length - 1 ? positions[0] : positions[currentIndex + 1];
+        pos.x =
+          currentIndex === positions.length - 1
+            ? positions[0]
+            : positions[currentIndex + 1];
       }
       break;
   }
@@ -106,7 +116,11 @@ const calculateGen1NextPosition = (pos: Position, action: InputAction, grid: Cha
 /**
  * GEN2のグリッドナビゲーションロジック
  */
-const calculateGen2NextPosition = (pos: Position, action: InputAction, grid: CharacterGrid): Position => {
+const calculateGen2NextPosition = (
+  pos: Position,
+  action: InputAction,
+  grid: CharacterGrid,
+): Position => {
   switch (action) {
     case "↑":
       if (pos.y === 0) {
@@ -129,7 +143,10 @@ const calculateGen2NextPosition = (pos: Position, action: InputAction, grid: Cha
         const currentRow = grid.grid.filter((p) => p.y === pos.y);
         const positions = currentRow.map((p) => p.x).sort((a, b) => a - b);
         const currentIndex = positions.indexOf(pos.x);
-        pos.x = currentIndex === 0 ? positions[positions.length - 1] : positions[currentIndex - 1];
+        pos.x =
+          currentIndex === 0
+            ? positions[positions.length - 1]
+            : positions[currentIndex - 1];
       }
       break;
     case "→":
@@ -139,7 +156,10 @@ const calculateGen2NextPosition = (pos: Position, action: InputAction, grid: Cha
         const currentRow = grid.grid.filter((p) => p.y === pos.y);
         const positions = currentRow.map((p) => p.x).sort((a, b) => a - b);
         const currentIndex = positions.indexOf(pos.x);
-        pos.x = currentIndex === positions.length - 1 ? positions[0] : positions[currentIndex + 1];
+        pos.x =
+          currentIndex === positions.length - 1
+            ? positions[0]
+            : positions[currentIndex + 1];
       }
       break;
   }
@@ -149,7 +169,11 @@ const calculateGen2NextPosition = (pos: Position, action: InputAction, grid: Cha
 /**
  * GEN2の下部行のナビゲーション処理
  */
-export const handleGen2BottomRowNavigation = (pos: Position, direction: "left" | "right", version: string): void => {
+export const handleGen2BottomRowNavigation = (
+  pos: Position,
+  direction: "left" | "right",
+  version: string,
+): void => {
   if (version === "GEN2_MAIL") {
     if (direction === "left") {
       if (pos.x >= 0 && pos.x <= 5) {

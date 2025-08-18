@@ -13,7 +13,10 @@ declare module "vitest" {
 
 export function setupCustomMatchers() {
   expect.extend({
-    toHaveSameStepsButDifferentActions(actualActions: InputAction[], expectedActions: InputAction[]) {
+    toHaveSameStepsButDifferentActions(
+      actualActions: InputAction[],
+      expectedActions: InputAction[],
+    ) {
       // 配列の長さが同じかどうかをチェック（ステップ数が同じ）
       const hasSameLength = actualActions.length === expectedActions.length;
 

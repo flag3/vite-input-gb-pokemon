@@ -1,7 +1,11 @@
 import { MAX_CHAR_LIMITS } from "../constants/gameConstants";
 import { CharacterGrid, InputAction, InputPath } from "../types";
 import { getFixedPositionForDakuten } from "./gridPositions";
-import { InternalPosition, findCharacterPosition, calculateDistance } from "./pathfinderUtils";
+import {
+  InternalPosition,
+  findCharacterPosition,
+  calculateDistance,
+} from "./pathfinderUtils";
 import { findOptimalSpacePosition } from "./spacePathfinder";
 
 /**
@@ -11,7 +15,11 @@ import { findOptimalSpacePosition } from "./spacePathfinder";
  * @param modes 各文字のモード（true:ひらがな、false:カタカナ）
  * @returns 入力パス
  */
-export const findInputSequence = (grid: CharacterGrid, text: string, modes: boolean[]): InputPath[] => {
+export const findInputSequence = (
+  grid: CharacterGrid,
+  text: string,
+  modes: boolean[],
+): InputPath[] => {
   const sequences: InputPath[] = [];
   let currentPosition: InternalPosition = { x: 0, y: 0, char: "" };
   let currentIsHiragana = grid.isHiragana;
@@ -28,14 +36,26 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
       // スペースの処理
       if (currentChar === "　") {
         let nextCharPosition: InternalPosition | null = null;
-        if (i + 1 < text.length && text[i + 1] !== "゛" && text[i + 1] !== "゜") {
+        if (
+          i + 1 < text.length &&
+          text[i + 1] !== "゛" &&
+          text[i + 1] !== "゜"
+        ) {
           const nextChar = text[i + 1];
           const nextMode = modes[i + 1];
-          const nextHiraganaResult = findCharacterPosition(nextChar, { ...grid, isHiragana: true });
-          const nextKatakanaResult = findCharacterPosition(nextChar, { ...grid, isHiragana: false });
+          const nextHiraganaResult = findCharacterPosition(nextChar, {
+            ...grid,
+            isHiragana: true,
+          });
+          const nextKatakanaResult = findCharacterPosition(nextChar, {
+            ...grid,
+            isHiragana: false,
+          });
 
           if (nextHiraganaResult || nextKatakanaResult) {
-            const nextTargetIsHiragana = Boolean(nextHiraganaResult && (!nextKatakanaResult || nextMode));
+            const nextTargetIsHiragana = Boolean(
+              nextHiraganaResult && (!nextKatakanaResult || nextMode),
+            );
             const nextTargetPosition = nextTargetIsHiragana
               ? nextHiraganaResult!.position
               : nextKatakanaResult!.position;
@@ -48,7 +68,12 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
           position: optimalSpacePosition,
           actions: optimalActions,
           totalSteps,
-        } = findOptimalSpacePosition(currentPosition, nextCharPosition, currentIsHiragana, grid);
+        } = findOptimalSpacePosition(
+          currentPosition,
+          nextCharPosition,
+          currentIsHiragana,
+          grid,
+        );
 
         if (optimalActions.includes("s")) {
           currentIsHiragana = !currentIsHiragana;
@@ -57,7 +82,8 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
         sequences.push({
           char: currentChar,
           actions: optimalActions,
-          totalSteps: grid.version === "GEN2_MAIL" ? optimalActions.length : totalSteps,
+          totalSteps:
+            grid.version === "GEN2_MAIL" ? optimalActions.length : totalSteps,
         });
 
         currentPosition = optimalSpacePosition;
@@ -65,24 +91,44 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
       }
 
       // 通常文字の処理
-      const hiraganaResult = findCharacterPosition(currentChar, { ...grid, isHiragana: true });
-      const katakanaResult = findCharacterPosition(currentChar, { ...grid, isHiragana: false });
+      const hiraganaResult = findCharacterPosition(currentChar, {
+        ...grid,
+        isHiragana: true,
+      });
+      const katakanaResult = findCharacterPosition(currentChar, {
+        ...grid,
+        isHiragana: false,
+      });
 
       if (!hiraganaResult && !katakanaResult) continue;
 
-      const targetIsHiragana = Boolean(hiraganaResult && (!katakanaResult || targetMode));
-      const targetIsKatakana = Boolean(katakanaResult && (!hiraganaResult || !targetMode));
+      const targetIsHiragana = Boolean(
+        hiraganaResult && (!katakanaResult || targetMode),
+      );
+      const targetIsKatakana = Boolean(
+        katakanaResult && (!hiraganaResult || !targetMode),
+      );
 
       // モード切替が必要かチェック
-      if ((targetIsHiragana && !currentIsHiragana) || (targetIsKatakana && currentIsHiragana)) {
+      if (
+        (targetIsHiragana && !currentIsHiragana) ||
+        (targetIsKatakana && currentIsHiragana)
+      ) {
         currentActions.push("s");
         currentIsHiragana = !currentIsHiragana;
       }
 
-      const targetPosition = targetIsHiragana ? hiraganaResult!.position : katakanaResult!.position;
+      const targetPosition = targetIsHiragana
+        ? hiraganaResult!.position
+        : katakanaResult!.position;
 
       // 移動アクションを追加
-      const { actions: directMoveActions } = calculateDistance(currentPosition, targetPosition, grid, inputCharCount);
+      const { actions: directMoveActions } = calculateDistance(
+        currentPosition,
+        targetPosition,
+        grid,
+        inputCharCount,
+      );
       const directActions: InputAction[] = [...directMoveActions, "A"];
 
       let chosenActions = directActions;
@@ -98,7 +144,12 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
               ...getFixedPositionForDakuten(grid.version),
               char: currentPosition.char,
             };
-            const { actions: moveFromED } = calculateDistance(fixedPos, targetPosition, grid, inputCharCount);
+            const { actions: moveFromED } = calculateDistance(
+              fixedPos,
+              targetPosition,
+              grid,
+              inputCharCount,
+            );
             const hack: InputAction[] = ["A", "B", ...moveFromED, "A"];
             if (hack.length < directActions.length) chosenActions = hack;
           }
@@ -108,7 +159,12 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
             ...getFixedPositionForDakuten(grid.version),
             char: currentPosition.char,
           };
-          const { actions: moveFromED } = calculateDistance(fixedPos, targetPosition, grid, inputCharCount);
+          const { actions: moveFromED } = calculateDistance(
+            fixedPos,
+            targetPosition,
+            grid,
+            inputCharCount,
+          );
           const hack: InputAction[] = ["A", "A", "B", "B", ...moveFromED, "A"];
           if (hack.length < directActions.length) chosenActions = hack;
         }
@@ -125,18 +181,27 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
       currentPosition = targetPosition;
 
       // 次の文字が濁点/半濁点の場合の処理
-      if (i + 1 < text.length && (text[i + 1] === "゛" || text[i + 1] === "゜")) {
+      if (
+        i + 1 < text.length &&
+        (text[i + 1] === "゛" || text[i + 1] === "゜")
+      ) {
         const dakutenResult = findCharacterPosition(text[i + 1], grid);
         if (dakutenResult) {
           // 標準ルート: 制限到達時はED起点、未達時は現在位置起点
-          const isAtCharLimit = inputCharCount === MAX_CHAR_LIMITS[grid.version];
+          const isAtCharLimit =
+            inputCharCount === MAX_CHAR_LIMITS[grid.version];
           let normalActions: InputAction[];
           if (isAtCharLimit) {
             const fixedStart: InternalPosition = {
               ...getFixedPositionForDakuten(grid.version),
               char: currentPosition.char,
             };
-            const { actions: optActions } = calculateDistance(fixedStart, dakutenResult.position, grid, inputCharCount);
+            const { actions: optActions } = calculateDistance(
+              fixedStart,
+              dakutenResult.position,
+              grid,
+              inputCharCount,
+            );
             normalActions = [...optActions, "A"];
           } else {
             const { actions: normalMoves } = calculateDistance(
@@ -149,18 +214,30 @@ export const findInputSequence = (grid: CharacterGrid, text: string, modes: bool
           }
           // limit-1の場合にED削除ハックを検討
           let chosenDakutenActions = normalActions;
-          if (grid.version === "GEN1" && inputCharCount === MAX_CHAR_LIMITS[grid.version] - 1) {
+          if (
+            grid.version === "GEN1" &&
+            inputCharCount === MAX_CHAR_LIMITS[grid.version] - 1
+          ) {
             const fixedPos: InternalPosition = {
               ...getFixedPositionForDakuten(grid.version),
               char: currentPosition.char,
             };
-            const { actions: hackMoves } = calculateDistance(fixedPos, dakutenResult.position, grid, inputCharCount);
+            const { actions: hackMoves } = calculateDistance(
+              fixedPos,
+              dakutenResult.position,
+              grid,
+              inputCharCount,
+            );
             const hackActions: InputAction[] = ["A", "B", ...hackMoves, "A"];
             if (hackActions.length < normalActions.length) {
               chosenDakutenActions = hackActions;
             }
           }
-          sequences.push({ char: text[i + 1], actions: chosenDakutenActions, totalSteps: chosenDakutenActions.length });
+          sequences.push({
+            char: text[i + 1],
+            actions: chosenDakutenActions,
+            totalSteps: chosenDakutenActions.length,
+          });
           currentPosition = dakutenResult.position;
           i++;
         }

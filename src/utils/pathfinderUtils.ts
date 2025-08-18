@@ -6,7 +6,12 @@ import {
   twoGenMailHiraganaGrid,
   twoGenMailKatakanaGrid,
 } from "../constants/characterGrids";
-import { CharacterGrid, CharacterPosition, InputAction, Position } from "../types";
+import {
+  CharacterGrid,
+  CharacterPosition,
+  InputAction,
+  Position,
+} from "../types";
 import { calculateNextPosition } from "./gridNavigation";
 import { HIRAGANA_KATAKANA_MAP } from "./gridPositions";
 
@@ -126,7 +131,12 @@ export const calculateDistance = (
     }
 
     for (const direction of directions) {
-      const nextPosition = calculateNextPosition(position, direction, grid, inputCharCount);
+      const nextPosition = calculateNextPosition(
+        position,
+        direction,
+        grid,
+        inputCharCount,
+      );
       const key = `${nextPosition.x},${nextPosition.y}`;
 
       if (!visited.has(key)) {
