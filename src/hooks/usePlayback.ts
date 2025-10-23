@@ -274,7 +274,7 @@ export const usePlayback = (
 
   useEffect(() => {
     handleReset();
-  }, [inputText, currentVersion]);
+  }, [inputText, currentVersion, handleReset]);
 
   return {
     isPlaying,

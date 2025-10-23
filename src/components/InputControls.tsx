@@ -66,21 +66,21 @@ export const InputControls: FC<InputControlsProps> = ({
           gap: "10px",
         }}
       >
-        <label>
-          <select
-            value={currentVersion}
-            onChange={onVersionChange}
-            style={{
-              padding: "8px",
-              width: isMobile ? "100%" : "auto",
-            }}
-          >
-            <option value="GEN1">gen-1 nickname</option>
-            <option value="GEN2_NICKNAME">gen-2 nickname</option>
-            <option value="GEN2_BOX">gen-2 box</option>
-            <option value="GEN2_MAIL">gen-2 mail</option>
-          </select>
-        </label>
+        <select
+          id="version-select"
+          aria-label="Game version"
+          value={currentVersion}
+          onChange={onVersionChange}
+          style={{
+            padding: "8px",
+            width: isMobile ? "100%" : "auto",
+          }}
+        >
+          <option value="GEN1">gen-1 nickname</option>
+          <option value="GEN2_NICKNAME">gen-2 nickname</option>
+          <option value="GEN2_BOX">gen-2 box</option>
+          <option value="GEN2_MAIL">gen-2 mail</option>
+        </select>
       </div>
 
       <div
