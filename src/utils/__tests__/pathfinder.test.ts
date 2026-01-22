@@ -209,4 +209,26 @@ describe("pathfinder - 入力シーケンス生成", () => {
       expect(actualActions).toEqual(expectedActions);
     });
   });
+
+  test("GEN1: 文字数上限時のスペースはED経由の最短ルートを使う", () => {
+    const input = "モげみみ　";
+    const version = "GEN1" as GameVersion;
+    const grid = { ...GRIDS[version], isHiragana: false };
+    const { chars, modes } = decomposeTextWithMode(input, false, version);
+    const sequences = findInputSequence(grid, chars.join(""), modes);
+    const spaceSequence = sequences.find((seq) => seq.char === "　");
+
+    expect(spaceSequence?.actions).toEqual(["A", "B", "←", "A"]);
+  });
+
+  test("GEN1: 文字数上限直前のスペースもED経由の最短ルートを使う", () => {
+    const input = "くくく　";
+    const version = "GEN1" as GameVersion;
+    const grid = { ...GRIDS[version], isHiragana: false };
+    const { chars, modes } = decomposeTextWithMode(input, false, version);
+    const sequences = findInputSequence(grid, chars.join(""), modes);
+    const spaceSequence = sequences.find((seq) => seq.char === "　");
+
+    expect(spaceSequence?.actions).toEqual(["A", "A", "B", "B", "←", "A"]);
+  });
 });

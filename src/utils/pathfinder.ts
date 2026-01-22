@@ -73,17 +73,65 @@ export const findInputSequence = (
           nextCharPosition,
           currentIsHiragana,
           grid,
+          inputCharCount,
         );
 
-        if (optimalActions.includes("s")) {
+        let chosenActions = optimalActions;
+        let chosenTotalSteps = totalSteps;
+
+        if (grid.version === "GEN1") {
+          const fixedPos: InternalPosition = {
+            ...getFixedPositionForDakuten(grid.version),
+            char: currentPosition.char,
+          };
+
+          if (inputCharCount === MAX_CHAR_LIMITS[grid.version]) {
+            const { actions: moveFromED } = calculateDistance(
+              fixedPos,
+              optimalSpacePosition,
+              grid,
+              inputCharCount,
+            );
+            const hackActions: InputAction[] = ["A", "B", ...moveFromED, "A"];
+            if (hackActions.length < chosenActions.length) {
+              chosenActions = hackActions;
+              chosenTotalSteps = hackActions.length;
+            }
+          }
+
+          if (inputCharCount === MAX_CHAR_LIMITS[grid.version] - 1) {
+            const { actions: moveFromED } = calculateDistance(
+              fixedPos,
+              optimalSpacePosition,
+              grid,
+              inputCharCount,
+            );
+            const hackActions: InputAction[] = [
+              "A",
+              "A",
+              "B",
+              "B",
+              ...moveFromED,
+              "A",
+            ];
+            if (hackActions.length < chosenActions.length) {
+              chosenActions = hackActions;
+              chosenTotalSteps = hackActions.length;
+            }
+          }
+        }
+
+        if (chosenActions.includes("s")) {
           currentIsHiragana = !currentIsHiragana;
         }
 
         sequences.push({
           char: currentChar,
-          actions: optimalActions,
+          actions: chosenActions,
           totalSteps:
-            grid.version === "GEN2_MAIL" ? optimalActions.length : totalSteps,
+            grid.version === "GEN2_MAIL"
+              ? chosenActions.length
+              : chosenTotalSteps,
         });
 
         currentPosition = optimalSpacePosition;
