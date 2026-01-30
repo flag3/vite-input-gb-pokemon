@@ -122,13 +122,7 @@ export const InputControls: FC<InputControlsProps> = ({
           }}
         >
           <Tooltip
-            title={
-              isPlaying
-                ? "Pause"
-                : currentStep >= totalSteps
-                  ? "Play from start"
-                  : "Play"
-            }
+            title={isPlaying ? "Pause" : currentStep >= totalSteps ? "Play from start" : "Play"}
           >
             <IconButton onClick={onPlayPause} color="primary" size="large">
               {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
@@ -186,9 +180,7 @@ export const InputControls: FC<InputControlsProps> = ({
             min={0}
             max={900}
             valueLabelDisplay="auto"
-            valueLabelFormat={(value) =>
-              `${((1000 - value) / 1000).toFixed(2)}s`
-            }
+            valueLabelFormat={(value) => `${((1000 - value) / 1000).toFixed(2)}s`}
           />
         </div>
 

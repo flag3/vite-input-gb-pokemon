@@ -24,9 +24,7 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({
 
     grid.grid.forEach((char) => {
       if (GROUPABLE_CHARS.includes(char.char)) {
-        const existingGroup = cells.find(
-          (cell) => cell.char === char.char && cell.y === char.y,
-        );
+        const existingGroup = cells.find((cell) => cell.char === char.char && cell.y === char.y);
 
         if (existingGroup) {
           existingGroup.x.push(char.x);
@@ -77,13 +75,11 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({
               alignItems: "center",
               justifyContent: "center",
               backgroundColor:
-                cell.x.includes(currentPosition.x) &&
-                cell.y === currentPosition.y
+                cell.x.includes(currentPosition.x) && cell.y === currentPosition.y
                   ? UI_CONSTANTS.COLORS.PRIMARY
                   : "white",
               color:
-                cell.x.includes(currentPosition.x) &&
-                cell.y === currentPosition.y
+                cell.x.includes(currentPosition.x) && cell.y === currentPosition.y
                   ? "white"
                   : "black",
               borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS}px`,

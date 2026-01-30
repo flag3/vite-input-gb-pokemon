@@ -1,13 +1,7 @@
 import { createGrid } from "../constants/characterGrids";
-import {
-  MAX_CHAR_LIMITS,
-  DAKUTEN_REVERSE_MAP,
-} from "../constants/gameConstants";
+import { MAX_CHAR_LIMITS, DAKUTEN_REVERSE_MAP } from "../constants/gameConstants";
 import { GameVersion, InputAction, StateHistory } from "../types";
-import {
-  calculateNextPosition,
-  getConfirmButtonPosition,
-} from "../utils/gridNavigation";
+import { calculateNextPosition, getConfirmButtonPosition } from "../utils/gridNavigation";
 import { findInputSequence } from "../utils/pathfinder";
 import { useState, useCallback, useEffect, useMemo } from "react";
 
@@ -30,42 +24,38 @@ export const usePlayback = (
     [sequences],
   );
 
-  const calculateDisplayTextLength = useCallback(
-    (history: StateHistory[]): number => {
-      let text = "";
-      let lastChar = "";
+  const calculateDisplayTextLength = useCallback((history: StateHistory[]): number => {
+    let text = "";
+    let lastChar = "";
 
-      for (let i = 0; i < history.length; i++) {
-        const state = history[i];
+    for (let i = 0; i < history.length; i++) {
+      const state = history[i];
 
-        if (state.action === "B") {
-          if (text.length > 0) {
-            text = text.substring(0, text.length - 1);
-            lastChar = text.length > 0 ? text[text.length - 1] : "";
+      if (state.action === "B") {
+        if (text.length > 0) {
+          text = text.substring(0, text.length - 1);
+          lastChar = text.length > 0 ? text[text.length - 1] : "";
+        }
+      } else if (state.action === "A" && state.inputChar) {
+        if (state.inputChar === "゛" || state.inputChar === "゜") {
+          if (lastChar && DAKUTEN_REVERSE_MAP[lastChar]?.[state.inputChar]) {
+            text =
+              text.substring(0, text.length - 1) + DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
+            lastChar = DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
           }
-        } else if (state.action === "A" && state.inputChar) {
-          if (state.inputChar === "゛" || state.inputChar === "゜") {
-            if (lastChar && DAKUTEN_REVERSE_MAP[lastChar]?.[state.inputChar]) {
-              text =
-                text.substring(0, text.length - 1) +
-                DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
-              lastChar = DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
-            }
-          } else if (
-            state.inputChar !== "ED" &&
-            state.inputChar !== "かな" &&
-            state.inputChar !== "カナ"
-          ) {
-            text += state.inputChar;
-            lastChar = state.inputChar;
-          }
+        } else if (
+          state.inputChar !== "ED" &&
+          state.inputChar !== "かな" &&
+          state.inputChar !== "カナ"
+        ) {
+          text += state.inputChar;
+          lastChar = state.inputChar;
         }
       }
+    }
 
-      return text.length;
-    },
-    [],
-  );
+    return text.length;
+  }, []);
 
   const handleStepForward = useCallback(() => {
     if (currentStep >= totalSteps) return;
@@ -92,10 +82,7 @@ export const usePlayback = (
         if (action === "s") {
           newIsHiragana = !newIsHiragana;
         } else if (action === "S" && currentVersion !== "GEN1") {
-          if (
-            currentVersion === "GEN2_NICKNAME" ||
-            currentVersion === "GEN2_BOX"
-          ) {
+          if (currentVersion === "GEN2_NICKNAME" || currentVersion === "GEN2_BOX") {
             newPosition.x = 14;
             newPosition.y = 4;
           } else if (currentVersion === "GEN2_MAIL") {
@@ -138,19 +125,9 @@ export const usePlayback = (
           }
         } else if (action === "B") {
           currentInputChar = "DELETE";
-        } else if (
-          action === "↑" ||
-          action === "↓" ||
-          action === "←" ||
-          action === "→"
-        ) {
+        } else if (action === "↑" || action === "↓" || action === "←" || action === "→") {
           const grid = createGrid(currentVersion, newIsHiragana);
-          const nextPos = calculateNextPosition(
-            newPosition,
-            action,
-            grid,
-            inputCharCount,
-          );
+          const nextPos = calculateNextPosition(newPosition, action, grid, inputCharCount);
           newPosition.x = nextPos.x;
           newPosition.y = nextPos.y;
         }
@@ -238,12 +215,9 @@ export const usePlayback = (
     ]);
   }, []);
 
-  const handleSpeedChange = useCallback(
-    (_event: Event, value: number | number[]) => {
-      setPlaybackSpeed(1000 - (Array.isArray(value) ? value[0] : value));
-    },
-    [],
-  );
+  const handleSpeedChange = useCallback((_event: Event, value: number | number[]) => {
+    setPlaybackSpeed(1000 - (Array.isArray(value) ? value[0] : value));
+  }, []);
 
   useEffect(() => {
     if (!isPlaying || currentStep >= totalSteps) {

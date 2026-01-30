@@ -1,11 +1,7 @@
 import { MAX_CHAR_LIMITS } from "../constants/gameConstants";
 import { CharacterGrid, InputAction, InputPath } from "../types";
 import { getFixedPositionForDakuten } from "./gridPositions";
-import {
-  InternalPosition,
-  findCharacterPosition,
-  calculateDistance,
-} from "./pathfinderUtils";
+import { InternalPosition, findCharacterPosition, calculateDistance } from "./pathfinderUtils";
 import { findOptimalSpacePosition } from "./spacePathfinder";
 
 /**
@@ -28,18 +24,13 @@ export const findInputSequence = (
     katakana: findCharacterPosition(char, katakanaGrid),
   });
   const resolveTargetPosition = (char: string, targetMode: boolean) => {
-    const { hiragana: hiraganaResult, katakana: katakanaResult } =
-      getCharPositions(char);
+    const { hiragana: hiraganaResult, katakana: katakanaResult } = getCharPositions(char);
     if (!hiraganaResult && !katakanaResult) return null;
 
-    const targetIsHiragana = Boolean(
-      hiraganaResult && (!katakanaResult || targetMode),
-    );
+    const targetIsHiragana = Boolean(hiraganaResult && (!katakanaResult || targetMode));
 
     return {
-      position: targetIsHiragana
-        ? hiraganaResult!.position
-        : katakanaResult!.position,
+      position: targetIsHiragana ? hiraganaResult!.position : katakanaResult!.position,
       isHiragana: targetIsHiragana,
     };
   };
@@ -48,12 +39,7 @@ export const findInputSequence = (
     to: InternalPosition,
     inputCharCount: number,
   ): InputAction[] => {
-    const { actions: moveActions } = calculateDistance(
-      from,
-      to,
-      grid,
-      inputCharCount,
-    );
+    const { actions: moveActions } = calculateDistance(from, to, grid, inputCharCount);
     return [...moveActions, "A"];
   };
   const buildDakutenActions = (
@@ -90,14 +76,13 @@ export const findInputSequence = (
       }
     }
 
-    const { position: optimalSpacePosition, actions: optimalActions } =
-      findOptimalSpacePosition(
-        currentPosition,
-        nextCharPosition,
-        currentIsHiragana,
-        grid,
-        inputCharCount,
-      );
+    const { position: optimalSpacePosition, actions: optimalActions } = findOptimalSpacePosition(
+      currentPosition,
+      nextCharPosition,
+      currentIsHiragana,
+      grid,
+      inputCharCount,
+    );
 
     const spaceShortcut = applyStandardGen1EdShortcut(
       optimalActions,
@@ -107,18 +92,13 @@ export const findInputSequence = (
     );
     const chosenActions = spaceShortcut.actions;
     const chosenTotalSteps = spaceShortcut.totalSteps;
-    const nextIsHiragana = chosenActions.includes("s")
-      ? !currentIsHiragana
-      : currentIsHiragana;
+    const nextIsHiragana = chosenActions.includes("s") ? !currentIsHiragana : currentIsHiragana;
 
     return {
       sequence: {
         char: "　",
         actions: chosenActions,
-        totalSteps:
-          grid.version === "GEN2_MAIL"
-            ? chosenActions.length
-            : chosenTotalSteps,
+        totalSteps: grid.version === "GEN2_MAIL" ? chosenActions.length : chosenTotalSteps,
       },
       position: optimalSpacePosition,
       isHiragana: nextIsHiragana,
@@ -138,11 +118,7 @@ export const findInputSequence = (
     );
     const chosenDakutenActions =
       grid.version === "GEN1"
-        ? applyDakutenGen1EdShortcut(
-            normalActions,
-            dakutenResult.position,
-            inputCharCount,
-          ).actions
+        ? applyDakutenGen1EdShortcut(normalActions, dakutenResult.position, inputCharCount).actions
         : normalActions;
 
     return {
@@ -229,11 +205,7 @@ export const findInputSequence = (
   ): { actions: InputAction[]; totalSteps: number } => {
     const isAtCharLimit = totalInputChars === MAX_CHAR_LIMITS[grid.version];
     const actions: InputAction[] =
-      grid.version === "GEN1"
-        ? [isAtCharLimit ? "A" : "S"]
-        : !isAtCharLimit
-          ? ["S", "A"]
-          : ["A"];
+      grid.version === "GEN1" ? [isAtCharLimit ? "A" : "S"] : !isAtCharLimit ? ["S", "A"] : ["A"];
 
     return {
       actions,
@@ -255,12 +227,7 @@ export const findInputSequence = (
 
     // スペースの処理
     if (currentChar === "　") {
-      const spaceResult = buildSpaceSequence(
-        i,
-        currentPosition,
-        currentIsHiragana,
-        inputCharCount,
-      );
+      const spaceResult = buildSpaceSequence(i, currentPosition, currentIsHiragana, inputCharCount);
       sequences.push(spaceResult.sequence);
       currentPosition = spaceResult.position;
       currentIsHiragana = spaceResult.isHiragana;
@@ -282,15 +249,10 @@ export const findInputSequence = (
     const targetPosition = target.position;
 
     // 移動アクションを追加
-    const directActions = buildMoveActions(
-      currentPosition,
-      targetPosition,
-      inputCharCount,
-    );
+    const directActions = buildMoveActions(currentPosition, targetPosition, inputCharCount);
 
     // GEN1かつ5文字目または4文字目で連続文字の場合にED→削除ハックを検討
-    const skipWhenAtLimit =
-      grid.version === "GEN1" ? isDakutenChar(text[i - 1]) : false;
+    const skipWhenAtLimit = grid.version === "GEN1" ? isDakutenChar(text[i - 1]) : false;
     const chosenActions =
       grid.version === "GEN1"
         ? applyStandardGen1EdShortcut(
@@ -314,11 +276,7 @@ export const findInputSequence = (
     // 次の文字が濁点/半濁点の場合の処理
     const nextChar = text[i + 1];
     if (i + 1 < text.length && isDakutenChar(nextChar)) {
-      const dakutenSequence = buildDakutenSequence(
-        nextChar,
-        currentPosition,
-        inputCharCount,
-      );
+      const dakutenSequence = buildDakutenSequence(nextChar, currentPosition, inputCharCount);
       if (!dakutenSequence) continue;
       sequences.push(dakutenSequence.sequence);
       currentPosition = dakutenSequence.position;

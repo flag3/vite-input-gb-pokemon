@@ -1,8 +1,5 @@
 import { GRIDS } from "../../constants/characterGrids";
-import {
-  DAKUTEN_REVERSE_MAP,
-  MAX_CHAR_LIMITS,
-} from "../../constants/gameConstants";
+import { DAKUTEN_REVERSE_MAP, MAX_CHAR_LIMITS } from "../../constants/gameConstants";
 import { GameVersion } from "../../types";
 import { decomposeTextWithMode } from "../characterMapping";
 import { findInputSequence } from "../pathfinder";
@@ -72,9 +69,7 @@ describe("characterMapping - 文字分解と濁点処理", () => {
         const sequences = findInputSequence(grid, chars.join(""), modes);
 
         // 予測される文字シーケンス（END以外）を取得
-        const actualSequence = sequences
-          .map((seq) => seq.char)
-          .filter((char) => char !== "END");
+        const actualSequence = sequences.map((seq) => seq.char).filter((char) => char !== "END");
 
         expect(actualSequence).toEqual(expectedSequence);
 
@@ -84,18 +79,13 @@ describe("characterMapping - 文字分解と濁点処理", () => {
             /[がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ]/,
           )
         ) {
-          const hasDakuten =
-            actualSequence.includes("゛") || actualSequence.includes("゜");
+          const hasDakuten = actualSequence.includes("゛") || actualSequence.includes("゜");
           expect(hasDakuten).toBe(true);
         }
 
         // 総文字数が制限内かチェック
-        const effectiveChars = actualSequence.filter(
-          (char) => char !== "゛" && char !== "゜",
-        );
-        expect(effectiveChars.length).toBeLessThanOrEqual(
-          MAX_CHAR_LIMITS[version],
-        );
+        const effectiveChars = actualSequence.filter((char) => char !== "゛" && char !== "゜");
+        expect(effectiveChars.length).toBeLessThanOrEqual(MAX_CHAR_LIMITS[version]);
       });
     });
   });
@@ -148,21 +138,15 @@ describe("characterMapping - 文字分解と濁点処理", () => {
         const sequences = findInputSequence(grid, chars.join(""), modes);
 
         // 予測される文字シーケンス（END以外）を取得
-        const actualSequence = sequences
-          .map((seq) => seq.char)
-          .filter((char) => char !== "END");
+        const actualSequence = sequences.map((seq) => seq.char).filter((char) => char !== "END");
 
         // 各文字について、基本文字と濁点/半濁点が正しく含まれているか検証
         for (const baseChar of baseChars) {
-          const charCount = actualSequence.filter(
-            (char) => char === baseChar,
-          ).length;
+          const charCount = actualSequence.filter((char) => char === baseChar).length;
           expect(charCount).toBeGreaterThan(0);
         }
 
-        const markCount = actualSequence.filter(
-          (char) => char === dakutenMark,
-        ).length;
+        const markCount = actualSequence.filter((char) => char === dakutenMark).length;
         expect(markCount).toBeGreaterThan(0);
       });
     });

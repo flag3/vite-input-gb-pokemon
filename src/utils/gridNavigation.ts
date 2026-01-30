@@ -90,10 +90,7 @@ const calculateGen1NextPosition = (
         const currentRow = grid.grid.filter((p) => p.y === pos.y);
         const positions = currentRow.map((p) => p.x).sort((a, b) => a - b);
         const currentIndex = positions.indexOf(pos.x);
-        pos.x =
-          currentIndex === 0
-            ? positions[positions.length - 1]
-            : positions[currentIndex - 1];
+        pos.x = currentIndex === 0 ? positions[positions.length - 1] : positions[currentIndex - 1];
       }
       break;
     case "→":
@@ -103,10 +100,7 @@ const calculateGen1NextPosition = (
         const currentRow = grid.grid.filter((p) => p.y === pos.y);
         const positions = currentRow.map((p) => p.x).sort((a, b) => a - b);
         const currentIndex = positions.indexOf(pos.x);
-        pos.x =
-          currentIndex === positions.length - 1
-            ? positions[0]
-            : positions[currentIndex + 1];
+        pos.x = currentIndex === positions.length - 1 ? positions[0] : positions[currentIndex + 1];
       }
       break;
   }
@@ -143,10 +137,7 @@ const calculateGen2NextPosition = (
         const currentRow = grid.grid.filter((p) => p.y === pos.y);
         const positions = currentRow.map((p) => p.x).sort((a, b) => a - b);
         const currentIndex = positions.indexOf(pos.x);
-        pos.x =
-          currentIndex === 0
-            ? positions[positions.length - 1]
-            : positions[currentIndex - 1];
+        pos.x = currentIndex === 0 ? positions[positions.length - 1] : positions[currentIndex - 1];
       }
       break;
     case "→":
@@ -156,10 +147,7 @@ const calculateGen2NextPosition = (
         const currentRow = grid.grid.filter((p) => p.y === pos.y);
         const positions = currentRow.map((p) => p.x).sort((a, b) => a - b);
         const currentIndex = positions.indexOf(pos.x);
-        pos.x =
-          currentIndex === positions.length - 1
-            ? positions[0]
-            : positions[currentIndex + 1];
+        pos.x = currentIndex === positions.length - 1 ? positions[0] : positions[currentIndex + 1];
       }
       break;
   }

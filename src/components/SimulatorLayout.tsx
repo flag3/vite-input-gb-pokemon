@@ -6,10 +6,7 @@ interface SimulatorLayoutProps {
   isMobile: boolean;
 }
 
-export const SimulatorLayout: FC<SimulatorLayoutProps> = ({
-  children,
-  isMobile,
-}) => {
+export const SimulatorLayout: FC<SimulatorLayoutProps> = ({ children, isMobile }) => {
   return (
     <div
       style={{
@@ -17,9 +14,7 @@ export const SimulatorLayout: FC<SimulatorLayoutProps> = ({
         margin: "0 auto",
         padding: `${UI_CONSTANTS.LAYOUT.CONTAINER_PADDING}px`,
         display: "grid",
-        gridTemplateColumns: isMobile
-          ? "1fr"
-          : `1fr ${UI_CONSTANTS.LAYOUT.SIDEBAR_WIDTH}px`,
+        gridTemplateColumns: isMobile ? "1fr" : `1fr ${UI_CONSTANTS.LAYOUT.SIDEBAR_WIDTH}px`,
         gap: `${UI_CONSTANTS.LAYOUT.SECTION_GAP}px`,
       }}
     >

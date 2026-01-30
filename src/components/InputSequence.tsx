@@ -33,8 +33,7 @@ const getCurrentText = (stateHistory: StateHistory[]): string => {
         if (lastChar && DAKUTEN_REVERSE_MAP[lastChar]?.[state.inputChar]) {
           // 最後の文字を濁点・半濁点付きの文字に置き換える
           text =
-            text.substring(0, text.length - 1) +
-            DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
+            text.substring(0, text.length - 1) + DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
           lastChar = DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
         }
         // 適用できない場合は何もしない
@@ -130,8 +129,7 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
               </span>
               <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
                 {sequence.actions.map((action, actionIndex) => {
-                  const isCurrentAction =
-                    stepCount + actionIndex === currentStep;
+                  const isCurrentAction = stepCount + actionIndex === currentStep;
                   const isCompleted = stepCount + actionIndex < currentStep;
                   return (
                     <span
@@ -168,8 +166,7 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
         })}
       </div>
       <div style={{ color: UI_CONSTANTS.COLORS.TEXT_MUTED }}>
-        Total steps:{" "}
-        {sequences.reduce((sum, seq) => sum + seq.actions.length, 0)}
+        Total steps: {sequences.reduce((sum, seq) => sum + seq.actions.length, 0)}
       </div>
       <style>
         {`

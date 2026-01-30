@@ -9,13 +9,8 @@ import { SimulatorLayout } from "./SimulatorLayout";
 import { type FC } from "react";
 
 const InputSimulator: FC = () => {
-  const {
-    inputText,
-    currentVersion,
-    sequences,
-    handleTextChange,
-    handleVersionChange,
-  } = useInputProcessing();
+  const { inputText, currentVersion, sequences, handleTextChange, handleVersionChange } =
+    useInputProcessing();
   const {
     isPlaying,
     currentStep,

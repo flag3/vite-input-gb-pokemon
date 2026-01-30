@@ -18,10 +18,7 @@ export const findOptimalSpacePosition = (
 } => {
   const spacePositions = getSpacePositions(grid.version);
 
-  if (
-    spacePositions.hiraganaSpaces.length === 0 &&
-    spacePositions.katakanaSpaces.length === 0
-  ) {
+  if (spacePositions.hiraganaSpaces.length === 0 && spacePositions.katakanaSpaces.length === 0) {
     return {
       position: { char: "　", x: currentPosition.x, y: currentPosition.y },
       actions: ["A"],
@@ -30,8 +27,7 @@ export const findOptimalSpacePosition = (
   }
 
   let minTotalSteps = Infinity;
-  let optimalPosition =
-    spacePositions.hiraganaSpaces[0] || spacePositions.katakanaSpaces[0];
+  let optimalPosition = spacePositions.hiraganaSpaces[0] || spacePositions.katakanaSpaces[0];
   let optimalActions: InputAction[] = [];
 
   // 現在のモードのスペースを試す

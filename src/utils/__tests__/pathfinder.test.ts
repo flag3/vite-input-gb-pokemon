@@ -45,22 +45,7 @@ describe("pathfinder - 入力シーケンス生成", () => {
     {
       input: "ツツツツロ",
       version: "GEN1" as GameVersion,
-      expectedActions: [
-        "↓",
-        "↓",
-        "→",
-        "→",
-        "→",
-        "A",
-        "A",
-        "A",
-        "A",
-        "A",
-        "B",
-        "↑",
-        "A",
-        "A",
-      ],
+      expectedActions: ["↓", "↓", "→", "→", "→", "A", "A", "A", "A", "A", "B", "↑", "A", "A"],
     },
     {
       input: "ツツツロロ",
@@ -163,20 +148,7 @@ describe("pathfinder - 入力シーケンス生成", () => {
     {
       input: "コ　サ",
       version: "GEN2_MAIL" as GameVersion,
-      expectedActions: [
-        "↑",
-        "←",
-        "↓",
-        "←",
-        "←",
-        "A",
-        "→",
-        "A",
-        "→",
-        "A",
-        "S",
-        "A",
-      ],
+      expectedActions: ["↑", "←", "↓", "←", "←", "A", "→", "A", "→", "A", "S", "A"],
     },
     {
       input: "９　９",
@@ -199,10 +171,7 @@ describe("pathfinder - 入力シーケンス生成", () => {
 
       const sequences = findInputSequence(grid, chars.join(""), modes);
       const actualActions = sequences.flatMap((seq) => seq.actions);
-      const actualTotalSteps = sequences.reduce(
-        (sum, seq) => sum + seq.totalSteps,
-        0,
-      );
+      const actualTotalSteps = sequences.reduce((sum, seq) => sum + seq.totalSteps, 0);
       const expectedSteps = expectedActions.length;
 
       expect(actualTotalSteps).toBe(expectedSteps);
