@@ -1,4 +1,4 @@
-import { CharacterGrid, GameVersion } from "../types";
+import type { CharacterGrid, GameVersion } from "../types";
 
 export const hiraganaGrid = [
   ["あ", "か", "さ", "た", "な", "は", "ま", "や", "ら"],

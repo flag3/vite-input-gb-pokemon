@@ -1,6 +1,6 @@
 import { GROUPABLE_CHARS } from "../constants/gameConstants";
 import { UI_CONSTANTS } from "../constants/ui";
-import { CharacterGrid as CharacterGridType, InputAction } from "../types";
+import type { CharacterGrid as CharacterGridType, InputAction } from "../types";
 import React from "react";
 
 interface CharacterGridProps {

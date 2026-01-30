@@ -1,6 +1,6 @@
 import { GRIDS } from "../constants/characterGrids";
 import { MAX_CHAR_LIMITS } from "../constants/gameConstants";
-import { GameVersion } from "../types";
+import type { GameVersion } from "../types";
 import { decomposeTextWithMode, normalizeSpaces } from "../utils/characterMapping";
 import { findInputSequence } from "../utils/pathfinder";
 import { useState, useCallback } from "react";

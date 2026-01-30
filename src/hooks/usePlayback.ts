@@ -1,6 +1,6 @@
 import { createGrid } from "../constants/characterGrids";
 import { MAX_CHAR_LIMITS, DAKUTEN_REVERSE_MAP } from "../constants/gameConstants";
-import { GameVersion, InputAction, StateHistory } from "../types";
+import type { GameVersion, InputAction, StateHistory } from "../types";
 import { calculateNextPosition, getConfirmButtonPosition } from "../utils/gridNavigation";
 import { findInputSequence } from "../utils/pathfinder";
 import { useState, useCallback, useEffect, useMemo } from "react";

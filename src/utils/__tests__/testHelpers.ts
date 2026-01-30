@@ -1,4 +1,4 @@
-import { InputAction } from "../../types";
+import type { InputAction } from "../../types";
 import { expect } from "vitest";
 
 interface CustomMatchers<R = unknown> {

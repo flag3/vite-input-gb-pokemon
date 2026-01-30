@@ -1,5 +1,5 @@
 import { createGrid } from "../constants/characterGrids";
-import { CharacterPosition, Position, GameVersion } from "../types";
+import type { CharacterPosition, Position, GameVersion } from "../types";
 
 /**
  * ひらがな/カタカナの対応マップ

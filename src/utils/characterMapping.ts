@@ -12,7 +12,7 @@ import {
   isControlChar,
   SPACE_CHARS,
 } from "../constants/gameConstants";
-import { GameVersion } from "../types";
+import type { GameVersion } from "../types";
 
 // 半角から全角への変換マップ
 const HALFWIDTH_TO_FULLWIDTH_MAP: { [key: string]: string } = {

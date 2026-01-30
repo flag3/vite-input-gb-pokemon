@@ -1,6 +1,6 @@
 import { DAKUTEN_REVERSE_MAP } from "../constants/gameConstants";
 import { UI_CONSTANTS } from "../constants/ui";
-import { InputPath, StateHistory } from "../types";
+import type { InputPath, StateHistory } from "../types";
 import React from "react";
 
 interface InputSequenceProps {

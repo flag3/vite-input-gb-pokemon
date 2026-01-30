@@ -1,6 +1,7 @@
-import { CharacterGrid, CharacterPosition, InputAction } from "../types";
+import type { CharacterGrid, CharacterPosition, InputAction } from "../types";
 import { getSpacePositions } from "./gridPositions";
-import { InternalPosition, calculateDistance } from "./pathfinderUtils";
+import type { InternalPosition } from "./pathfinderUtils";
+import { calculateDistance } from "./pathfinderUtils";
 
 /**
  * 最適なスペース位置を見つける

@@ -1,4 +1,4 @@
-import { GameVersion } from "../types";
+import type { GameVersion } from "../types";
 
 // 各ゲームバージョンの文字数上限
 export const MAX_CHAR_LIMITS: Record<GameVersion, number> = {

@@ -1,5 +1,5 @@
 import { GRIDS } from "../../constants/characterGrids";
-import { GameVersion } from "../../types";
+import type { GameVersion } from "../../types";
 import { decomposeTextWithMode } from "../characterMapping";
 import { findInputSequence } from "../pathfinder";
 import { describe, test, expect } from "vitest";
