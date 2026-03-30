@@ -1,11 +1,6 @@
 import { UI_CONSTANTS } from "../constants/ui";
 import type { GameVersion } from "../types";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import PauseIcon from "@mui/icons-material/Pause";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import SpeedIcon from "@mui/icons-material/Speed";
+import { Icon } from "@iconify/react";
 import { IconButton, Slider, Tooltip } from "@mui/material";
 import { type ChangeEvent, type FC } from "react";
 
@@ -125,13 +120,13 @@ export const InputControls: FC<InputControlsProps> = ({
             title={isPlaying ? "Pause" : currentStep >= totalSteps ? "Play from start" : "Play"}
           >
             <IconButton onClick={onPlayPause} color="primary" size="large">
-              {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
+              {isPlaying ? <Icon icon="material-symbols:pause" width={24} /> : <Icon icon="material-symbols:play-arrow" width={24} />}
             </IconButton>
           </Tooltip>
 
           <Tooltip title="Reset">
             <IconButton onClick={onReset} color="primary" size="large">
-              <RestartAltIcon />
+              <Icon icon="material-symbols:restart-alt" width={24} />
             </IconButton>
           </Tooltip>
 
@@ -143,7 +138,7 @@ export const InputControls: FC<InputControlsProps> = ({
                 color="primary"
                 size="large"
               >
-                <ArrowBackIcon />
+                <Icon icon="material-symbols:arrow-back" width={24} />
               </IconButton>
             </span>
           </Tooltip>
@@ -156,7 +151,7 @@ export const InputControls: FC<InputControlsProps> = ({
                 color="primary"
                 size="large"
               >
-                <ArrowForwardIcon />
+                <Icon icon="material-symbols:arrow-forward" width={24} />
               </IconButton>
             </span>
           </Tooltip>
@@ -172,7 +167,7 @@ export const InputControls: FC<InputControlsProps> = ({
           }}
         >
           <Tooltip title="Playback Speed">
-            <SpeedIcon color="primary" />
+            <Icon icon="material-symbols:speed-outline" width={24} style={{ color: "#1976d2" }} />
           </Tooltip>
           <Slider
             value={1000 - playbackSpeed}
