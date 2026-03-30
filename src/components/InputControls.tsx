@@ -120,7 +120,11 @@ export const InputControls: FC<InputControlsProps> = ({
             title={isPlaying ? "Pause" : currentStep >= totalSteps ? "Play from start" : "Play"}
           >
             <IconButton onClick={onPlayPause} color="primary" size="large">
-              {isPlaying ? <Icon icon="material-symbols:pause" width={24} /> : <Icon icon="material-symbols:play-arrow" width={24} />}
+              {isPlaying ? (
+                <Icon icon="material-symbols:pause" width={24} />
+              ) : (
+                <Icon icon="material-symbols:play-arrow" width={24} />
+              )}
             </IconButton>
           </Tooltip>
 
