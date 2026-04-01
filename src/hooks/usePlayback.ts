@@ -3,7 +3,7 @@ import { MAX_CHAR_LIMITS, DAKUTEN_REVERSE_MAP } from "../constants/gameConstants
 import type { GameVersion, InputAction, StateHistory } from "../types";
 import { calculateNextPosition, getConfirmButtonPosition } from "../utils/gridNavigation";
 import { findInputSequence } from "../utils/pathfinder";
-import { useState, useCallback, useEffect, useMemo } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 
 export const usePlayback = (
   inputText: string,
@@ -215,8 +215,8 @@ export const usePlayback = (
     ]);
   }, []);
 
-  const handleSpeedChange = useCallback((_event: Event, value: number | number[]) => {
-    setPlaybackSpeed(1000 - (Array.isArray(value) ? value[0] : value));
+  const handleSpeedChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setPlaybackSpeed(1000 - Number(e.target.value));
   }, []);
 
   useEffect(() => {

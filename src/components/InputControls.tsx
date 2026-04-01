@@ -1,8 +1,7 @@
 import { UI_CONSTANTS } from "../constants/ui";
 import type { GameVersion } from "../types";
 import { Icon } from "@iconify/react";
-import { IconButton, Slider, Tooltip } from "@mui/material";
-import { type ChangeEvent, type FC } from "react";
+import React, { type ChangeEvent, type FC } from "react";
 
 interface InputControlsProps {
   inputText: string;
@@ -18,8 +17,20 @@ interface InputControlsProps {
   onReset: () => void;
   onStepForward: () => void;
   onStepBackward: () => void;
-  onSpeedChange: (_: Event, value: number | number[]) => void;
+  onSpeedChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
+
+const iconButtonStyle: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "8px",
+  border: "none",
+  borderRadius: "50%",
+  background: "none",
+  color: "#1976d2",
+  cursor: "pointer",
+};
 
 export const InputControls: FC<InputControlsProps> = ({
   inputText,
@@ -116,49 +127,39 @@ export const InputControls: FC<InputControlsProps> = ({
             justifyContent: isMobile ? "center" : "flex-start",
           }}
         >
-          <Tooltip
+          <button
             title={isPlaying ? "Pause" : currentStep >= totalSteps ? "Play from start" : "Play"}
+            onClick={onPlayPause}
+            style={iconButtonStyle}
           >
-            <IconButton onClick={onPlayPause} color="primary" size="large">
-              {isPlaying ? (
-                <Icon icon="material-symbols:pause" width={24} />
-              ) : (
-                <Icon icon="material-symbols:play-arrow" width={24} />
-              )}
-            </IconButton>
-          </Tooltip>
+            {isPlaying ? (
+              <Icon icon="material-symbols:pause" width={24} />
+            ) : (
+              <Icon icon="material-symbols:play-arrow" width={24} />
+            )}
+          </button>
 
-          <Tooltip title="Reset">
-            <IconButton onClick={onReset} color="primary" size="large">
-              <Icon icon="material-symbols:restart-alt" width={24} />
-            </IconButton>
-          </Tooltip>
+          <button title="Reset" onClick={onReset} style={iconButtonStyle}>
+            <Icon icon="material-symbols:restart-alt" width={24} />
+          </button>
 
-          <Tooltip title="Previous">
-            <span>
-              <IconButton
-                onClick={onStepBackward}
-                disabled={currentStep === 0}
-                color="primary"
-                size="large"
-              >
-                <Icon icon="material-symbols:arrow-back" width={24} />
-              </IconButton>
-            </span>
-          </Tooltip>
+          <button
+            title="Previous"
+            onClick={onStepBackward}
+            disabled={currentStep === 0}
+            style={iconButtonStyle}
+          >
+            <Icon icon="material-symbols:arrow-back" width={24} />
+          </button>
 
-          <Tooltip title="Next">
-            <span>
-              <IconButton
-                onClick={onStepForward}
-                disabled={currentStep >= totalSteps}
-                color="primary"
-                size="large"
-              >
-                <Icon icon="material-symbols:arrow-forward" width={24} />
-              </IconButton>
-            </span>
-          </Tooltip>
+          <button
+            title="Next"
+            onClick={onStepForward}
+            disabled={currentStep >= totalSteps}
+            style={iconButtonStyle}
+          >
+            <Icon icon="material-symbols:arrow-forward" width={24} />
+          </button>
         </div>
 
         <div
@@ -170,17 +171,22 @@ export const InputControls: FC<InputControlsProps> = ({
             minWidth: isMobile ? "100%" : "200px",
           }}
         >
-          <Tooltip title="Playback Speed">
-            <Icon icon="material-symbols:speed-outline" width={24} style={{ color: "#1976d2" }} />
-          </Tooltip>
-          <Slider
+          <Icon
+            icon="material-symbols:speed-outline"
+            width={24}
+            style={{ color: "#1976d2", flexShrink: 0 }}
+          />
+          <input
+            type="range"
             value={1000 - playbackSpeed}
             onChange={onSpeedChange}
             min={0}
             max={900}
-            valueLabelDisplay="auto"
-            valueLabelFormat={(value) => `${((1000 - value) / 1000).toFixed(2)}s`}
+            style={{ flex: 1 }}
           />
+          <span style={{ fontSize: "12px", color: UI_CONSTANTS.COLORS.TEXT_MUTED, flexShrink: 0 }}>
+            {(playbackSpeed / 1000).toFixed(2)}s
+          </span>
         </div>
 
         <div
