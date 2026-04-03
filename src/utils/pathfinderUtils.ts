@@ -31,7 +31,7 @@ interface PositionWithActions {
 export const findCharacterPosition = (
   char: string,
   grid: CharacterGrid,
-): { position: CharacterPosition; needsModeChange: boolean } | null => {
+): { position: CharacterPosition } | null => {
   let hiraganaBaseGrid: string[][];
   let katakanaBaseGrid: string[][];
 
@@ -61,13 +61,11 @@ export const findCharacterPosition = (
       if (currentGrid[y][x] === char) {
         return {
           position: { char, x, y },
-          needsModeChange: false,
         };
       }
       if (HIRAGANA_KATAKANA_MAP[char]?.includes(currentGrid[y][x])) {
         return {
           position: { char: currentGrid[y][x], x, y },
-          needsModeChange: false,
         };
       }
     }
@@ -80,13 +78,11 @@ export const findCharacterPosition = (
       if (otherGrid[y][x] === char) {
         return {
           position: { char, x, y },
-          needsModeChange: true,
         };
       }
       if (HIRAGANA_KATAKANA_MAP[char]?.includes(otherGrid[y][x])) {
         return {
           position: { char: otherGrid[y][x], x, y },
-          needsModeChange: true,
         };
       }
     }

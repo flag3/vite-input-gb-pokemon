@@ -26,24 +26,6 @@ export interface StateHistory {
   inputChar: string | null;
 }
 
-export interface PlaybackState {
-  isPlaying: boolean;
-  currentStep: number;
-  currentCharIndex: number;
-  currentAction: InputAction | null;
-  playbackSpeed: number;
-  stateHistory: StateHistory[];
-  currentPosition: Position;
-  isHiragana: boolean;
-  totalSteps: number;
-}
-
-export interface InputProcessingState {
-  inputText: string;
-  currentVersion: GameVersion;
-  sequences: InputPath[];
-}
-
 export type InputPath = {
   char: string;
   actions: InputAction[];
