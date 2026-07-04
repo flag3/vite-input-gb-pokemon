@@ -1,11 +1,4 @@
-import {
-  hiraganaGrid,
-  katakanaGrid,
-  twoGenBoxHiraganaGrid,
-  twoGenBoxKatakanaGrid,
-  twoGenMailHiraganaGrid,
-  twoGenMailKatakanaGrid,
-} from "../constants/characterGrids";
+import { BASE_GRIDS } from "../constants/characterGrids";
 import type { CharacterGrid, CharacterPosition, InputAction, Position } from "../types";
 import { calculateNextPosition } from "./gridNavigation";
 import { HIRAGANA_KATAKANA_MAP } from "./gridPositions";
@@ -32,58 +25,18 @@ export const findCharacterPosition = (
   char: string,
   grid: CharacterGrid,
 ): { position: CharacterPosition } | null => {
-  let hiraganaBaseGrid: string[][];
-  let katakanaBaseGrid: string[][];
+  const { hiragana, katakana } = BASE_GRIDS[grid.version];
 
-  switch (grid.version) {
-    case "GEN1":
-      hiraganaBaseGrid = hiraganaGrid;
-      katakanaBaseGrid = katakanaGrid;
-      break;
-    case "GEN2_NICKNAME":
-      hiraganaBaseGrid = twoGenBoxHiraganaGrid;
-      katakanaBaseGrid = twoGenBoxKatakanaGrid;
-      break;
-    case "GEN2_BOX":
-      hiraganaBaseGrid = twoGenBoxHiraganaGrid;
-      katakanaBaseGrid = twoGenBoxKatakanaGrid;
-      break;
-    case "GEN2_MAIL":
-      hiraganaBaseGrid = twoGenMailHiraganaGrid;
-      katakanaBaseGrid = twoGenMailKatakanaGrid;
-      break;
-  }
+  // 現在のモードのグリッドを先に探し、なければ他のモードのグリッドを探す
+  const searchOrder = grid.isHiragana ? [hiragana, katakana] : [katakana, hiragana];
 
-  // 現在のモードのグリッドから文字を探す
-  const currentGrid = grid.isHiragana ? hiraganaBaseGrid : katakanaBaseGrid;
-  for (let y = 0; y < currentGrid.length; y++) {
-    for (let x = 0; x < currentGrid[y].length; x++) {
-      if (currentGrid[y][x] === char) {
-        return {
-          position: { char, x, y },
-        };
-      }
-      if (HIRAGANA_KATAKANA_MAP[char]?.includes(currentGrid[y][x])) {
-        return {
-          position: { char: currentGrid[y][x], x, y },
-        };
-      }
-    }
-  }
-
-  // 他のモードのグリッドから文字を探す
-  const otherGrid = grid.isHiragana ? katakanaBaseGrid : hiraganaBaseGrid;
-  for (let y = 0; y < otherGrid.length; y++) {
-    for (let x = 0; x < otherGrid[y].length; x++) {
-      if (otherGrid[y][x] === char) {
-        return {
-          position: { char, x, y },
-        };
-      }
-      if (HIRAGANA_KATAKANA_MAP[char]?.includes(otherGrid[y][x])) {
-        return {
-          position: { char: otherGrid[y][x], x, y },
-        };
+  for (const baseGrid of searchOrder) {
+    for (let y = 0; y < baseGrid.length; y++) {
+      for (let x = 0; x < baseGrid[y].length; x++) {
+        const gridChar = baseGrid[y][x];
+        if (gridChar === char || HIRAGANA_KATAKANA_MAP[char]?.includes(gridChar)) {
+          return { position: { char: gridChar, x, y } };
+        }
       }
     }
   }

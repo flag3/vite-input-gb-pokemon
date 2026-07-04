@@ -1,5 +1,5 @@
 import { createGrid } from "../constants/characterGrids";
-import type { CharacterPosition, Position, GameVersion } from "../types";
+import type { CharacterPosition, GameVersion } from "../types";
 
 /**
  * ひらがな/カタカナの対応マップ
@@ -34,21 +34,4 @@ export const getSpacePositions = (
     .map((pos) => ({ char: "　", x: pos.x, y: pos.y }));
 
   return { hiraganaSpaces, katakanaSpaces };
-};
-
-/**
- * 文字数上限に達した時の確定ボタンの位置を取得
- */
-export const getFixedPositionForDakuten = (version: GameVersion): Position => {
-  switch (version) {
-    case "GEN1":
-      return { x: 8, y: 5 };
-    case "GEN2_NICKNAME":
-    case "GEN2_BOX":
-      return { x: 14, y: 4 };
-    case "GEN2_MAIL":
-      return { x: 15, y: 4 };
-    default:
-      return { x: 0, y: 0 };
-  }
 };

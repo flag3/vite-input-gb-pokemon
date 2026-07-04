@@ -1,6 +1,5 @@
-import { MAX_CHAR_LIMITS } from "../constants/gameConstants";
+import { CONFIRM_POSITIONS, MAX_CHAR_LIMITS } from "../constants/gameConstants";
 import type { CharacterGrid, InputAction, InputPath } from "../types";
-import { getFixedPositionForDakuten } from "./gridPositions";
 import type { InternalPosition } from "./pathfinderUtils";
 import { findCharacterPosition, calculateDistance } from "./pathfinderUtils";
 import { findOptimalSpacePosition } from "./spacePathfinder";
@@ -51,7 +50,7 @@ export const findInputSequence = (
     const isAtCharLimit = inputCharCount === MAX_CHAR_LIMITS[grid.version];
     const startPosition = isAtCharLimit
       ? {
-          ...getFixedPositionForDakuten(grid.version),
+          ...CONFIRM_POSITIONS[grid.version],
           char: currentPosition.char,
         }
       : currentPosition;
@@ -144,7 +143,7 @@ export const findInputSequence = (
 
     const limit = MAX_CHAR_LIMITS[grid.version];
     const fixedPos: InternalPosition = {
-      ...getFixedPositionForDakuten(grid.version),
+      ...CONFIRM_POSITIONS[grid.version],
       char: targetPosition.char,
     };
 

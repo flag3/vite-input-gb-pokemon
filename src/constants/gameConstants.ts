@@ -1,4 +1,4 @@
-import type { GameVersion } from "../types";
+import type { GameVersion, Position } from "../types";
 
 // 各ゲームバージョンの文字数上限
 export const MAX_CHAR_LIMITS: Record<GameVersion, number> = {
@@ -6,6 +6,14 @@ export const MAX_CHAR_LIMITS: Record<GameVersion, number> = {
   GEN2_NICKNAME: 5,
   GEN2_BOX: 8,
   GEN2_MAIL: 32,
+};
+
+// 各ゲームバージョンの確定ボタン（ED / けってい）の位置
+export const CONFIRM_POSITIONS: Record<GameVersion, Position> = {
+  GEN1: { x: 8, y: 5 },
+  GEN2_NICKNAME: { x: 14, y: 4 },
+  GEN2_BOX: { x: 14, y: 4 },
+  GEN2_MAIL: { x: 15, y: 4 },
 };
 
 // 特殊文字の判定

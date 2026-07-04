@@ -1,18 +1,12 @@
-import {
-  hiraganaGrid,
-  katakanaGrid,
-  twoGenBoxHiraganaGrid,
-  twoGenBoxKatakanaGrid,
-  twoGenMailHiraganaGrid,
-  twoGenMailKatakanaGrid,
-} from "../constants/characterGrids";
+import { BASE_GRIDS } from "../constants/characterGrids";
 import {
   DAKUTEN_MAP,
+  DAKUTEN_REVERSE_MAP,
   isDiacriticalMark,
   isControlChar,
   SPACE_CHARS,
 } from "../constants/gameConstants";
-import type { GameVersion } from "../types";
+import type { GameVersion, StateHistory } from "../types";
 
 // 半角から全角への変換マップ
 const HALFWIDTH_TO_FULLWIDTH_MAP: { [key: string]: string } = {
@@ -55,58 +49,16 @@ const excludeSpecialChars = (char: string): boolean => {
   return !isControlChar(char) && !isDiacriticalMark(char) && char !== "　";
 };
 
-// 各グリッドで使用可能な文字のセットを作成
-const gen1HiraganaChars = new Set(hiraganaGrid.flat().filter(excludeSpecialChars));
-const gen1KatakanaChars = new Set(katakanaGrid.flat().filter(excludeSpecialChars));
+// 各グリッドで使用可能な文字のセット（バージョン別）
+const toCharSet = (grid: string[][]): Set<string> =>
+  new Set(grid.flat().filter(excludeSpecialChars));
 
-const gen2BoxHiraganaChars = new Set(
-  twoGenBoxHiraganaGrid
-    .flat()
-    .filter((char) => !isControlChar(char) && !isDiacriticalMark(char) && char !== "　"),
-);
-
-const gen2BoxKatakanaChars = new Set(
-  twoGenBoxKatakanaGrid
-    .flat()
-    .filter((char) => !isControlChar(char) && !isDiacriticalMark(char) && char !== "　"),
-);
-
-const gen2MailHiraganaChars = new Set(twoGenMailHiraganaGrid.flat().filter(excludeSpecialChars));
-const gen2MailKatakanaChars = new Set(twoGenMailKatakanaGrid.flat().filter(excludeSpecialChars));
-
-const isHiragana = (char: string, version: GameVersion): boolean => {
-  if (isDiacriticalMark(char)) return false;
-
-  switch (version) {
-    case "GEN1":
-      return gen1HiraganaChars.has(char);
-    case "GEN2_NICKNAME":
-      return gen2BoxHiraganaChars.has(char);
-    case "GEN2_BOX":
-      return gen2BoxHiraganaChars.has(char);
-    case "GEN2_MAIL":
-      return gen2MailHiraganaChars.has(char);
-    default:
-      return false;
-  }
-};
-
-const isKatakana = (char: string, version: GameVersion): boolean => {
-  if (isDiacriticalMark(char)) return false;
-
-  switch (version) {
-    case "GEN1":
-      return gen1KatakanaChars.has(char);
-    case "GEN2_NICKNAME":
-      return gen2BoxKatakanaChars.has(char);
-    case "GEN2_BOX":
-      return gen2BoxKatakanaChars.has(char);
-    case "GEN2_MAIL":
-      return gen2MailKatakanaChars.has(char);
-    default:
-      return false;
-  }
-};
+const KANA_SETS = Object.fromEntries(
+  Object.entries(BASE_GRIDS).map(([version, grids]) => [
+    version,
+    { hiragana: toCharSet(grids.hiragana), katakana: toCharSet(grids.katakana) },
+  ]),
+) as Record<GameVersion, { hiragana: Set<string>; katakana: Set<string> }>;
 
 export const decomposeTextWithMode = (
   text: string,
@@ -137,8 +89,8 @@ export const decomposeTextWithMode = (
         continue;
       }
 
-      const charIsHiragana = isHiragana(c, version);
-      const charIsKatakana = isKatakana(c, version);
+      const charIsHiragana = KANA_SETS[version].hiragana.has(c);
+      const charIsKatakana = KANA_SETS[version].katakana.has(c);
 
       if ((charIsHiragana && !currentIsHiragana) || (charIsKatakana && currentIsHiragana)) {
         currentIsHiragana = !currentIsHiragana;
@@ -150,4 +102,29 @@ export const decomposeTextWithMode = (
   }
 
   return { chars: result, modes: modes };
+};
+
+/**
+ * 再生履歴（Aで入力・Bで削除・濁点合成）から現在の表示テキストを復元する
+ */
+export const getDisplayText = (history: StateHistory[]): string => {
+  let text = "";
+
+  for (const state of history) {
+    if (state.action === "B") {
+      text = text.slice(0, -1);
+    } else if (state.action === "A" && state.inputChar) {
+      const lastChar = text[text.length - 1];
+      if (state.inputChar === "゛" || state.inputChar === "゜") {
+        const combined = lastChar ? DAKUTEN_REVERSE_MAP[lastChar]?.[state.inputChar] : undefined;
+        if (combined) {
+          text = text.slice(0, -1) + combined;
+        }
+      } else if (!isControlChar(state.inputChar)) {
+        text += state.inputChar;
+      }
+    }
+  }
+
+  return text;
 };

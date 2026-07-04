@@ -1,6 +1,6 @@
-import { DAKUTEN_REVERSE_MAP } from "../constants/gameConstants";
 import { UI_CONSTANTS } from "../constants/ui";
 import type { InputPath, StateHistory } from "../types";
+import { getDisplayText } from "../utils/characterMapping";
 import React from "react";
 
 interface InputSequenceProps {
@@ -11,48 +11,6 @@ interface InputSequenceProps {
   isMobile: boolean;
 }
 
-const getCurrentText = (stateHistory: StateHistory[]): string => {
-  let text = "";
-  let lastChar = "";
-
-  // stateHistoryからAアクションの入力文字と削除操作を追跡
-  for (let i = 0; i < stateHistory.length; i++) {
-    const state = stateHistory[i];
-
-    if (state.action === "B") {
-      // Bボタンで削除操作
-      if (text.length > 0) {
-        text = text.substring(0, text.length - 1);
-        // 最後の文字も更新
-        lastChar = text.length > 0 ? text[text.length - 1] : "";
-      }
-    } else if (state.action === "A" && state.inputChar) {
-      // 濁点・半濁点の処理
-      if (state.inputChar === "゛" || state.inputChar === "゜") {
-        // 最後の文字に濁点・半濁点を適用できるかチェック
-        if (lastChar && DAKUTEN_REVERSE_MAP[lastChar]?.[state.inputChar]) {
-          // 最後の文字を濁点・半濁点付きの文字に置き換える
-          text =
-            text.substring(0, text.length - 1) + DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
-          lastChar = DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
-        }
-        // 適用できない場合は何もしない
-      } else {
-        // EDは終了ボタンなので表示しない
-        if (state.inputChar !== "ED" && state.inputChar !== "けってい") {
-          // かな/カナ切り替えボタンも表示しない
-          if (state.inputChar !== "かな" && state.inputChar !== "カナ") {
-            text += state.inputChar;
-            lastChar = state.inputChar;
-          }
-        }
-      }
-    }
-  }
-
-  return text;
-};
-
 export const InputSequence: React.FC<InputSequenceProps> = ({
   sequences,
   currentStep,
@@ -60,7 +18,7 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
   stateHistory,
   isMobile,
 }) => {
-  const currentText = getCurrentText(stateHistory);
+  const currentText = getDisplayText(stateHistory);
 
   const formatText = (text: string) => {
     const lines = text.match(/.{1,16}/g) || [];

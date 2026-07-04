@@ -31,95 +31,58 @@ export const findOptimalSpacePosition = (
   let optimalPosition = spacePositions.hiraganaSpaces[0] || spacePositions.katakanaSpaces[0];
   let optimalActions: InputAction[] = [];
 
-  // 現在のモードのスペースを試す
-  const currentModeSpaces = currentIsHiragana
-    ? spacePositions.hiraganaSpaces
-    : spacePositions.katakanaSpaces;
-  for (const spacePos of currentModeSpaces) {
-    const actions: InputAction[] = [];
+  // 現在のモードのスペースはそのまま、他のモードのスペースは "s"（モード切替）を先頭に付けて試す
+  const candidates: { spaces: CharacterPosition[]; prefix: InputAction[] }[] = [
+    {
+      spaces: currentIsHiragana ? spacePositions.hiraganaSpaces : spacePositions.katakanaSpaces,
+      prefix: [],
+    },
+    {
+      spaces: currentIsHiragana ? spacePositions.katakanaSpaces : spacePositions.hiraganaSpaces,
+      prefix: ["s"],
+    },
+  ];
 
-    if (currentPosition.x !== spacePos.x || currentPosition.y !== spacePos.y) {
-      const { actions: moveActions } = calculateDistance(
-        currentPosition,
-        spacePos,
-        grid,
-        inputCharCount,
-      );
-      actions.push(...moveActions);
-    }
+  for (const { spaces, prefix } of candidates) {
+    for (const spacePos of spaces) {
+      const actions: InputAction[] = [...prefix];
 
-    actions.push("A");
+      if (currentPosition.x !== spacePos.x || currentPosition.y !== spacePos.y) {
+        const { actions: moveActions } = calculateDistance(
+          currentPosition,
+          spacePos,
+          grid,
+          inputCharCount,
+        );
+        actions.push(...moveActions);
+      }
 
-    let totalSteps = actions.length;
+      actions.push("A");
 
-    if (nextCharPosition) {
-      const spaceToNextPosition: InternalPosition = {
-        x: spacePos.x,
-        y: spacePos.y,
-        char: "　",
-      };
+      let totalSteps = actions.length;
 
-      const { distance: nextDistance } = calculateDistance(
-        spaceToNextPosition,
-        nextCharPosition,
-        grid,
-        inputCharCount,
-      );
+      if (nextCharPosition) {
+        const spaceToNextPosition: InternalPosition = {
+          x: spacePos.x,
+          y: spacePos.y,
+          char: "　",
+        };
 
-      totalSteps += nextDistance;
-    }
+        const { distance: nextDistance } = calculateDistance(
+          spaceToNextPosition,
+          nextCharPosition,
+          grid,
+          inputCharCount,
+        );
 
-    if (totalSteps < minTotalSteps) {
-      minTotalSteps = totalSteps;
-      optimalPosition = spacePos;
-      optimalActions = actions;
-    }
-  }
+        totalSteps += nextDistance;
+      }
 
-  // 他のモードのスペースも試す
-  const otherModeSpaces = currentIsHiragana
-    ? spacePositions.katakanaSpaces
-    : spacePositions.hiraganaSpaces;
-  for (const spacePos of otherModeSpaces) {
-    const actions: InputAction[] = [];
-
-    actions.push("s");
-
-    if (currentPosition.x !== spacePos.x || currentPosition.y !== spacePos.y) {
-      const { actions: moveActions } = calculateDistance(
-        currentPosition,
-        spacePos,
-        grid,
-        inputCharCount,
-      );
-      actions.push(...moveActions);
-    }
-
-    actions.push("A");
-
-    let totalSteps = actions.length;
-
-    if (nextCharPosition) {
-      const spaceToNextPosition: InternalPosition = {
-        x: spacePos.x,
-        y: spacePos.y,
-        char: "　",
-      };
-
-      const { distance: nextDistance } = calculateDistance(
-        spaceToNextPosition,
-        nextCharPosition,
-        grid,
-        inputCharCount,
-      );
-
-      totalSteps += nextDistance;
-    }
-
-    if (totalSteps < minTotalSteps) {
-      minTotalSteps = totalSteps;
-      optimalPosition = spacePos;
-      optimalActions = actions;
+      if (totalSteps < minTotalSteps) {
+        minTotalSteps = totalSteps;
+        optimalPosition = spacePos;
+        optimalActions = actions;
+      }
     }
   }
 

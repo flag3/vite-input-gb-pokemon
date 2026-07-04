@@ -3,47 +3,31 @@ import { MAX_CHAR_LIMITS } from "../constants/gameConstants";
 import type { GameVersion } from "../types";
 import { decomposeTextWithMode, normalizeSpaces } from "../utils/characterMapping";
 import { findInputSequence } from "../utils/pathfinder";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 export const useInputProcessing = () => {
   const [inputText, setInputText] = useState("");
   const [currentVersion, setCurrentVersion] = useState<GameVersion>("GEN1");
-  const [sequences, setSequences] = useState<ReturnType<typeof findInputSequence>>([]);
+
+  const sequences = useMemo(() => {
+    if (!inputText) return [];
+
+    const grid = { ...GRIDS[currentVersion], isHiragana: false };
+    const { chars, modes } = decomposeTextWithMode(inputText, false, currentVersion);
+    return findInputSequence(grid, chars.join(""), modes);
+  }, [inputText, currentVersion]);
 
   const handleTextChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const text = normalizeSpaces(e.target.value);
-      const maxLength = MAX_CHAR_LIMITS[currentVersion];
-      const truncatedText = text.slice(0, maxLength);
-
-      setInputText(truncatedText);
-
-      if (truncatedText) {
-        const grid = { ...GRIDS[currentVersion], isHiragana: false };
-        const { chars, modes } = decomposeTextWithMode(truncatedText, false, currentVersion);
-        const newSequences = findInputSequence(grid, chars.join(""), modes);
-        setSequences(newSequences);
-      } else {
-        setSequences([]);
-      }
+      setInputText(text.slice(0, MAX_CHAR_LIMITS[currentVersion]));
     },
     [currentVersion],
   );
 
-  const handleVersionChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const version = e.target.value as GameVersion;
-      setCurrentVersion(version);
-
-      if (inputText) {
-        const grid = { ...GRIDS[version], isHiragana: false };
-        const { chars, modes } = decomposeTextWithMode(inputText, false, version);
-        const newSequences = findInputSequence(grid, chars.join(""), modes);
-        setSequences(newSequences);
-      }
-    },
-    [inputText],
-  );
+  const handleVersionChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCurrentVersion(e.target.value as GameVersion);
+  }, []);
 
   return {
     inputText,

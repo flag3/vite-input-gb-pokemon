@@ -1,7 +1,8 @@
 import { createGrid } from "../constants/characterGrids";
-import { MAX_CHAR_LIMITS, DAKUTEN_REVERSE_MAP } from "../constants/gameConstants";
+import { CONFIRM_POSITIONS, MAX_CHAR_LIMITS, isControlChar } from "../constants/gameConstants";
 import type { GameVersion, InputAction, StateHistory } from "../types";
-import { calculateNextPosition, getConfirmButtonPosition } from "../utils/gridNavigation";
+import { getDisplayText } from "../utils/characterMapping";
+import { calculateNextPosition } from "../utils/gridNavigation";
 import { findInputSequence } from "../utils/pathfinder";
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 
@@ -23,39 +24,6 @@ export const usePlayback = (
     () => sequences.reduce((sum, seq) => sum + seq.actions.length, 0),
     [sequences],
   );
-
-  const calculateDisplayTextLength = useCallback((history: StateHistory[]): number => {
-    let text = "";
-    let lastChar = "";
-
-    for (let i = 0; i < history.length; i++) {
-      const state = history[i];
-
-      if (state.action === "B") {
-        if (text.length > 0) {
-          text = text.substring(0, text.length - 1);
-          lastChar = text.length > 0 ? text[text.length - 1] : "";
-        }
-      } else if (state.action === "A" && state.inputChar) {
-        if (state.inputChar === "゛" || state.inputChar === "゜") {
-          if (lastChar && DAKUTEN_REVERSE_MAP[lastChar]?.[state.inputChar]) {
-            text =
-              text.substring(0, text.length - 1) + DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
-            lastChar = DAKUTEN_REVERSE_MAP[lastChar][state.inputChar];
-          }
-        } else if (
-          state.inputChar !== "ED" &&
-          state.inputChar !== "かな" &&
-          state.inputChar !== "カナ"
-        ) {
-          text += state.inputChar;
-          lastChar = state.inputChar;
-        }
-      }
-    }
-
-    return text.length;
-  }, []);
 
   const handleStepForward = useCallback(() => {
     if (currentStep >= totalSteps) return;
@@ -82,13 +50,8 @@ export const usePlayback = (
         if (action === "s") {
           newIsHiragana = !newIsHiragana;
         } else if (action === "S" && currentVersion !== "GEN1") {
-          if (currentVersion === "GEN2_NICKNAME" || currentVersion === "GEN2_BOX") {
-            newPosition.x = 14;
-            newPosition.y = 4;
-          } else if (currentVersion === "GEN2_MAIL") {
-            newPosition.x = 15;
-            newPosition.y = 4;
-          }
+          newPosition.x = CONFIRM_POSITIONS[currentVersion].x;
+          newPosition.y = CONFIRM_POSITIONS[currentVersion].y;
         } else if (action === "A") {
           const grid = createGrid(currentVersion, newIsHiragana);
           const charAtPosition = grid.grid.find(
@@ -110,16 +73,14 @@ export const usePlayback = (
             },
           ];
 
-          const newTextLength = calculateDisplayTextLength(tempHistory);
+          const newTextLength = getDisplayText(tempHistory).length;
 
           if (
             newTextLength >= MAX_CHAR_LIMITS[currentVersion] &&
             currentInputChar &&
-            currentInputChar !== "ED" &&
-            currentInputChar !== "かな" &&
-            currentInputChar !== "カナ"
+            !isControlChar(currentInputChar)
           ) {
-            const confirmPos = getConfirmButtonPosition(currentVersion);
+            const confirmPos = CONFIRM_POSITIONS[currentVersion];
             newPosition.x = confirmPos.x;
             newPosition.y = confirmPos.y;
           }
@@ -161,7 +122,6 @@ export const usePlayback = (
     sequences,
     currentVersion,
     stateHistory,
-    calculateDisplayTextLength,
   ]);
 
   const handleStepBackward = useCallback(() => {

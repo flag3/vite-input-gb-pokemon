@@ -1,4 +1,4 @@
-import { MAX_CHAR_LIMITS } from "../constants/gameConstants";
+import { CONFIRM_POSITIONS, MAX_CHAR_LIMITS } from "../constants/gameConstants";
 import type { InputAction, CharacterGrid, Position } from "../types";
 
 /**
@@ -16,37 +16,16 @@ export const calculateNextPosition = (
     return pos; // これらのアクションは位置を変更しない
   }
 
-  // Sアクションの場合は、GEN2で位置変更が必要
+  // Sアクションの場合は、GEN2で確定ボタンへ移動
   if (action === "S") {
-    if (grid.version !== "GEN1") {
-      if (grid.version === "GEN2_MAIL") {
-        pos.x = 15;
-        pos.y = 4;
-      } else {
-        pos.x = 14;
-        pos.y = 4;
-      }
-    }
-    return pos;
+    return grid.version === "GEN1" ? pos : { ...CONFIRM_POSITIONS[grid.version] };
   }
 
   // Aアクションの場合、MAX文字数に達した場合は確定ボタンへ移動
-  if (action === "A" && inputCharCount !== undefined) {
-    const isAtCharLimit = inputCharCount === MAX_CHAR_LIMITS[grid.version];
-    if (isAtCharLimit) {
-      if (grid.version === "GEN1") {
-        pos.x = 8;
-        pos.y = 5;
-      } else if (grid.version === "GEN2_MAIL") {
-        pos.x = 15;
-        pos.y = 4;
-      } else {
-        pos.x = 14;
-        pos.y = 4;
-      }
-      return pos;
-    }
-    return pos; // MAX文字数でない場合は位置変更しない
+  if (action === "A") {
+    return inputCharCount === MAX_CHAR_LIMITS[grid.version]
+      ? { ...CONFIRM_POSITIONS[grid.version] }
+      : pos;
   }
 
   if (grid.version === "GEN1") {
@@ -54,6 +33,19 @@ export const calculateNextPosition = (
   } else {
     return calculateGen2NextPosition(pos, action, grid);
   }
+};
+
+/**
+ * 同じ行内で左右にラップしながら移動する
+ */
+const moveInRow = (pos: Position, grid: CharacterGrid, delta: -1 | 1): void => {
+  const positions = grid.grid
+    .filter((p) => p.y === pos.y)
+    .map((p) => p.x)
+    .sort((a, b) => a - b);
+  const currentIndex = positions.indexOf(pos.x);
+  const nextIndex = (currentIndex + delta + positions.length) % positions.length;
+  pos.x = positions[nextIndex];
 };
 
 /**
@@ -87,20 +79,14 @@ const calculateGen1NextPosition = (
       if (pos.y === 6) {
         pos.x = 0;
       } else {
-        const currentRow = grid.grid.filter((p) => p.y === pos.y);
-        const positions = currentRow.map((p) => p.x).sort((a, b) => a - b);
-        const currentIndex = positions.indexOf(pos.x);
-        pos.x = currentIndex === 0 ? positions[positions.length - 1] : positions[currentIndex - 1];
+        moveInRow(pos, grid, -1);
       }
       break;
     case "→":
       if (pos.y === 6) {
         pos.x = 0;
       } else {
-        const currentRow = grid.grid.filter((p) => p.y === pos.y);
-        const positions = currentRow.map((p) => p.x).sort((a, b) => a - b);
-        const currentIndex = positions.indexOf(pos.x);
-        pos.x = currentIndex === positions.length - 1 ? positions[0] : positions[currentIndex + 1];
+        moveInRow(pos, grid, 1);
       }
       break;
   }
@@ -134,20 +120,14 @@ const calculateGen2NextPosition = (
       if (pos.y === 4) {
         handleGen2BottomRowNavigation(pos, "left", grid.version);
       } else {
-        const currentRow = grid.grid.filter((p) => p.y === pos.y);
-        const positions = currentRow.map((p) => p.x).sort((a, b) => a - b);
-        const currentIndex = positions.indexOf(pos.x);
-        pos.x = currentIndex === 0 ? positions[positions.length - 1] : positions[currentIndex - 1];
+        moveInRow(pos, grid, -1);
       }
       break;
     case "→":
       if (pos.y === 4) {
         handleGen2BottomRowNavigation(pos, "right", grid.version);
       } else {
-        const currentRow = grid.grid.filter((p) => p.y === pos.y);
-        const positions = currentRow.map((p) => p.x).sort((a, b) => a - b);
-        const currentIndex = positions.indexOf(pos.x);
-        pos.x = currentIndex === positions.length - 1 ? positions[0] : positions[currentIndex + 1];
+        moveInRow(pos, grid, 1);
       }
       break;
   }
@@ -155,64 +135,18 @@ const calculateGen2NextPosition = (
 };
 
 /**
- * GEN2の下部行のナビゲーション処理
+ * GEN2の下部行（かな/ていせい/けってい）のナビゲーション処理
+ * 下部行は3つのボタンに分割されており、左右移動でボタン間をラップする
  */
-export const handleGen2BottomRowNavigation = (
+const handleGen2BottomRowNavigation = (
   pos: Position,
   direction: "left" | "right",
   version: string,
 ): void => {
-  if (version === "GEN2_MAIL") {
-    if (direction === "left") {
-      if (pos.x >= 0 && pos.x <= 5) {
-        pos.x = 12;
-      } else if (pos.x >= 6 && pos.x <= 11) {
-        pos.x = 0;
-      } else if (pos.x >= 12 && pos.x <= 17) {
-        pos.x = 6;
-      }
-    } else {
-      // right
-      if (pos.x >= 0 && pos.x <= 5) {
-        pos.x = 6;
-      } else if (pos.x >= 6 && pos.x <= 11) {
-        pos.x = 12;
-      } else if (pos.x >= 12 && pos.x <= 17) {
-        pos.x = 0;
-      }
-    }
-  } else {
-    // GEN2_NICKNAME or GEN2_BOX
-    if (direction === "left") {
-      if (pos.x >= 0 && pos.x <= 4) {
-        pos.x = 10;
-      } else if (pos.x >= 5 && pos.x <= 9) {
-        pos.x = 0;
-      } else if (pos.x >= 10 && pos.x <= 14) {
-        pos.x = 5;
-      }
-    } else {
-      // right
-      if (pos.x >= 0 && pos.x <= 4) {
-        pos.x = 5;
-      } else if (pos.x >= 5 && pos.x <= 9) {
-        pos.x = 10;
-      } else if (pos.x >= 10 && pos.x <= 14) {
-        pos.x = 0;
-      }
-    }
-  }
-};
-
-/**
- * "けってい"ボタンの位置を取得
- */
-export const getConfirmButtonPosition = (version: string): Position => {
-  if (version === "GEN1") {
-    return { x: 8, y: 5 }; // GEN1の"ED"位置
-  } else if (version === "GEN2_MAIL") {
-    return { x: 15, y: 4 };
-  } else {
-    return { x: 14, y: 4 };
-  }
+  const buttonWidth = version === "GEN2_MAIL" ? 6 : 5;
+  const buttonCount = 3;
+  const currentButton = Math.floor(pos.x / buttonWidth);
+  const delta = direction === "left" ? -1 : 1;
+  const nextButton = (currentButton + delta + buttonCount) % buttonCount;
+  pos.x = nextButton * buttonWidth;
 };

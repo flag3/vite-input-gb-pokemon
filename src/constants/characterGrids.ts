@@ -274,39 +274,23 @@ export const twoGenMailKatakanaGrid = [
   ],
 ];
 
-export const createGrid = (version: GameVersion, isHiragana: boolean): CharacterGrid => {
-  let baseGrid: string[][];
-  let width: number;
-  let height: number;
+// バージョンごとのひらがな/カタカナのベースグリッド
+export const BASE_GRIDS: Record<GameVersion, { hiragana: string[][]; katakana: string[][] }> = {
+  GEN1: { hiragana: hiraganaGrid, katakana: katakanaGrid },
+  GEN2_NICKNAME: { hiragana: twoGenBoxHiraganaGrid, katakana: twoGenBoxKatakanaGrid },
+  GEN2_BOX: { hiragana: twoGenBoxHiraganaGrid, katakana: twoGenBoxKatakanaGrid },
+  GEN2_MAIL: { hiragana: twoGenMailHiraganaGrid, katakana: twoGenMailKatakanaGrid },
+};
 
-  switch (version) {
-    case "GEN1":
-      baseGrid = isHiragana ? hiraganaGrid : katakanaGrid;
-      width = 9;
-      height = 7;
-      break;
-    case "GEN2_NICKNAME":
-      baseGrid = isHiragana ? twoGenBoxHiraganaGrid : twoGenBoxKatakanaGrid;
-      width = 15;
-      height = 5;
-      break;
-    case "GEN2_BOX":
-      baseGrid = isHiragana ? twoGenBoxHiraganaGrid : twoGenBoxKatakanaGrid;
-      width = 15;
-      height = 5;
-      break;
-    case "GEN2_MAIL":
-      baseGrid = isHiragana ? twoGenMailHiraganaGrid : twoGenMailKatakanaGrid;
-      width = 18;
-      height = 5;
-      break;
-  }
+export const createGrid = (version: GameVersion, isHiragana: boolean): CharacterGrid => {
+  const base = BASE_GRIDS[version];
+  const baseGrid = isHiragana ? base.hiragana : base.katakana;
 
   return {
     version,
     isHiragana,
-    width,
-    height,
+    width: baseGrid[0].length,
+    height: baseGrid.length,
     grid: baseGrid
       .flatMap((row, y) =>
         row.map((char, x) => ({
