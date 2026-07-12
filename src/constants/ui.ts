@@ -1,16 +1,9 @@
 export const UI_CONSTANTS = {
-  MOBILE_BREAKPOINT: 768,
   GRID: {
     CELL_SIZE: 40,
     GAP: 4,
     PADDING: 8,
     BORDER_RADIUS: 4,
-  },
-  LAYOUT: {
-    MAX_WIDTH: 1200,
-    CONTAINER_PADDING: 20,
-    SECTION_GAP: 40,
-    SIDEBAR_WIDTH: 400,
   },
   TYPOGRAPHY: {
     FONT_SIZE_INPUT: 16,

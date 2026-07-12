@@ -8,7 +8,6 @@ interface InputSequenceProps {
   currentStep: number;
   currentCharIndex: number;
   stateHistory: StateHistory[];
-  isMobile: boolean;
 }
 
 export const InputSequence: React.FC<InputSequenceProps> = ({
@@ -16,7 +15,6 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
   currentStep,
   currentCharIndex,
   stateHistory,
-  isMobile,
 }) => {
   const currentText = getDisplayText(stateHistory);
 
@@ -26,14 +24,7 @@ export const InputSequence: React.FC<InputSequenceProps> = ({
   };
 
   return (
-    <div
-      style={{
-        position: isMobile ? "static" : "sticky",
-        top: "20px",
-        alignSelf: "start",
-        marginTop: isMobile ? "20px" : "0",
-      }}
-    >
+    <div className="input-sequence">
       <div
         style={{
           marginBottom: "20px",

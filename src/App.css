@@ -3,3 +3,76 @@
   margin: 0 auto;
   padding: 2rem;
 }
+
+.simulator-layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 40px;
+}
+
+.input-sequence {
+  position: sticky;
+  top: 20px;
+  align-self: start;
+}
+
+.controls-row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.playback-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.playback-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.speed-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 200px;
+}
+
+@media (max-width: 768px) {
+  .simulator-layout {
+    grid-template-columns: 1fr;
+  }
+  .input-sequence {
+    position: static;
+    margin-top: 20px;
+  }
+  .controls-row,
+  .playback-row {
+    flex-direction: column;
+  }
+  .playback-row {
+    align-items: stretch;
+  }
+  .playback-buttons {
+    justify-content: center;
+  }
+  .controls-row select {
+    width: 100%;
+  }
+  .speed-control {
+    min-width: 100%;
+  }
+  .step-counter {
+    text-align: center;
+  }
+}

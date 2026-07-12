@@ -10,7 +10,6 @@ interface InputControlsProps {
   currentStep: number;
   totalSteps: number;
   playbackSpeed: number;
-  isMobile: boolean;
   onTextChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onVersionChange: (e: ChangeEvent<HTMLSelectElement>) => void;
   onPlayPause: () => void;
@@ -39,7 +38,6 @@ export const InputControls: FC<InputControlsProps> = ({
   currentStep,
   totalSteps,
   playbackSpeed,
-  isMobile,
   onTextChange,
   onVersionChange,
   onPlayPause,
@@ -64,23 +62,13 @@ export const InputControls: FC<InputControlsProps> = ({
 
   return (
     <>
-      <div
-        style={{
-          marginBottom: "20px",
-          display: "flex",
-          flexDirection: isMobile ? "column" : "row",
-          gap: "10px",
-        }}
-      >
+      <div className="controls-row">
         <select
           id="version-select"
           aria-label="Game version"
           value={currentVersion}
           onChange={onVersionChange}
-          style={{
-            padding: "8px",
-            width: isMobile ? "100%" : "auto",
-          }}
+          style={{ padding: "8px" }}
         >
           <option value="GEN1">gen-1 nickname</option>
           <option value="GEN2_NICKNAME">gen-2 nickname</option>
@@ -110,23 +98,8 @@ export const InputControls: FC<InputControlsProps> = ({
         />
       </div>
 
-      <div
-        style={{
-          marginBottom: "20px",
-          display: "flex",
-          flexDirection: isMobile ? "column" : "row",
-          alignItems: isMobile ? "stretch" : "center",
-          gap: "16px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            justifyContent: isMobile ? "center" : "flex-start",
-          }}
-        >
+      <div className="playback-row">
+        <div className="playback-buttons">
           <button
             title={isPlaying ? "Pause" : currentStep >= totalSteps ? "Play from start" : "Play"}
             onClick={onPlayPause}
@@ -162,15 +135,7 @@ export const InputControls: FC<InputControlsProps> = ({
           </button>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            flex: 1,
-            minWidth: isMobile ? "100%" : "200px",
-          }}
-        >
+        <div className="speed-control">
           <Icon
             icon="material-symbols:speed-outline"
             width={24}
@@ -189,12 +154,7 @@ export const InputControls: FC<InputControlsProps> = ({
           </span>
         </div>
 
-        <div
-          style={{
-            color: UI_CONSTANTS.COLORS.TEXT_MUTED,
-            textAlign: isMobile ? "center" : "left",
-          }}
-        >
+        <div className="step-counter" style={{ color: UI_CONSTANTS.COLORS.TEXT_MUTED }}>
           Step: {currentStep} / {totalSteps}
         </div>
       </div>

@@ -1,7 +1,6 @@
 import { createGrid } from "../constants/characterGrids";
 import { useInputProcessing } from "../hooks/useInputProcessing";
 import { usePlayback } from "../hooks/usePlayback";
-import { useResponsive } from "../hooks/useResponsive";
 import { CharacterGrid } from "./CharacterGrid";
 import { InputControls } from "./InputControls";
 import { InputSequence } from "./InputSequence";
@@ -27,10 +26,9 @@ const InputSimulator: FC = () => {
     handleReset,
     handleSpeedChange,
   } = usePlayback(inputText, currentVersion, sequences);
-  const { isMobile } = useResponsive();
 
   return (
-    <SimulatorLayout isMobile={isMobile}>
+    <SimulatorLayout>
       <div>
         <InputControls
           inputText={inputText}
@@ -39,7 +37,6 @@ const InputSimulator: FC = () => {
           currentStep={currentStep}
           totalSteps={totalSteps}
           playbackSpeed={playbackSpeed}
-          isMobile={isMobile}
           onTextChange={handleTextChange}
           onVersionChange={handleVersionChange}
           onPlayPause={handlePlayPause}
@@ -61,7 +58,6 @@ const InputSimulator: FC = () => {
         currentStep={currentStep}
         currentCharIndex={currentCharIndex}
         stateHistory={stateHistory}
-        isMobile={isMobile}
       />
     </SimulatorLayout>
   );
