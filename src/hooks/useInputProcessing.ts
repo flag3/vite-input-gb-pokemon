@@ -1,4 +1,4 @@
-import { GRIDS } from "../constants/characterGrids";
+import { createGrid } from "../constants/characterGrids";
 import { MAX_CHAR_LIMITS } from "../constants/gameConstants";
 import type { GameVersion } from "../types";
 import { decomposeTextWithMode, normalizeSpaces } from "../utils/characterMapping";
@@ -12,7 +12,7 @@ export const useInputProcessing = () => {
   const sequences = useMemo(() => {
     if (!inputText) return [];
 
-    const grid = { ...GRIDS[currentVersion], isHiragana: false };
+    const grid = createGrid(currentVersion, false);
     const { chars, modes } = decomposeTextWithMode(inputText, false, currentVersion);
     return findInputSequence(grid, chars.join(""), modes);
   }, [inputText, currentVersion]);

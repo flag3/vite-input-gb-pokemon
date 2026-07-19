@@ -1,7 +1,6 @@
 import { UI_CONSTANTS } from "../constants/ui";
 import type { InputPath, StateHistory } from "../types";
 import { getDisplayText } from "../utils/characterMapping";
-import React from "react";
 
 interface InputSequenceProps {
   sequences: InputPath[];
@@ -10,12 +9,12 @@ interface InputSequenceProps {
   stateHistory: StateHistory[];
 }
 
-export const InputSequence: React.FC<InputSequenceProps> = ({
+export const InputSequence = ({
   sequences,
   currentStep,
   currentCharIndex,
   stateHistory,
-}) => {
+}: InputSequenceProps) => {
   const currentText = getDisplayText(stateHistory);
 
   const formatText = (text: string) => {

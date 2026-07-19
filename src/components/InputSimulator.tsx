@@ -4,10 +4,8 @@ import { usePlayback } from "../hooks/usePlayback";
 import { CharacterGrid } from "./CharacterGrid";
 import { InputControls } from "./InputControls";
 import { InputSequence } from "./InputSequence";
-import { SimulatorLayout } from "./SimulatorLayout";
-import { type FC } from "react";
 
-const InputSimulator: FC = () => {
+const InputSimulator = () => {
   const { inputText, currentVersion, sequences, handleTextChange, handleVersionChange } =
     useInputProcessing();
   const {
@@ -28,7 +26,7 @@ const InputSimulator: FC = () => {
   } = usePlayback(inputText, currentVersion, sequences);
 
   return (
-    <SimulatorLayout>
+    <div className="simulator-layout">
       <div>
         <InputControls
           inputText={inputText}
@@ -59,7 +57,7 @@ const InputSimulator: FC = () => {
         currentCharIndex={currentCharIndex}
         stateHistory={stateHistory}
       />
-    </SimulatorLayout>
+    </div>
   );
 };
 

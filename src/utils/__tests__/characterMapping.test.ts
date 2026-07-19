@@ -1,4 +1,4 @@
-import { GRIDS } from "../../constants/characterGrids";
+import { createGrid } from "../../constants/characterGrids";
 import { DAKUTEN_REVERSE_MAP, MAX_CHAR_LIMITS } from "../../constants/gameConstants";
 import type { GameVersion } from "../../types";
 import { decomposeTextWithMode } from "../characterMapping";
@@ -64,7 +64,7 @@ describe("characterMapping - 文字分解と濁点処理", () => {
       test(`文字分解 #${index + 1}: "${testCase.input}" (${testCase.version})`, () => {
         const { input, version, expectedSequence } = testCase;
 
-        const grid = { ...GRIDS[version], isHiragana: false };
+        const grid = createGrid(version, false);
         const { chars, modes } = decomposeTextWithMode(input, false, version);
         const sequences = findInputSequence(grid, chars.join(""), modes);
 
@@ -133,7 +133,7 @@ describe("characterMapping - 文字分解と濁点処理", () => {
       test(`${testCase.name}の処理`, () => {
         const { input, version, baseChars, dakutenMark } = testCase;
 
-        const grid = { ...GRIDS[version], isHiragana: false };
+        const grid = createGrid(version, false);
         const { chars, modes } = decomposeTextWithMode(input, false, version);
         const sequences = findInputSequence(grid, chars.join(""), modes);
 

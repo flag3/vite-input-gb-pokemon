@@ -20,18 +20,8 @@ export const getSpacePositions = (
   hiraganaSpaces: CharacterPosition[];
   katakanaSpaces: CharacterPosition[];
 } => {
-  // ひらがなとカタカナのグリッドを取得
-  const hiraganaGrid = createGrid(version, true);
-  const katakanaGrid = createGrid(version, false);
+  const spacesIn = (isHiragana: boolean): CharacterPosition[] =>
+    createGrid(version, isHiragana).grid.filter((pos) => pos.char === "　");
 
-  // グリッドから空白の位置を抽出
-  const hiraganaSpaces = hiraganaGrid.grid
-    .filter((pos) => pos.char === "　")
-    .map((pos) => ({ char: "　", x: pos.x, y: pos.y }));
-
-  const katakanaSpaces = katakanaGrid.grid
-    .filter((pos) => pos.char === "　")
-    .map((pos) => ({ char: "　", x: pos.x, y: pos.y }));
-
-  return { hiraganaSpaces, katakanaSpaces };
+  return { hiraganaSpaces: spacesIn(true), katakanaSpaces: spacesIn(false) };
 };

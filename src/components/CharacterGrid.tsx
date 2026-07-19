@@ -1,7 +1,6 @@
 import { GROUPABLE_CHARS } from "../constants/gameConstants";
 import { UI_CONSTANTS } from "../constants/ui";
 import type { CharacterGrid as CharacterGridType, InputAction } from "../types";
-import React from "react";
 
 interface CharacterGridProps {
   grid: CharacterGridType;
@@ -9,11 +8,7 @@ interface CharacterGridProps {
   currentAction: InputAction | null;
 }
 
-export const CharacterGrid: React.FC<CharacterGridProps> = ({
-  grid,
-  currentPosition,
-  currentAction,
-}) => {
+export const CharacterGrid = ({ grid, currentPosition, currentAction }: CharacterGridProps) => {
   const getGroupedCells = () => {
     const cells: {
       char: string;

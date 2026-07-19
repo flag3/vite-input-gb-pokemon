@@ -1,7 +1,7 @@
 import { UI_CONSTANTS } from "../constants/ui";
 import type { GameVersion } from "../types";
 import { Icon } from "@iconify/react";
-import React, { type ChangeEvent, type FC } from "react";
+import React, { type ChangeEvent } from "react";
 
 interface InputControlsProps {
   inputText: string;
@@ -31,7 +31,7 @@ const iconButtonStyle: React.CSSProperties = {
   cursor: "pointer",
 };
 
-export const InputControls: FC<InputControlsProps> = ({
+export const InputControls = ({
   inputText,
   currentVersion,
   isPlaying,
@@ -45,7 +45,7 @@ export const InputControls: FC<InputControlsProps> = ({
   onStepForward,
   onStepBackward,
   onSpeedChange,
-}) => {
+}: InputControlsProps) => {
   const getPlaceholder = () => {
     switch (currentVersion) {
       case "GEN1":

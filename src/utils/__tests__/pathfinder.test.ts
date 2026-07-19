@@ -1,4 +1,4 @@
-import { GRIDS } from "../../constants/characterGrids";
+import { createGrid } from "../../constants/characterGrids";
 import type { GameVersion } from "../../types";
 import { decomposeTextWithMode } from "../characterMapping";
 import { findInputSequence } from "../pathfinder";
@@ -166,7 +166,7 @@ describe("pathfinder - 入力シーケンス生成", () => {
     test(`ケース #${index + 1}: "${testCase.input}" (${testCase.version})`, () => {
       const { input, version, expectedActions } = testCase;
 
-      const grid = { ...GRIDS[version], isHiragana: false };
+      const grid = createGrid(version, false);
       const { chars, modes } = decomposeTextWithMode(input, false, version);
 
       const sequences = findInputSequence(grid, chars.join(""), modes);
@@ -182,7 +182,7 @@ describe("pathfinder - 入力シーケンス生成", () => {
   test("GEN1: 文字数上限時のスペースはED経由の最短ルートを使う", () => {
     const input = "モげみみ　";
     const version = "GEN1" as GameVersion;
-    const grid = { ...GRIDS[version], isHiragana: false };
+    const grid = createGrid(version, false);
     const { chars, modes } = decomposeTextWithMode(input, false, version);
     const sequences = findInputSequence(grid, chars.join(""), modes);
     const spaceSequence = sequences.find((seq) => seq.char === "　");
@@ -193,7 +193,7 @@ describe("pathfinder - 入力シーケンス生成", () => {
   test("GEN1: 文字数上限直前のスペースもED経由の最短ルートを使う", () => {
     const input = "くくく　";
     const version = "GEN1" as GameVersion;
-    const grid = { ...GRIDS[version], isHiragana: false };
+    const grid = createGrid(version, false);
     const { chars, modes } = decomposeTextWithMode(input, false, version);
     const sequences = findInputSequence(grid, chars.join(""), modes);
     const spaceSequence = sequences.find((seq) => seq.char === "　");

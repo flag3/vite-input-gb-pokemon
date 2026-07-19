@@ -6,6 +6,16 @@ import { calculateNextPosition } from "../utils/gridNavigation";
 import { findInputSequence } from "../utils/pathfinder";
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 
+const initialHistory = (): StateHistory[] => [
+  {
+    position: { x: 0, y: 0 },
+    isHiragana: false,
+    charIndex: 0,
+    action: null,
+    inputChar: null,
+  },
+];
+
 export const usePlayback = (
   inputText: string,
   currentVersion: GameVersion,
@@ -139,41 +149,23 @@ export const usePlayback = (
     setStateHistory((prev) => prev.slice(0, -1));
   }, [currentStep, stateHistory]);
 
-  const handlePlayPause = useCallback(() => {
-    if (currentStep >= totalSteps) {
-      setCurrentStep(0);
-      setCurrentPosition({ x: 0, y: 0 });
-      setCurrentCharIndex(0);
-      setIsHiragana(false);
-      setStateHistory([
-        {
-          position: { x: 0, y: 0 },
-          isHiragana: false,
-          charIndex: 0,
-          action: null,
-          inputChar: null,
-        },
-      ]);
-    }
-    setIsPlaying(!isPlaying);
-  }, [currentStep, totalSteps, isPlaying]);
-
   const handleReset = useCallback(() => {
     setCurrentStep(0);
     setCurrentPosition({ x: 0, y: 0 });
     setCurrentCharIndex(0);
     setIsPlaying(false);
     setIsHiragana(false);
-    setStateHistory([
-      {
-        position: { x: 0, y: 0 },
-        isHiragana: false,
-        charIndex: 0,
-        action: null,
-        inputChar: null,
-      },
-    ]);
+    setStateHistory(initialHistory());
   }, []);
+
+  const handlePlayPause = useCallback(() => {
+    if (currentStep >= totalSteps) {
+      handleReset();
+      setIsPlaying(true);
+      return;
+    }
+    setIsPlaying(!isPlaying);
+  }, [currentStep, totalSteps, isPlaying, handleReset]);
 
   const handleSpeedChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setPlaybackSpeed(1000 - Number(e.target.value));
@@ -191,20 +183,6 @@ export const usePlayback = (
 
     return () => clearTimeout(timer);
   }, [isPlaying, currentStep, totalSteps, playbackSpeed, handleStepForward]);
-
-  useEffect(() => {
-    if (sequences.length > 0) {
-      setStateHistory([
-        {
-          position: { x: 0, y: 0 },
-          isHiragana: false,
-          charIndex: 0,
-          action: null,
-          inputChar: null,
-        },
-      ]);
-    }
-  }, [sequences]);
 
   useEffect(() => {
     handleReset();
