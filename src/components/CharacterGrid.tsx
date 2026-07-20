@@ -18,20 +18,13 @@ export const CharacterGrid = ({ grid, currentPosition, currentAction }: Characte
     }[] = [];
 
     grid.grid.forEach((char) => {
-      if (GROUPABLE_CHARS.includes(char.char)) {
-        const existingGroup = cells.find((cell) => cell.char === char.char && cell.y === char.y);
+      const existingGroup = GROUPABLE_CHARS.includes(char.char)
+        ? cells.find((cell) => cell.char === char.char && cell.y === char.y)
+        : undefined;
 
-        if (existingGroup) {
-          existingGroup.x.push(char.x);
-          existingGroup.width++;
-        } else {
-          cells.push({
-            char: char.char,
-            x: [char.x],
-            y: char.y,
-            width: 1,
-          });
-        }
+      if (existingGroup) {
+        existingGroup.x.push(char.x);
+        existingGroup.width++;
       } else {
         cells.push({
           char: char.char,
@@ -60,37 +53,33 @@ export const CharacterGrid = ({ grid, currentPosition, currentAction }: Characte
           borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS * 2}px`,
         }}
       >
-        {groupedCells.map((cell, index) => (
-          <div
-            key={index}
-            style={{
-              width: `${cell.width * UI_CONSTANTS.GRID.CELL_SIZE + (cell.width - 1) * UI_CONSTANTS.GRID.GAP}px`,
-              height: `${UI_CONSTANTS.GRID.CELL_SIZE}px`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor:
-                cell.x.includes(currentPosition.x) && cell.y === currentPosition.y
+        {groupedCells.map((cell, index) => {
+          const isActive = cell.x.includes(currentPosition.x) && cell.y === currentPosition.y;
+          return (
+            <div
+              key={index}
+              style={{
+                width: `${cell.width * UI_CONSTANTS.GRID.CELL_SIZE + (cell.width - 1) * UI_CONSTANTS.GRID.GAP}px`,
+                height: `${UI_CONSTANTS.GRID.CELL_SIZE}px`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: isActive
                   ? "var(--bgColor-accent-emphasis)"
                   : "var(--bgColor-default)",
-              color:
-                cell.x.includes(currentPosition.x) && cell.y === currentPosition.y
-                  ? "var(--fgColor-onEmphasis)"
-                  : "var(--fgColor-default)",
-              borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS}px`,
-              cursor: "pointer",
-              userSelect: "none",
-              fontSize: `${UI_CONSTANTS.TYPOGRAPHY.FONT_SIZE_INPUT}px`,
-              position: "relative",
-              transition: `background-color ${UI_CONSTANTS.ANIMATION.TRANSITION_DURATION}`,
-              gridColumn: `${cell.x[0] + 1} / span ${cell.width}`,
-            }}
-            className={`character-cell ${cell.x.includes(currentPosition.x) && cell.y === currentPosition.y ? "active" : ""}`}
-          >
-            {cell.char}
-            {cell.x.includes(currentPosition.x) &&
-              cell.y === currentPosition.y &&
-              currentAction === "A" && (
+                color: isActive ? "var(--fgColor-onEmphasis)" : "var(--fgColor-default)",
+                borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS}px`,
+                cursor: "pointer",
+                userSelect: "none",
+                fontSize: `${UI_CONSTANTS.TYPOGRAPHY.FONT_SIZE_INPUT}px`,
+                position: "relative",
+                transition: `background-color ${UI_CONSTANTS.ANIMATION.TRANSITION_DURATION}`,
+                gridColumn: `${cell.x[0] + 1} / span ${cell.width}`,
+              }}
+              className={`character-cell ${isActive ? "active" : ""}`}
+            >
+              {cell.char}
+              {isActive && currentAction === "A" && (
                 <div
                   style={{
                     position: "absolute",
@@ -108,8 +97,9 @@ export const CharacterGrid = ({ grid, currentPosition, currentAction }: Characte
                   A
                 </div>
               )}
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </div>
       <style>
         {`

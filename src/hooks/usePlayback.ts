@@ -26,7 +26,7 @@ export const usePlayback = (
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
   const [currentAction, setCurrentAction] = useState<InputAction | null>(null);
   const [playbackSpeed, setPlaybackSpeed] = useState(500);
-  const [stateHistory, setStateHistory] = useState<StateHistory[]>([]);
+  const [stateHistory, setStateHistory] = useState<StateHistory[]>(initialHistory);
   const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
   const [isHiragana, setIsHiragana] = useState(false);
 

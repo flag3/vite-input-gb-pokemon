@@ -18,6 +18,14 @@ export const InputSequence = ({
 }: InputSequenceProps) => {
   const currentText = getDisplayText(stateHistory);
 
+  // 各シーケンスの開始ステップ番号と総ステップ数を1パスで計算
+  const stepOffsets: number[] = [];
+  let totalSteps = 0;
+  for (const sequence of sequences) {
+    stepOffsets.push(totalSteps);
+    totalSteps += sequence.actions.length;
+  }
+
   const formatText = (text: string) => {
     const lines = text.match(/.{1,16}/g) || [];
     return lines.join("\n");
@@ -66,9 +74,7 @@ export const InputSequence = ({
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         {sequences.map((sequence, index) => {
           const displayChar = sequence.char;
-          const stepCount = sequences
-            .slice(0, index)
-            .reduce((sum, seq) => sum + seq.actions.length, 0);
+          const stepCount = stepOffsets[index];
           const isCurrentSequence = index === currentCharIndex;
 
           return (
@@ -126,7 +132,7 @@ export const InputSequence = ({
         })}
       </div>
       <Text as="div" style={{ color: "var(--fgColor-muted)" }}>
-        Total steps: {sequences.reduce((sum, seq) => sum + seq.actions.length, 0)}
+        Total steps: {totalSteps}
       </Text>
       <style>
         {`

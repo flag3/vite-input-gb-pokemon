@@ -4,7 +4,6 @@ import {
   DAKUTEN_REVERSE_MAP,
   isDiacriticalMark,
   isControlChar,
-  SPACE_CHARS,
 } from "../constants/gameConstants";
 import type { GameVersion, StateHistory } from "../types";
 
@@ -26,15 +25,7 @@ const HALFWIDTH_TO_FULLWIDTH_MAP: { [key: string]: string } = {
 };
 
 // スペース文字を正規化する関数
-export const normalizeSpaces = (text: string): string => {
-  let result = text;
-  for (const char of SPACE_CHARS) {
-    if (char !== "　") {
-      result = result.replace(new RegExp(char, "g"), "　");
-    }
-  }
-  return result;
-};
+export const normalizeSpaces = (text: string): string => text.replaceAll(" ", "　");
 
 // 半角文字を全角に変換する関数
 export const normalizeHalfwidthChars = (text: string): string => {

@@ -31,8 +31,6 @@ export const isDiacriticalMark = (char: string): boolean => {
   return char === "゛" || char === "゜" || char === "ー" || char === "リ" || char === "へ";
 };
 
-export const SPACE_CHARS = [" ", "　"];
-
 // グループ化可能な文字
 export const GROUPABLE_CHARS = ["かな", "カナ", "ていせい", "けってい"];
 
@@ -90,46 +88,10 @@ export const DAKUTEN_MAP: Record<string, [string, string]> = {
   ポ: ["ホ", "゜"],
 };
 
-// 濁点・半濁点の逆引きマップ
-export const DAKUTEN_REVERSE_MAP: Record<string, Record<string, string>> = {
-  か: { ゛: "が" },
-  き: { ゛: "ぎ" },
-  く: { ゛: "ぐ" },
-  け: { ゛: "げ" },
-  こ: { ゛: "ご" },
-  さ: { ゛: "ざ" },
-  し: { ゛: "じ" },
-  す: { ゛: "ず" },
-  せ: { ゛: "ぜ" },
-  そ: { ゛: "ぞ" },
-  た: { ゛: "だ" },
-  ち: { ゛: "ぢ" },
-  つ: { ゛: "づ" },
-  て: { ゛: "で" },
-  と: { ゛: "ど" },
-  は: { ゛: "ば", ゜: "ぱ" },
-  ひ: { ゛: "び", ゜: "ぴ" },
-  ふ: { ゛: "ぶ", ゜: "ぷ" },
-  へ: { ゛: "べ", ゜: "ぺ" },
-  ほ: { ゛: "ぼ", ゜: "ぽ" },
-  カ: { ゛: "ガ" },
-  キ: { ゛: "ギ" },
-  ク: { ゛: "グ" },
-  ケ: { ゛: "ゲ" },
-  コ: { ゛: "ゴ" },
-  サ: { ゛: "ザ" },
-  シ: { ゛: "ジ" },
-  ス: { ゛: "ズ" },
-  セ: { ゛: "ゼ" },
-  ソ: { ゛: "ゾ" },
-  タ: { ゛: "ダ" },
-  チ: { ゛: "ヂ" },
-  ツ: { ゛: "ヅ" },
-  テ: { ゛: "デ" },
-  ト: { ゛: "ド" },
-  ハ: { ゛: "バ", ゜: "パ" },
-  ヒ: { ゛: "ビ", ゜: "ピ" },
-  フ: { ゛: "ブ", ゜: "プ" },
-  ヘ: { ゛: "ベ", ゜: "ペ" },
-  ホ: { ゛: "ボ", ゜: "ポ" },
-};
+// 濁点・半濁点の逆引きマップ（DAKUTEN_MAPから導出）
+export const DAKUTEN_REVERSE_MAP: Record<string, Record<string, string>> = Object.entries(
+  DAKUTEN_MAP,
+).reduce<Record<string, Record<string, string>>>((map, [composed, [base, mark]]) => {
+  map[base] = { ...map[base], [mark]: composed };
+  return map;
+}, {});

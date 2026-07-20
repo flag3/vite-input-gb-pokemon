@@ -19,12 +19,9 @@ export const findInputSequence = (
   const hiraganaGrid = { ...grid, isHiragana: true };
   const katakanaGrid = { ...grid, isHiragana: false };
   const isDakutenChar = (char?: string) => char === "゛" || char === "゜";
-  const getCharPositions = (char: string) => ({
-    hiragana: findCharacterPosition(char, hiraganaGrid),
-    katakana: findCharacterPosition(char, katakanaGrid),
-  });
   const resolveTargetPosition = (char: string, targetMode: boolean) => {
-    const { hiragana: hiraganaResult, katakana: katakanaResult } = getCharPositions(char);
+    const hiraganaResult = findCharacterPosition(char, hiraganaGrid);
+    const katakanaResult = findCharacterPosition(char, katakanaGrid);
     if (!hiraganaResult && !katakanaResult) return null;
 
     const targetIsHiragana = Boolean(hiraganaResult && (!katakanaResult || targetMode));
@@ -84,7 +81,7 @@ export const findInputSequence = (
       inputCharCount,
     );
 
-    const spaceShortcut = applyStandardGen1EdShortcut(
+    const spaceShortcut = applyGen1EdShortcut(
       optimalActions,
       optimalSpacePosition,
       inputCharCount,
@@ -116,10 +113,13 @@ export const findInputSequence = (
       dakutenResult.position,
       inputCharCount,
     );
-    const chosenDakutenActions =
-      grid.version === "GEN1"
-        ? applyDakutenGen1EdShortcut(normalActions, dakutenResult.position, inputCharCount).actions
-        : normalActions;
+    const chosenDakutenActions = applyGen1EdShortcut(
+      normalActions,
+      dakutenResult.position,
+      inputCharCount,
+      true,
+      true,
+    ).actions;
 
     return {
       sequence: {
@@ -130,76 +130,42 @@ export const findInputSequence = (
       position: dakutenResult.position,
     };
   };
-  const maybeApplyGen1EdShortcut = (
+  // GEN1限定: ED上でA連打→B削除で入力位置を稼ぐショートカットが直行より短ければ採用
+  const applyGen1EdShortcut = (
     actions: InputAction[],
     targetPosition: InternalPosition,
     inputCharCount: number,
-    pressCountForRemaining: (remainingToLimit: number) => number | null,
     skipWhenAtLimit: boolean,
+    isDakuten = false,
   ): { actions: InputAction[]; totalSteps: number } => {
-    if (grid.version !== "GEN1") {
-      return { actions, totalSteps: actions.length };
-    }
+    const noChange = { actions, totalSteps: actions.length };
+    if (grid.version !== "GEN1") return noChange;
 
-    const limit = MAX_CHAR_LIMITS[grid.version];
+    const remainingToLimit = MAX_CHAR_LIMITS[grid.version] - inputCharCount;
+    if (remainingToLimit < 0 || (skipWhenAtLimit && remainingToLimit === 0)) return noChange;
+
     const fixedPos: InternalPosition = {
       ...CONFIRM_POSITIONS[grid.version],
       char: targetPosition.char,
     };
+    const pressCount = isDakuten ? remainingToLimit : remainingToLimit + 1;
+    const { actions: moveFromED } = calculateDistance(
+      fixedPos,
+      targetPosition,
+      grid,
+      inputCharCount,
+    );
+    const hackActions: InputAction[] = [
+      ...Array<InputAction>(pressCount).fill("A"),
+      ...Array<InputAction>(pressCount).fill("B"),
+      ...moveFromED,
+      "A",
+    ];
 
-    const remainingToLimit = limit - inputCharCount;
-    if (remainingToLimit >= 0) {
-      if (skipWhenAtLimit && remainingToLimit === 0) {
-        return { actions, totalSteps: actions.length };
-      }
-      const pressCount = pressCountForRemaining(remainingToLimit);
-      if (pressCount === null) {
-        return { actions, totalSteps: actions.length };
-      }
-      const { actions: moveFromED } = calculateDistance(
-        fixedPos,
-        targetPosition,
-        grid,
-        inputCharCount,
-      );
-      const hackActions: InputAction[] = [
-        ...Array.from({ length: pressCount }, () => "A" as InputAction),
-        ...Array.from({ length: pressCount }, () => "B" as InputAction),
-        ...moveFromED,
-        "A",
-      ];
-      if (hackActions.length < actions.length) {
-        return { actions: hackActions, totalSteps: hackActions.length };
-      }
-    }
-
-    return { actions, totalSteps: actions.length };
+    return hackActions.length < actions.length
+      ? { actions: hackActions, totalSteps: hackActions.length }
+      : noChange;
   };
-  const applyStandardGen1EdShortcut = (
-    actions: InputAction[],
-    targetPosition: InternalPosition,
-    inputCharCount: number,
-    skipWhenAtLimit: boolean,
-  ): { actions: InputAction[]; totalSteps: number } =>
-    maybeApplyGen1EdShortcut(
-      actions,
-      targetPosition,
-      inputCharCount,
-      (remaining) => remaining + 1,
-      skipWhenAtLimit,
-    );
-  const applyDakutenGen1EdShortcut = (
-    actions: InputAction[],
-    targetPosition: InternalPosition,
-    inputCharCount: number,
-  ): { actions: InputAction[]; totalSteps: number } =>
-    maybeApplyGen1EdShortcut(
-      actions,
-      targetPosition,
-      inputCharCount,
-      (remaining) => (remaining >= 1 ? remaining : null),
-      true,
-    );
   const buildEndActions = (
     totalInputChars: number,
   ): { actions: InputAction[]; totalSteps: number } => {
@@ -252,16 +218,12 @@ export const findInputSequence = (
     const directActions = buildMoveActions(currentPosition, targetPosition, inputCharCount);
 
     // GEN1かつ5文字目または4文字目で連続文字の場合にED→削除ハックを検討
-    const skipWhenAtLimit = grid.version === "GEN1" ? isDakutenChar(text[i - 1]) : false;
-    const chosenActions =
-      grid.version === "GEN1"
-        ? applyStandardGen1EdShortcut(
-            directActions,
-            targetPosition,
-            inputCharCount,
-            skipWhenAtLimit,
-          ).actions
-        : directActions;
+    const chosenActions = applyGen1EdShortcut(
+      directActions,
+      targetPosition,
+      inputCharCount,
+      isDakutenChar(text[i - 1]),
+    ).actions;
 
     currentActions.push(...chosenActions);
 
