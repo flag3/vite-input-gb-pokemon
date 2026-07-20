@@ -9,27 +9,29 @@
   margin: 0 auto;
   padding: 20px;
   display: grid;
-  grid-template-columns: 1fr 400px;
+  grid-template-columns: 1fr;
   gap: 40px;
 }
 
 .input-sequence {
-  position: sticky;
-  top: 20px;
-  align-self: start;
+  margin-top: 20px;
 }
 
 .controls-row {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 10px;
   margin-bottom: 20px;
 }
 
+.controls-row > * {
+  width: 100%;
+}
+
 .playback-row {
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 16px;
   margin-bottom: 20px;
 }
@@ -37,6 +39,7 @@
 .playback-buttons {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
 }
 
@@ -45,34 +48,47 @@
   align-items: center;
   gap: 8px;
   flex: 1;
-  min-width: 200px;
+  min-width: 100%;
 }
 
-@media (max-width: 768px) {
+.step-counter {
+  text-align: center;
+}
+
+@media (min-width: 48rem) {
   .simulator-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 400px;
   }
+
   .input-sequence {
-    position: static;
-    margin-top: 20px;
+    position: sticky;
+    top: 20px;
+    align-self: start;
+    margin-top: 0;
   }
+
   .controls-row,
   .playback-row {
-    flex-direction: column;
+    flex-direction: row;
   }
+
   .playback-row {
-    align-items: stretch;
+    align-items: center;
   }
+
   .playback-buttons {
-    justify-content: center;
+    justify-content: flex-start;
   }
+
   .controls-row > * {
-    width: 100%;
+    width: auto;
   }
+
   .speed-control {
-    min-width: 100%;
+    min-width: 200px;
   }
+
   .step-counter {
-    text-align: center;
+    text-align: left;
   }
 }
