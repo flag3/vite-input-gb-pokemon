@@ -1,7 +1,7 @@
-import { UI_CONSTANTS } from "../constants/ui";
 import type { GameVersion } from "../types";
 import { Icon } from "@iconify/react";
-import React, { type ChangeEvent } from "react";
+import { IconButton, Select, Text, TextInput } from "@primer/react";
+import { type ChangeEvent } from "react";
 
 interface InputControlsProps {
   inputText: string;
@@ -19,17 +19,11 @@ interface InputControlsProps {
   onSpeedChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-const iconButtonStyle: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  padding: "8px",
-  border: "none",
-  borderRadius: "50%",
-  background: "none",
-  color: "#1976d2",
-  cursor: "pointer",
-};
+const PlayIcon = () => <Icon icon="material-symbols:play-arrow" width={24} />;
+const PauseIcon = () => <Icon icon="material-symbols:pause" width={24} />;
+const ResetIcon = () => <Icon icon="material-symbols:restart-alt" width={24} />;
+const BackIcon = () => <Icon icon="material-symbols:arrow-back" width={24} />;
+const ForwardIcon = () => <Icon icon="material-symbols:arrow-forward" width={24} />;
 
 export const InputControls = ({
   inputText,
@@ -63,98 +57,76 @@ export const InputControls = ({
   return (
     <>
       <div className="controls-row">
-        <select
-          id="version-select"
-          aria-label="Game version"
-          value={currentVersion}
-          onChange={onVersionChange}
-          style={{ padding: "8px" }}
-        >
-          <option value="GEN1">gen-1 nickname</option>
-          <option value="GEN2_NICKNAME">gen-2 nickname</option>
-          <option value="GEN2_BOX">gen-2 box</option>
-          <option value="GEN2_MAIL">gen-2 mail</option>
-        </select>
+        <Select aria-label="Game version" value={currentVersion} onChange={onVersionChange}>
+          <Select.Option value="GEN1">gen-1 nickname</Select.Option>
+          <Select.Option value="GEN2_NICKNAME">gen-2 nickname</Select.Option>
+          <Select.Option value="GEN2_BOX">gen-2 box</Select.Option>
+          <Select.Option value="GEN2_MAIL">gen-2 mail</Select.Option>
+        </Select>
       </div>
 
-      <div
-        style={{
-          marginBottom: "20px",
-          width: "100%",
-        }}
-      >
-        <input
-          type="text"
+      <div style={{ marginBottom: "20px", width: "100%" }}>
+        <TextInput
+          block
+          size="large"
+          aria-label="Input text"
           value={inputText}
           onChange={onTextChange}
           placeholder={getPlaceholder()}
-          style={{
-            width: "100%",
-            padding: `${UI_CONSTANTS.GRID.PADDING}px`,
-            fontSize: `${UI_CONSTANTS.TYPOGRAPHY.FONT_SIZE_INPUT}px`,
-            borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS}px`,
-            border: "1px solid #ccc",
-          }}
         />
       </div>
 
       <div className="playback-row">
         <div className="playback-buttons">
-          <button
-            title={isPlaying ? "Pause" : currentStep >= totalSteps ? "Play from start" : "Play"}
+          <IconButton
+            icon={isPlaying ? PauseIcon : PlayIcon}
+            aria-label={
+              isPlaying ? "Pause" : currentStep >= totalSteps ? "Play from start" : "Play"
+            }
+            variant="invisible"
             onClick={onPlayPause}
-            style={iconButtonStyle}
-          >
-            {isPlaying ? (
-              <Icon icon="material-symbols:pause" width={24} />
-            ) : (
-              <Icon icon="material-symbols:play-arrow" width={24} />
-            )}
-          </button>
+          />
 
-          <button title="Reset" onClick={onReset} style={iconButtonStyle}>
-            <Icon icon="material-symbols:restart-alt" width={24} />
-          </button>
+          <IconButton icon={ResetIcon} aria-label="Reset" variant="invisible" onClick={onReset} />
 
-          <button
-            title="Previous"
-            onClick={onStepBackward}
+          <IconButton
+            icon={BackIcon}
+            aria-label="Previous"
+            variant="invisible"
             disabled={currentStep === 0}
-            style={iconButtonStyle}
-          >
-            <Icon icon="material-symbols:arrow-back" width={24} />
-          </button>
+            onClick={onStepBackward}
+          />
 
-          <button
-            title="Next"
-            onClick={onStepForward}
+          <IconButton
+            icon={ForwardIcon}
+            aria-label="Next"
+            variant="invisible"
             disabled={currentStep >= totalSteps}
-            style={iconButtonStyle}
-          >
-            <Icon icon="material-symbols:arrow-forward" width={24} />
-          </button>
+            onClick={onStepForward}
+          />
         </div>
 
         <div className="speed-control">
           <Icon
             icon="material-symbols:speed-outline"
             width={24}
-            style={{ color: "#1976d2", flexShrink: 0 }}
+            style={{ color: "var(--fgColor-accent)", flexShrink: 0 }}
           />
           <input
             type="range"
+            aria-label="Playback speed"
             value={1000 - playbackSpeed}
             onChange={onSpeedChange}
             min={0}
             max={900}
             style={{ flex: 1 }}
           />
-          <span style={{ fontSize: "12px", color: UI_CONSTANTS.COLORS.TEXT_MUTED, flexShrink: 0 }}>
+          <Text style={{ fontSize: "12px", color: "var(--fgColor-muted)", flexShrink: 0 }}>
             {(playbackSpeed / 1000).toFixed(2)}s
-          </span>
+          </Text>
         </div>
 
-        <div className="step-counter" style={{ color: UI_CONSTANTS.COLORS.TEXT_MUTED }}>
+        <div className="step-counter" style={{ color: "var(--fgColor-muted)" }}>
           Step: {currentStep} / {totalSteps}
         </div>
       </div>
