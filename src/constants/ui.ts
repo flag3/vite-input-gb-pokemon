@@ -11,16 +11,6 @@ export const UI_CONSTANTS = {
     FONT_SIZE_SMALL: 12,
     FONT_SIZE_DISPLAY: 18,
   },
-  COLORS: {
-    PRIMARY: "#2196f3",
-    SECONDARY: "#4a90e2",
-    SUCCESS: "#4caf50",
-    BACKGROUND_LIGHT: "#f0f0f0",
-    BACKGROUND_DARK: "#2a2a2a",
-    CARD_LIGHT: "#f5f5f5",
-    CARD_DARK: "#333",
-    TEXT_MUTED: "#666",
-  },
   ANIMATION: {
     FADE_OUT_DURATION: "0.5s",
     TRANSITION_DURATION: "0.3s",

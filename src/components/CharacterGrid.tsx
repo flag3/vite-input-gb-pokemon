@@ -56,7 +56,7 @@ export const CharacterGrid = ({ grid, currentPosition, currentAction }: Characte
           gridTemplateColumns: `repeat(${grid.width}, ${UI_CONSTANTS.GRID.CELL_SIZE}px)`,
           gap: `${UI_CONSTANTS.GRID.GAP}px`,
           padding: `${UI_CONSTANTS.GRID.PADDING}px`,
-          backgroundColor: UI_CONSTANTS.COLORS.BACKGROUND_LIGHT,
+          backgroundColor: "var(--bgColor-muted)",
           borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS * 2}px`,
         }}
       >
@@ -71,12 +71,12 @@ export const CharacterGrid = ({ grid, currentPosition, currentAction }: Characte
               justifyContent: "center",
               backgroundColor:
                 cell.x.includes(currentPosition.x) && cell.y === currentPosition.y
-                  ? UI_CONSTANTS.COLORS.PRIMARY
-                  : "white",
+                  ? "var(--bgColor-accent-emphasis)"
+                  : "var(--bgColor-default)",
               color:
                 cell.x.includes(currentPosition.x) && cell.y === currentPosition.y
-                  ? "white"
-                  : "black",
+                  ? "var(--fgColor-onEmphasis)"
+                  : "var(--fgColor-default)",
               borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS}px`,
               cursor: "pointer",
               userSelect: "none",
@@ -97,8 +97,8 @@ export const CharacterGrid = ({ grid, currentPosition, currentAction }: Characte
                     top: "-20px",
                     left: "50%",
                     transform: "translateX(-50%)",
-                    backgroundColor: UI_CONSTANTS.COLORS.SUCCESS,
-                    color: "white",
+                    backgroundColor: "var(--bgColor-success-emphasis)",
+                    color: "var(--fgColor-onEmphasis)",
                     padding: "2px 6px",
                     borderRadius: "4px",
                     fontSize: `${UI_CONSTANTS.TYPOGRAPHY.FONT_SIZE_SMALL}px`,
@@ -113,19 +113,6 @@ export const CharacterGrid = ({ grid, currentPosition, currentAction }: Characte
       </div>
       <style>
         {`
-          @media (prefers-color-scheme: dark) {
-            .grid-container {
-              background-color: ${UI_CONSTANTS.COLORS.BACKGROUND_DARK} !important;
-            }
-            .character-cell {
-              background-color: ${UI_CONSTANTS.COLORS.CARD_DARK} !important;
-              color: rgba(255, 255, 255, 0.95) !important;
-            }
-            .character-cell.active {
-              background-color: ${UI_CONSTANTS.COLORS.SECONDARY} !important;
-              color: white !important;
-            }
-          }
           @keyframes fadeOut {
             from { opacity: 1; transform: translate(-50%, 0); }
             to { opacity: 0; transform: translate(-50%, -10px); }
