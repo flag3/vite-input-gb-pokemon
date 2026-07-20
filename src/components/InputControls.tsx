@@ -1,6 +1,6 @@
 import type { GameVersion } from "../types";
 import { Icon } from "@iconify/react";
-import { IconButton, Select, Text, TextInput } from "@primer/react";
+import { FormControl, IconButton, Select, Text, TextInput } from "@primer/react";
 import { type ChangeEvent } from "react";
 
 interface InputControlsProps {
@@ -40,40 +40,47 @@ export const InputControls = ({
   onStepBackward,
   onSpeedChange,
 }: InputControlsProps) => {
-  const getPlaceholder = () => {
+  const getTextField = () => {
     switch (currentVersion) {
       case "GEN1":
       case "GEN2_NICKNAME":
-        return "Enter nickname";
+        return { label: "Nickname", placeholder: "Enter nickname" };
       case "GEN2_BOX":
-        return "Enter box name";
+        return { label: "Box name", placeholder: "Enter box name" };
       case "GEN2_MAIL":
-        return "Enter mail";
+        return { label: "Mail", placeholder: "Enter mail" };
       default:
-        return "Enter text";
+        return { label: "Input text", placeholder: "Enter text" };
     }
   };
+
+  const textField = getTextField();
 
   return (
     <>
       <div className="controls-row">
-        <Select aria-label="Game version" value={currentVersion} onChange={onVersionChange}>
-          <Select.Option value="GEN1">gen-1 nickname</Select.Option>
-          <Select.Option value="GEN2_NICKNAME">gen-2 nickname</Select.Option>
-          <Select.Option value="GEN2_BOX">gen-2 box</Select.Option>
-          <Select.Option value="GEN2_MAIL">gen-2 mail</Select.Option>
-        </Select>
+        <FormControl>
+          <FormControl.Label>Input mode</FormControl.Label>
+          <Select block value={currentVersion} onChange={onVersionChange}>
+            <Select.Option value="GEN1">gen-1 nickname</Select.Option>
+            <Select.Option value="GEN2_NICKNAME">gen-2 nickname</Select.Option>
+            <Select.Option value="GEN2_BOX">gen-2 box</Select.Option>
+            <Select.Option value="GEN2_MAIL">gen-2 mail</Select.Option>
+          </Select>
+        </FormControl>
       </div>
 
       <div style={{ marginBottom: "20px", width: "100%" }}>
-        <TextInput
-          block
-          size="large"
-          aria-label="Input text"
-          value={inputText}
-          onChange={onTextChange}
-          placeholder={getPlaceholder()}
-        />
+        <FormControl>
+          <FormControl.Label>{textField.label}</FormControl.Label>
+          <TextInput
+            block
+            size="large"
+            value={inputText}
+            onChange={onTextChange}
+            placeholder={textField.placeholder}
+          />
+        </FormControl>
       </div>
 
       <div className="playback-row">
