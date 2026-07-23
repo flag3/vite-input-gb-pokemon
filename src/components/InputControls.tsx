@@ -79,7 +79,7 @@ export const InputControls = ({
         </FormControl>
       </div>
 
-      <div style={{ marginBottom: "20px", width: "100%" }}>
+      <div className="text-input-row">
         <FormControl>
           <FormControl.Label>{textField.label}</FormControl.Label>
           <TextInput
@@ -133,7 +133,7 @@ export const InputControls = ({
           ))}
         </SegmentedControl>
 
-        <div className="step-counter" style={{ color: "var(--fgColor-muted)" }}>
+        <div className="step-counter">
           Step: {currentStep} / {totalSteps}
         </div>
       </div>
