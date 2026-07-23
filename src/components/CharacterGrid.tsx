@@ -74,7 +74,6 @@ export const CharacterGrid = ({ grid, currentPosition, currentAction }: Characte
                   : "var(--bgColor-default)",
                 color: isActive ? "var(--fgColor-onEmphasis)" : "var(--fgColor-default)",
                 borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS}px`,
-                cursor: "pointer",
                 userSelect: "none",
                 fontSize: `min(${UI_CONSTANTS.TYPOGRAPHY.FONT_SIZE_INPUT}px, ${60 / grid.width}cqw)`,
                 position: "relative",
