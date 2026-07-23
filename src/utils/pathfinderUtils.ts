@@ -1,22 +1,7 @@
 import { BASE_GRIDS } from "../constants/characterGrids";
-import type { CharacterGrid, CharacterPosition, InputAction, Position } from "../types";
+import type { CharacterGrid, CharacterPosition, InputAction } from "../types";
 import { calculateNextPosition } from "./gridNavigation";
 import { HIRAGANA_KATAKANA_MAP } from "./gridPositions";
-
-/**
- * 内部で使用する位置情報の型
- */
-export interface InternalPosition extends Position {
-  char: string;
-}
-
-/**
- * 位置と操作の組み合わせの型
- */
-interface PositionWithActions {
-  position: InternalPosition;
-  actions: InputAction[];
-}
 
 /**
  * 文字の位置を見つける
@@ -45,15 +30,17 @@ export const findCharacterPosition = (
 };
 
 /**
- * 2点間の最短経路を計算する
+ * 2点間の最短経路（キー操作列）をBFSで求める
  */
-export const calculateDistance = (
-  from: InternalPosition,
-  to: InternalPosition,
+export const findShortestPath = (
+  from: CharacterPosition,
+  to: CharacterPosition,
   grid: CharacterGrid,
   inputCharCount?: number,
-): { distance: number; actions: InputAction[] } => {
-  const queue: PositionWithActions[] = [{ position: from, actions: [] }];
+): InputAction[] => {
+  const queue: { position: CharacterPosition; actions: InputAction[] }[] = [
+    { position: from, actions: [] },
+  ];
   const visited = new Set<string>();
   const directions: InputAction[] = ["↑", "↓", "←", "→"];
 
@@ -64,14 +51,10 @@ export const calculateDistance = (
   visited.add(`${from.x},${from.y}`);
 
   while (queue.length > 0) {
-    const current = queue.shift()!;
-    const { position, actions } = current;
+    const { position, actions } = queue.shift()!;
 
     if (position.x === to.x && position.y === to.y) {
-      return {
-        distance: actions.length,
-        actions,
-      };
+      return actions;
     }
 
     for (const direction of directions) {
@@ -88,8 +71,5 @@ export const calculateDistance = (
     }
   }
 
-  return {
-    distance: 0,
-    actions: [],
-  };
+  return [];
 };

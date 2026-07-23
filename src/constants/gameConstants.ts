@@ -27,6 +27,8 @@ export const isControlChar = (char: string): boolean => {
   );
 };
 
+export const isDakutenChar = (char?: string | null): boolean => char === "゛" || char === "゜";
+
 export const isDiacriticalMark = (char: string): boolean => {
   return char === "゛" || char === "゜" || char === "ー" || char === "リ" || char === "へ";
 };

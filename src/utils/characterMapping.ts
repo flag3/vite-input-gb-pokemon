@@ -2,6 +2,7 @@ import { BASE_GRIDS } from "../constants/characterGrids";
 import {
   DAKUTEN_MAP,
   DAKUTEN_REVERSE_MAP,
+  isDakutenChar,
   isDiacriticalMark,
   isControlChar,
 } from "../constants/gameConstants";
@@ -28,13 +29,8 @@ const HALFWIDTH_TO_FULLWIDTH_MAP: { [key: string]: string } = {
 export const normalizeSpaces = (text: string): string => text.replaceAll(" ", "　");
 
 // 半角文字を全角に変換する関数
-export const normalizeHalfwidthChars = (text: string): string => {
-  let result = "";
-  for (const char of text) {
-    result += HALFWIDTH_TO_FULLWIDTH_MAP[char] || char;
-  }
-  return result;
-};
+export const normalizeHalfwidthChars = (text: string): string =>
+  Array.from(text, (char) => HALFWIDTH_TO_FULLWIDTH_MAP[char] || char).join("");
 
 const excludeSpecialChars = (char: string): boolean => {
   return !isControlChar(char) && !isDiacriticalMark(char) && char !== "　";
@@ -106,7 +102,7 @@ export const getDisplayText = (history: StateHistory[]): string => {
       text = text.slice(0, -1);
     } else if (state.action === "A" && state.inputChar) {
       const lastChar = text[text.length - 1];
-      if (state.inputChar === "゛" || state.inputChar === "゜") {
+      if (isDakutenChar(state.inputChar)) {
         const combined = lastChar ? DAKUTEN_REVERSE_MAP[lastChar]?.[state.inputChar] : undefined;
         if (combined) {
           text = text.slice(0, -1) + combined;

@@ -1,7 +1,6 @@
-import { CONFIRM_POSITIONS, MAX_CHAR_LIMITS } from "../constants/gameConstants";
-import type { CharacterGrid, InputAction, InputPath } from "../types";
-import type { InternalPosition } from "./pathfinderUtils";
-import { findCharacterPosition, calculateDistance } from "./pathfinderUtils";
+import { CONFIRM_POSITIONS, MAX_CHAR_LIMITS, isDakutenChar } from "../constants/gameConstants";
+import type { CharacterGrid, CharacterPosition, InputAction, InputPath } from "../types";
+import { findCharacterPosition, findShortestPath } from "./pathfinderUtils";
 import { findOptimalSpacePosition } from "./spacePathfinder";
 
 /**
@@ -18,7 +17,6 @@ export const findInputSequence = (
 ): InputPath[] => {
   const hiraganaGrid = { ...grid, isHiragana: true };
   const katakanaGrid = { ...grid, isHiragana: false };
-  const isDakutenChar = (char?: string) => char === "゛" || char === "゜";
   const resolveTargetPosition = (char: string, targetMode: boolean) => {
     const hiraganaResult = findCharacterPosition(char, hiraganaGrid);
     const katakanaResult = findCharacterPosition(char, katakanaGrid);
@@ -32,16 +30,15 @@ export const findInputSequence = (
     };
   };
   const buildMoveActions = (
-    from: InternalPosition,
-    to: InternalPosition,
+    from: CharacterPosition,
+    to: CharacterPosition,
     inputCharCount: number,
   ): InputAction[] => {
-    const { actions: moveActions } = calculateDistance(from, to, grid, inputCharCount);
-    return [...moveActions, "A"];
+    return [...findShortestPath(from, to, grid, inputCharCount), "A"];
   };
   const buildDakutenActions = (
-    currentPosition: InternalPosition,
-    targetPosition: InternalPosition,
+    currentPosition: CharacterPosition,
+    targetPosition: CharacterPosition,
     inputCharCount: number,
   ): InputAction[] => {
     const isAtCharLimit = inputCharCount === MAX_CHAR_LIMITS[grid.version];
@@ -56,15 +53,15 @@ export const findInputSequence = (
   };
   const buildSpaceSequence = (
     index: number,
-    currentPosition: InternalPosition,
+    currentPosition: CharacterPosition,
     currentIsHiragana: boolean,
     inputCharCount: number,
   ): {
     sequence: InputPath;
-    position: InternalPosition;
+    position: CharacterPosition;
     isHiragana: boolean;
   } => {
-    let nextCharPosition: InternalPosition | null = null;
+    let nextCharPosition: CharacterPosition | null = null;
     const nextChar = text[index + 1];
     if (index + 1 < text.length && !isDakutenChar(nextChar)) {
       const nextTarget = resolveTargetPosition(nextChar, modes[index + 1]);
@@ -103,9 +100,9 @@ export const findInputSequence = (
   };
   const buildDakutenSequence = (
     char: string,
-    currentPosition: InternalPosition,
+    currentPosition: CharacterPosition,
     inputCharCount: number,
-  ): { sequence: InputPath; position: InternalPosition } | null => {
+  ): { sequence: InputPath; position: CharacterPosition } | null => {
     const dakutenResult = findCharacterPosition(char, grid);
     if (!dakutenResult) return null;
     const normalActions = buildDakutenActions(
@@ -133,7 +130,7 @@ export const findInputSequence = (
   // GEN1限定: ED上でA連打→B削除で入力位置を稼ぐショートカットが直行より短ければ採用
   const applyGen1EdShortcut = (
     actions: InputAction[],
-    targetPosition: InternalPosition,
+    targetPosition: CharacterPosition,
     inputCharCount: number,
     skipWhenAtLimit: boolean,
     isDakuten = false,
@@ -144,17 +141,12 @@ export const findInputSequence = (
     const remainingToLimit = MAX_CHAR_LIMITS[grid.version] - inputCharCount;
     if (remainingToLimit < 0 || (skipWhenAtLimit && remainingToLimit === 0)) return noChange;
 
-    const fixedPos: InternalPosition = {
+    const fixedPos: CharacterPosition = {
       ...CONFIRM_POSITIONS[grid.version],
       char: targetPosition.char,
     };
     const pressCount = isDakuten ? remainingToLimit : remainingToLimit + 1;
-    const { actions: moveFromED } = calculateDistance(
-      fixedPos,
-      targetPosition,
-      grid,
-      inputCharCount,
-    );
+    const moveFromED = findShortestPath(fixedPos, targetPosition, grid, inputCharCount);
     const hackActions: InputAction[] = [
       ...Array<InputAction>(pressCount).fill("A"),
       ...Array<InputAction>(pressCount).fill("B"),
@@ -180,7 +172,7 @@ export const findInputSequence = (
   };
 
   const sequences: InputPath[] = [];
-  let currentPosition: InternalPosition = { x: 0, y: 0, char: "" };
+  let currentPosition: CharacterPosition = { x: 0, y: 0, char: "" };
   let currentIsHiragana = grid.isHiragana;
   let inputCharCount = 0;
 

@@ -1,5 +1,10 @@
 import { createGrid } from "../constants/characterGrids";
-import { CONFIRM_POSITIONS, MAX_CHAR_LIMITS, isControlChar } from "../constants/gameConstants";
+import {
+  CONFIRM_POSITIONS,
+  MAX_CHAR_LIMITS,
+  isControlChar,
+  isDakutenChar,
+} from "../constants/gameConstants";
 import type { GameVersion, InputAction, StateHistory } from "../types";
 import { getDisplayText } from "../utils/characterMapping";
 import { calculateNextPosition } from "../utils/gridNavigation";
@@ -49,7 +54,7 @@ export const usePlayback = (
 
     for (let i = 0; i < sequences.length; i++) {
       const sequence = sequences[i];
-      if (sequence.char !== "゛" && sequence.char !== "゜") {
+      if (!isDakutenChar(sequence.char)) {
         inputCharCount++;
       }
       if (stepCount + sequence.actions.length > currentStep) {
@@ -169,10 +174,6 @@ export const usePlayback = (
     setIsPlaying(!isPlaying);
   }, [currentStep, totalSteps, isPlaying, handleReset]);
 
-  const handleSpeedChange = useCallback((speed: number) => {
-    setPlaybackSpeed(speed);
-  }, []);
-
   useEffect(() => {
     if (!isPlaying || currentStep >= totalSteps) {
       setIsPlaying(false);
@@ -204,6 +205,6 @@ export const usePlayback = (
     handleStepBackward,
     handlePlayPause,
     handleReset,
-    handleSpeedChange,
+    handleSpeedChange: setPlaybackSpeed,
   };
 };

@@ -42,10 +42,7 @@ export const CharacterGrid = ({ grid, currentPosition, currentAction }: Characte
 
   return (
     <div className="grid-wrapper">
-      <div
-        className="grid-container"
-        style={{ "--grid-width": grid.width } as CSSProperties}
-      >
+      <div className="grid-container" style={{ "--grid-width": grid.width } as CSSProperties}>
         {groupedCells.map((cell, index) => {
           const isActive = cell.x.includes(currentPosition.x) && cell.y === currentPosition.y;
           return (

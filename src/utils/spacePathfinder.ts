@@ -1,14 +1,13 @@
 import type { CharacterGrid, CharacterPosition, InputAction } from "../types";
 import { getSpacePositions } from "./gridPositions";
-import type { InternalPosition } from "./pathfinderUtils";
-import { calculateDistance } from "./pathfinderUtils";
+import { findShortestPath } from "./pathfinderUtils";
 
 /**
  * 最適なスペース位置を見つける
  */
 export const findOptimalSpacePosition = (
-  currentPosition: InternalPosition,
-  nextCharPosition: InternalPosition | null,
+  currentPosition: CharacterPosition,
+  nextCharPosition: CharacterPosition | null,
   currentIsHiragana: boolean,
   grid: CharacterGrid,
   inputCharCount?: number,
@@ -48,13 +47,7 @@ export const findOptimalSpacePosition = (
       const actions: InputAction[] = [...prefix];
 
       if (currentPosition.x !== spacePos.x || currentPosition.y !== spacePos.y) {
-        const { actions: moveActions } = calculateDistance(
-          currentPosition,
-          spacePos,
-          grid,
-          inputCharCount,
-        );
-        actions.push(...moveActions);
+        actions.push(...findShortestPath(currentPosition, spacePos, grid, inputCharCount));
       }
 
       actions.push("A");
@@ -62,20 +55,7 @@ export const findOptimalSpacePosition = (
       let totalSteps = actions.length;
 
       if (nextCharPosition) {
-        const spaceToNextPosition: InternalPosition = {
-          x: spacePos.x,
-          y: spacePos.y,
-          char: "　",
-        };
-
-        const { distance: nextDistance } = calculateDistance(
-          spaceToNextPosition,
-          nextCharPosition,
-          grid,
-          inputCharCount,
-        );
-
-        totalSteps += nextDistance;
+        totalSteps += findShortestPath(spacePos, nextCharPosition, grid, inputCharCount).length;
       }
 
       if (totalSteps < minTotalSteps) {
