@@ -1,13 +1,14 @@
 #root {
+  width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  box-sizing: border-box;
+  padding: clamp(1rem, 4vw, 2rem);
 }
 
 .simulator-layout {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
   display: grid;
   grid-template-columns: 1fr;
   gap: 40px;

@@ -40,13 +40,19 @@ export const CharacterGrid = ({ grid, currentPosition, currentAction }: Characte
 
   const groupedCells = getGroupedCells();
 
+  const naturalWidth =
+    grid.width * (UI_CONSTANTS.GRID.CELL_SIZE + UI_CONSTANTS.GRID.GAP) -
+    UI_CONSTANTS.GRID.GAP +
+    UI_CONSTANTS.GRID.PADDING * 2;
+
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", containerType: "inline-size" }}>
       <div
         className="grid-container"
         style={{
           display: "grid",
-          gridTemplateColumns: `repeat(${grid.width}, ${UI_CONSTANTS.GRID.CELL_SIZE}px)`,
+          gridTemplateColumns: `repeat(${grid.width}, minmax(0, 1fr))`,
+          maxWidth: `${naturalWidth}px`,
           gap: `${UI_CONSTANTS.GRID.GAP}px`,
           padding: `${UI_CONSTANTS.GRID.PADDING}px`,
           backgroundColor: "var(--bgColor-muted)",
@@ -59,8 +65,7 @@ export const CharacterGrid = ({ grid, currentPosition, currentAction }: Characte
             <div
               key={index}
               style={{
-                width: `${cell.width * UI_CONSTANTS.GRID.CELL_SIZE + (cell.width - 1) * UI_CONSTANTS.GRID.GAP}px`,
-                height: `${UI_CONSTANTS.GRID.CELL_SIZE}px`,
+                aspectRatio: `${cell.width} / 1`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -71,7 +76,7 @@ export const CharacterGrid = ({ grid, currentPosition, currentAction }: Characte
                 borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS}px`,
                 cursor: "pointer",
                 userSelect: "none",
-                fontSize: `${UI_CONSTANTS.TYPOGRAPHY.FONT_SIZE_INPUT}px`,
+                fontSize: `min(${UI_CONSTANTS.TYPOGRAPHY.FONT_SIZE_INPUT}px, ${60 / grid.width}cqw)`,
                 position: "relative",
                 transition: `background-color ${UI_CONSTANTS.ANIMATION.TRANSITION_DURATION}`,
                 gridColumn: `${cell.x[0] + 1} / span ${cell.width}`,
