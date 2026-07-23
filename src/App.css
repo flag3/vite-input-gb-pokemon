@@ -18,6 +18,13 @@
   margin-top: 20px;
 }
 
+.sequence-display,
+.sequence-item,
+.character-cell,
+.text-input-mono input {
+  font-family: var(--fontStack-monospace);
+}
+
 .controls-row {
   display: flex;
   flex-direction: column;

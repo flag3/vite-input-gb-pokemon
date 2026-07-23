@@ -1,5 +1,6 @@
 import App from "./App.tsx";
 import "./index.css";
+import "@primer/primitives/dist/css/functional/typography/typography.css";
 import "@primer/primitives/dist/css/functional/themes/light.css";
 import "@primer/primitives/dist/css/functional/themes/dark.css";
 import { BaseStyles, ThemeProvider } from "@primer/react";

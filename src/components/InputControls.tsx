@@ -83,6 +83,7 @@ export const InputControls = ({
         <FormControl>
           <FormControl.Label>{textField.label}</FormControl.Label>
           <TextInput
+            className="text-input-mono"
             block
             size="large"
             value={inputText}

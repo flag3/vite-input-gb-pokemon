@@ -59,7 +59,6 @@ export const InputSequence = ({
           backgroundColor: "var(--bgColor-muted)",
           borderRadius: `${UI_CONSTANTS.GRID.BORDER_RADIUS}px`,
           fontSize: `${UI_CONSTANTS.TYPOGRAPHY.FONT_SIZE_DISPLAY}px`,
-          fontFamily: "monospace",
           whiteSpace: "pre-wrap",
           wordBreak: "break-all",
         }}
@@ -98,7 +97,6 @@ export const InputSequence = ({
                   marginRight: "8px",
                   fontWeight: "bold",
                   minWidth: "2em",
-                  fontFamily: "monospace",
                 }}
               >
                 {displayChar}:
