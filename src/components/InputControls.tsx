@@ -1,6 +1,13 @@
 import type { GameVersion } from "../types";
 import { Icon } from "@iconify/react";
-import { FormControl, IconButton, Select, Text, TextInput } from "@primer/react";
+import {
+  ButtonGroup,
+  FormControl,
+  IconButton,
+  SegmentedControl,
+  Select,
+  TextInput,
+} from "@primer/react";
 import { type ChangeEvent } from "react";
 
 interface InputControlsProps {
@@ -16,14 +23,16 @@ interface InputControlsProps {
   onReset: () => void;
   onStepForward: () => void;
   onStepBackward: () => void;
-  onSpeedChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onSpeedChange: (speed: number) => void;
 }
 
-const PlayIcon = () => <Icon icon="material-symbols:play-arrow" width={24} />;
-const PauseIcon = () => <Icon icon="material-symbols:pause" width={24} />;
-const ResetIcon = () => <Icon icon="material-symbols:restart-alt" width={24} />;
-const BackIcon = () => <Icon icon="material-symbols:arrow-back" width={24} />;
-const ForwardIcon = () => <Icon icon="material-symbols:arrow-forward" width={24} />;
+const PLAYBACK_SPEEDS = [1, 2, 4];
+
+const PlayIcon = () => <Icon icon="material-symbols:play-arrow" />;
+const PauseIcon = () => <Icon icon="material-symbols:pause" />;
+const ResetIcon = () => <Icon icon="material-symbols:restart-alt" />;
+const BackIcon = () => <Icon icon="material-symbols:arrow-back" />;
+const ForwardIcon = () => <Icon icon="material-symbols:arrow-forward" />;
 
 export const InputControls = ({
   inputText,
@@ -85,53 +94,43 @@ export const InputControls = ({
 
       <div className="playback-row">
         <div className="playback-buttons">
-          <IconButton
-            icon={isPlaying ? PauseIcon : PlayIcon}
-            aria-label={
-              isPlaying ? "Pause" : currentStep >= totalSteps ? "Play from start" : "Play"
-            }
-            variant="invisible"
-            onClick={onPlayPause}
-          />
+          <ButtonGroup>
+            <IconButton
+              icon={isPlaying ? PauseIcon : PlayIcon}
+              aria-label={
+                isPlaying ? "Pause" : currentStep >= totalSteps ? "Play from start" : "Play"
+              }
+              onClick={onPlayPause}
+            />
 
-          <IconButton icon={ResetIcon} aria-label="Reset" variant="invisible" onClick={onReset} />
+            <IconButton
+              icon={BackIcon}
+              aria-label="Previous"
+              disabled={currentStep === 0}
+              onClick={onStepBackward}
+            />
 
-          <IconButton
-            icon={BackIcon}
-            aria-label="Previous"
-            variant="invisible"
-            disabled={currentStep === 0}
-            onClick={onStepBackward}
-          />
+            <IconButton
+              icon={ForwardIcon}
+              aria-label="Next"
+              disabled={currentStep >= totalSteps}
+              onClick={onStepForward}
+            />
 
-          <IconButton
-            icon={ForwardIcon}
-            aria-label="Next"
-            variant="invisible"
-            disabled={currentStep >= totalSteps}
-            onClick={onStepForward}
-          />
+            <IconButton icon={ResetIcon} aria-label="Reset" onClick={onReset} />
+          </ButtonGroup>
         </div>
 
-        <div className="speed-control">
-          <Icon
-            icon="material-symbols:speed-outline"
-            width={24}
-            style={{ color: "var(--fgColor-accent)", flexShrink: 0 }}
-          />
-          <input
-            type="range"
-            aria-label="Playback speed"
-            value={1000 - playbackSpeed}
-            onChange={onSpeedChange}
-            min={0}
-            max={900}
-            style={{ flex: 1 }}
-          />
-          <Text style={{ fontSize: "12px", color: "var(--fgColor-muted)", flexShrink: 0 }}>
-            {(playbackSpeed / 1000).toFixed(2)}s
-          </Text>
-        </div>
+        <SegmentedControl
+          aria-label="Playback speed"
+          onChange={(index) => onSpeedChange(PLAYBACK_SPEEDS[index])}
+        >
+          {PLAYBACK_SPEEDS.map((speed) => (
+            <SegmentedControl.Button key={speed} selected={speed === playbackSpeed}>
+              {`${speed}×`}
+            </SegmentedControl.Button>
+          ))}
+        </SegmentedControl>
 
         <div className="step-counter" style={{ color: "var(--fgColor-muted)" }}>
           Step: {currentStep} / {totalSteps}

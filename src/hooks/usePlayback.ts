@@ -4,7 +4,9 @@ import type { GameVersion, InputAction, StateHistory } from "../types";
 import { getDisplayText } from "../utils/characterMapping";
 import { calculateNextPosition } from "../utils/gridNavigation";
 import { findInputSequence } from "../utils/pathfinder";
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
+
+const BASE_STEP_INTERVAL_MS = 500;
 
 const initialHistory = (): StateHistory[] => [
   {
@@ -25,7 +27,7 @@ export const usePlayback = (
   const [currentStep, setCurrentStep] = useState(0);
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
   const [currentAction, setCurrentAction] = useState<InputAction | null>(null);
-  const [playbackSpeed, setPlaybackSpeed] = useState(500);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [stateHistory, setStateHistory] = useState<StateHistory[]>(initialHistory);
   const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
   const [isHiragana, setIsHiragana] = useState(false);
@@ -167,8 +169,8 @@ export const usePlayback = (
     setIsPlaying(!isPlaying);
   }, [currentStep, totalSteps, isPlaying, handleReset]);
 
-  const handleSpeedChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setPlaybackSpeed(1000 - Number(e.target.value));
+  const handleSpeedChange = useCallback((speed: number) => {
+    setPlaybackSpeed(speed);
   }, []);
 
   useEffect(() => {
@@ -179,7 +181,7 @@ export const usePlayback = (
 
     const timer = setTimeout(() => {
       handleStepForward();
-    }, playbackSpeed);
+    }, BASE_STEP_INTERVAL_MS / playbackSpeed);
 
     return () => clearTimeout(timer);
   }, [isPlaying, currentStep, totalSteps, playbackSpeed, handleStepForward]);
