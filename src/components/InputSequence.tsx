@@ -46,7 +46,7 @@ export const InputSequence = ({
 
           return (
             <div key={index} className={`sequence-item ${isCurrentSequence ? "current" : ""}`}>
-              <Text className="sequence-char">{sequence.char}:</Text>
+              <Text className="sequence-char">{sequence.char === "　" ? "␣" : sequence.char}:</Text>
               <div className="action-steps">
                 {sequence.actions.map((action, actionIndex) => {
                   const isCurrentAction = stepCount + actionIndex === currentStep;
@@ -61,7 +61,9 @@ export const InputSequence = ({
                   );
                 })}
               </div>
-              <Text className="sequence-step-count">{sequence.actions.length} steps</Text>
+              <Text className="sequence-step-count">
+                {sequence.actions.length} {sequence.actions.length === 1 ? "step" : "steps"}
+              </Text>
             </div>
           );
         })}
