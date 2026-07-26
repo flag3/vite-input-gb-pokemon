@@ -152,7 +152,6 @@
 .sequence-item {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
   padding: 8px;
   background-color: var(--bgColor-default);
   border-radius: 4px;
