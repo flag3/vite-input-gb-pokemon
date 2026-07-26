@@ -1,14 +1,13 @@
 import { GROUPABLE_CHARS } from "../constants/gameConstants";
-import type { CharacterGrid as CharacterGridType, InputAction } from "../types";
+import type { CharacterGrid as CharacterGridType } from "../types";
 import type { CSSProperties } from "react";
 
 interface CharacterGridProps {
   grid: CharacterGridType;
   currentPosition: { x: number; y: number };
-  currentAction: InputAction | null;
 }
 
-export const CharacterGrid = ({ grid, currentPosition, currentAction }: CharacterGridProps) => {
+export const CharacterGrid = ({ grid, currentPosition }: CharacterGridProps) => {
   const getGroupedCells = () => {
     const cells: {
       char: string;
@@ -55,7 +54,6 @@ export const CharacterGrid = ({ grid, currentPosition, currentAction }: Characte
               }}
             >
               {cell.char}
-              {isActive && currentAction === "A" && <div className="press-indicator">A</div>}
             </div>
           );
         })}

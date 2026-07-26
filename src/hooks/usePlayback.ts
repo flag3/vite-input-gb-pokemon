@@ -175,7 +175,6 @@ export const usePlayback = (
   return {
     isPlaying,
     currentStep,
-    currentAction: currentState.action,
     playbackSpeed,
     stateHistory,
     currentPosition: currentState.position,

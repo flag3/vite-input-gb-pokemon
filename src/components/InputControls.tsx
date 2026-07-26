@@ -49,21 +49,19 @@ export const InputControls = ({
   onStepBackward,
   onSpeedChange,
 }: InputControlsProps) => {
-  const getTextField = () => {
+  const getTextFieldLabel = () => {
     switch (currentVersion) {
       case "GEN1":
       case "GEN2_NICKNAME":
-        return { label: "Nickname", placeholder: "Enter nickname" };
+        return "Nickname";
       case "GEN2_BOX":
-        return { label: "Box name", placeholder: "Enter box name" };
+        return "Box name";
       case "GEN2_MAIL":
-        return { label: "Mail", placeholder: "Enter mail" };
+        return "Mail";
       default:
-        return { label: "Input text", placeholder: "Enter text" };
+        return "Input text";
     }
   };
-
-  const textField = getTextField();
 
   return (
     <>
@@ -81,14 +79,13 @@ export const InputControls = ({
 
       <div className="text-input-row">
         <FormControl>
-          <FormControl.Label>{textField.label}</FormControl.Label>
+          <FormControl.Label>{getTextFieldLabel()}</FormControl.Label>
           <TextInput
             className="text-input-mono"
             block
             size="large"
             value={inputText}
             onChange={onTextChange}
-            placeholder={textField.placeholder}
           />
         </FormControl>
       </div>

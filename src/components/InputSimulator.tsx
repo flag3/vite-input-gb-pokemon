@@ -11,7 +11,6 @@ const InputSimulator = () => {
   const {
     isPlaying,
     currentStep,
-    currentAction,
     playbackSpeed,
     stateHistory,
     currentPosition,
@@ -46,7 +45,6 @@ const InputSimulator = () => {
         <CharacterGrid
           grid={createGrid(currentVersion, isHiragana)}
           currentPosition={currentPosition}
-          currentAction={currentAction}
         />
       </div>
 
