@@ -17,12 +17,24 @@ export const useInputProcessing = () => {
     return findInputSequence(grid, chars.join(""), modes);
   }, [inputText, currentVersion]);
 
+  const clamp = useCallback(
+    (text: string) => normalizeSpaces(text).slice(0, MAX_CHAR_LIMITS[currentVersion]),
+    [currentVersion],
+  );
+
   const handleTextChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const text = normalizeSpaces(e.target.value);
-      setInputText(text.slice(0, MAX_CHAR_LIMITS[currentVersion]));
+      const isComposing = (e.nativeEvent as InputEvent).isComposing;
+      setInputText(isComposing ? e.target.value : clamp(e.target.value));
     },
-    [currentVersion],
+    [clamp],
+  );
+
+  const handleCompositionEnd = useCallback(
+    (e: React.CompositionEvent<HTMLInputElement>) => {
+      setInputText(clamp(e.currentTarget.value));
+    },
+    [clamp],
   );
 
   const handleVersionChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -34,6 +46,7 @@ export const useInputProcessing = () => {
     currentVersion,
     sequences,
     handleTextChange,
+    handleCompositionEnd,
     handleVersionChange,
   };
 };

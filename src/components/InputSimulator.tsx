@@ -6,8 +6,14 @@ import { InputControls } from "./InputControls";
 import { InputSequence } from "./InputSequence";
 
 const InputSimulator = () => {
-  const { inputText, currentVersion, sequences, handleTextChange, handleVersionChange } =
-    useInputProcessing();
+  const {
+    inputText,
+    currentVersion,
+    sequences,
+    handleTextChange,
+    handleCompositionEnd,
+    handleVersionChange,
+  } = useInputProcessing();
   const {
     isPlaying,
     currentStep,
@@ -34,6 +40,7 @@ const InputSimulator = () => {
           totalSteps={totalSteps}
           playbackSpeed={playbackSpeed}
           onTextChange={handleTextChange}
+          onCompositionEnd={handleCompositionEnd}
           onVersionChange={handleVersionChange}
           onPlayPause={handlePlayPause}
           onReset={handleReset}

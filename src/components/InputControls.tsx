@@ -8,7 +8,7 @@ import {
   Select,
   TextInput,
 } from "@primer/react";
-import { type ChangeEvent } from "react";
+import { type ChangeEvent, type CompositionEvent } from "react";
 
 interface InputControlsProps {
   inputText: string;
@@ -18,6 +18,7 @@ interface InputControlsProps {
   totalSteps: number;
   playbackSpeed: number;
   onTextChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onCompositionEnd: (e: CompositionEvent<HTMLInputElement>) => void;
   onVersionChange: (e: ChangeEvent<HTMLSelectElement>) => void;
   onPlayPause: () => void;
   onReset: () => void;
@@ -42,6 +43,7 @@ export const InputControls = ({
   totalSteps,
   playbackSpeed,
   onTextChange,
+  onCompositionEnd,
   onVersionChange,
   onPlayPause,
   onReset,
@@ -86,6 +88,7 @@ export const InputControls = ({
             size="large"
             value={inputText}
             onChange={onTextChange}
+            onCompositionEnd={onCompositionEnd}
           />
         </FormControl>
       </div>
