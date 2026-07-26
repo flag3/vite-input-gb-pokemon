@@ -11,7 +11,6 @@ const InputSimulator = () => {
   const {
     isPlaying,
     currentStep,
-    currentCharIndex,
     currentAction,
     playbackSpeed,
     stateHistory,
@@ -51,12 +50,7 @@ const InputSimulator = () => {
         />
       </div>
 
-      <InputSequence
-        sequences={sequences}
-        currentStep={currentStep}
-        currentCharIndex={currentCharIndex}
-        stateHistory={stateHistory}
-      />
+      <InputSequence sequences={sequences} currentStep={currentStep} stateHistory={stateHistory} />
     </div>
   );
 };

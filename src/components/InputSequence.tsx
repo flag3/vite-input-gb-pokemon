@@ -5,16 +5,10 @@ import { Text } from "@primer/react";
 interface InputSequenceProps {
   sequences: InputPath[];
   currentStep: number;
-  currentCharIndex: number;
   stateHistory: StateHistory[];
 }
 
-export const InputSequence = ({
-  sequences,
-  currentStep,
-  currentCharIndex,
-  stateHistory,
-}: InputSequenceProps) => {
+export const InputSequence = ({ sequences, currentStep, stateHistory }: InputSequenceProps) => {
   const currentText = getDisplayText(stateHistory);
 
   // 各シーケンスの開始ステップ番号と総ステップ数を1パスで計算
@@ -42,7 +36,8 @@ export const InputSequence = ({
       <div className="sequence-list">
         {sequences.map((sequence, index) => {
           const stepCount = stepOffsets[index];
-          const isCurrentSequence = index === currentCharIndex;
+          const isCurrentSequence =
+            stepCount <= currentStep && currentStep < stepCount + sequence.actions.length;
 
           return (
             <div key={index} className={`sequence-item ${isCurrentSequence ? "current" : ""}`}>
