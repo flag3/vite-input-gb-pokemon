@@ -7,10 +7,11 @@
 }
 
 .simulator-layout {
-  max-width: 1200px;
+  --character-grid-width: calc(var(--grid-width) * 44px + 12px);
+  max-width: var(--character-grid-width);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 40px;
 }
 
@@ -34,6 +35,11 @@
 
 .text-input-row {
   margin-bottom: 20px;
+}
+
+.text-input-row,
+.grid-container {
+  max-width: var(--character-grid-width);
 }
 
 .playback-row {
@@ -65,7 +71,6 @@
 .grid-container {
   display: grid;
   grid-template-columns: repeat(var(--grid-width), minmax(0, 1fr));
-  max-width: calc(var(--grid-width) * 44px + 12px);
   gap: 4px;
   padding: 8px;
   background-color: var(--bgColor-muted);
@@ -179,7 +184,8 @@
 
 @media (min-width: 48rem) {
   .simulator-layout {
-    grid-template-columns: 1fr 400px;
+    max-width: calc(var(--character-grid-width) + 40px + 400px);
+    grid-template-columns: minmax(0, 1fr) 400px;
   }
 
   .input-sequence {
@@ -196,6 +202,7 @@
 
   .playback-row {
     align-items: center;
+    flex-wrap: wrap;
   }
 
   .playback-buttons {

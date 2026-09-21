@@ -71,10 +71,10 @@ export const InputControls = ({
         <FormControl>
           <FormControl.Label>Input mode</FormControl.Label>
           <Select block value={currentVersion} onChange={onVersionChange}>
-            <Select.Option value="GEN1">gen-1 nickname</Select.Option>
-            <Select.Option value="GEN2_NICKNAME">gen-2 nickname</Select.Option>
-            <Select.Option value="GEN2_BOX">gen-2 box</Select.Option>
-            <Select.Option value="GEN2_MAIL">gen-2 mail</Select.Option>
+            <Select.Option value="GEN1">Gen 1 nickname</Select.Option>
+            <Select.Option value="GEN2_NICKNAME">Gen 2 nickname</Select.Option>
+            <Select.Option value="GEN2_BOX">Gen 2 box name</Select.Option>
+            <Select.Option value="GEN2_MAIL">Gen 2 mail</Select.Option>
           </Select>
         </FormControl>
       </div>

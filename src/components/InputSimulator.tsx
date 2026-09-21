@@ -4,6 +4,7 @@ import { usePlayback } from "../hooks/usePlayback";
 import { CharacterGrid } from "./CharacterGrid";
 import { InputControls } from "./InputControls";
 import { InputSequence } from "./InputSequence";
+import type { CSSProperties } from "react";
 
 const InputSimulator = () => {
   const {
@@ -28,9 +29,10 @@ const InputSimulator = () => {
     handleReset,
     handleSpeedChange,
   } = usePlayback(inputText, currentVersion, sequences);
+  const grid = createGrid(currentVersion, isHiragana);
 
   return (
-    <div className="simulator-layout">
+    <div className="simulator-layout" style={{ "--grid-width": grid.width } as CSSProperties}>
       <div>
         <InputControls
           inputText={inputText}
@@ -49,10 +51,7 @@ const InputSimulator = () => {
           onSpeedChange={handleSpeedChange}
         />
 
-        <CharacterGrid
-          grid={createGrid(currentVersion, isHiragana)}
-          currentPosition={currentPosition}
-        />
+        <CharacterGrid grid={grid} currentPosition={currentPosition} />
       </div>
 
       <InputSequence sequences={sequences} currentStep={currentStep} stateHistory={stateHistory} />
