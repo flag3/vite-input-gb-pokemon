@@ -4,23 +4,20 @@ import { calculateNextPosition } from "./gridNavigation";
 import { HIRAGANA_KATAKANA_MAP } from "./gridPositions";
 
 /**
- * 文字の位置を見つける
+ * 文字の位置と、見つかったグリッドの入力モードを返す
  */
 export const findCharacterPosition = (
   char: string,
   grid: CharacterGrid,
-): { position: CharacterPosition } | null => {
-  const { hiragana, katakana } = BASE_GRIDS[grid.version];
-
+): { position: CharacterPosition; isHiragana: boolean } | null => {
   // 現在のモードのグリッドを先に探し、なければ他のモードのグリッドを探す
-  const searchOrder = grid.isHiragana ? [hiragana, katakana] : [katakana, hiragana];
-
-  for (const baseGrid of searchOrder) {
+  for (const isHiragana of [grid.isHiragana, !grid.isHiragana]) {
+    const baseGrid = BASE_GRIDS[grid.version][isHiragana ? "hiragana" : "katakana"];
     for (let y = 0; y < baseGrid.length; y++) {
       for (let x = 0; x < baseGrid[y].length; x++) {
         const gridChar = baseGrid[y][x];
         if (gridChar === char || HIRAGANA_KATAKANA_MAP[char]?.includes(gridChar)) {
-          return { position: { char: gridChar, x, y } };
+          return { position: { char: gridChar, x, y }, isHiragana };
         }
       }
     }

@@ -15,20 +15,6 @@ export const findInputSequence = (
   text: string,
   modes: boolean[],
 ): InputPath[] => {
-  const hiraganaGrid = { ...grid, isHiragana: true };
-  const katakanaGrid = { ...grid, isHiragana: false };
-  const resolveTargetPosition = (char: string, targetMode: boolean) => {
-    const hiraganaResult = findCharacterPosition(char, hiraganaGrid);
-    const katakanaResult = findCharacterPosition(char, katakanaGrid);
-    if (!hiraganaResult && !katakanaResult) return null;
-
-    const targetIsHiragana = Boolean(hiraganaResult && (!katakanaResult || targetMode));
-
-    return {
-      position: targetIsHiragana ? hiraganaResult!.position : katakanaResult!.position,
-      isHiragana: targetIsHiragana,
-    };
-  };
   const buildMoveActions = (from: CharacterPosition, to: CharacterPosition): InputAction[] => {
     return [...findShortestPath(from, to, grid), "A"];
   };
@@ -60,7 +46,7 @@ export const findInputSequence = (
     let nextCharPosition: CharacterPosition | null = null;
     const nextChar = text[index + 1];
     if (index + 1 < text.length && !isDakutenChar(nextChar)) {
-      const nextTarget = resolveTargetPosition(nextChar, modes[index + 1]);
+      const nextTarget = findCharacterPosition(nextChar, { ...grid, isHiragana: modes[index + 1] });
       if (nextTarget) {
         nextCharPosition = nextTarget.position;
       }
@@ -177,7 +163,7 @@ export const findInputSequence = (
     }
 
     // 通常文字の処理
-    const target = resolveTargetPosition(currentChar, targetMode);
+    const target = findCharacterPosition(currentChar, { ...grid, isHiragana: targetMode });
     if (!target) continue;
     const targetIsHiragana = target.isHiragana;
     const currentActions: InputAction[] = [];
