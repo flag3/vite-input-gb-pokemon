@@ -1,6 +1,6 @@
 import type { InputPath, StateHistory } from "../types";
 import { getDisplayText } from "../utils/characterMapping";
-import { ProgressBar, Stack, Text } from "@primer/react";
+import { Label, ProgressBar, Stack, Text } from "@primer/react";
 
 interface InputSequenceProps {
   sequences: InputPath[];
@@ -70,9 +70,9 @@ export const InputSequence = ({ sequences, currentStep, stateHistory }: InputSeq
                   );
                 })}
               </Stack>
-              <Text className="sequence-step-count">
+              <Label className="sequence-step-count">
                 {sequence.actions.length} {sequence.actions.length === 1 ? "step" : "steps"}
-              </Text>
+              </Label>
             </Stack>
           );
         })}
