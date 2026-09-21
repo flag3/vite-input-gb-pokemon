@@ -10,7 +10,6 @@ export const findOptimalSpacePosition = (
   nextCharPosition: CharacterPosition | null,
   currentIsHiragana: boolean,
   grid: CharacterGrid,
-  inputCharCount?: number,
 ): {
   position: CharacterPosition;
   actions: InputAction[];
@@ -47,7 +46,7 @@ export const findOptimalSpacePosition = (
       const actions: InputAction[] = [...prefix];
 
       if (currentPosition.x !== spacePos.x || currentPosition.y !== spacePos.y) {
-        actions.push(...findShortestPath(currentPosition, spacePos, grid, inputCharCount));
+        actions.push(...findShortestPath(currentPosition, spacePos, grid));
       }
 
       actions.push("A");
@@ -55,7 +54,7 @@ export const findOptimalSpacePosition = (
       let totalSteps = actions.length;
 
       if (nextCharPosition) {
-        totalSteps += findShortestPath(spacePos, nextCharPosition, grid, inputCharCount).length;
+        totalSteps += findShortestPath(spacePos, nextCharPosition, grid).length;
       }
 
       if (totalSteps < minTotalSteps) {

@@ -21,7 +21,6 @@ export interface CharacterGrid {
 export interface StateHistory {
   position: Position;
   isHiragana: boolean;
-  charIndex: number;
   action: InputAction | null;
   inputChar: string | null;
 }

@@ -1,10 +1,5 @@
 import { createGrid } from "../constants/characterGrids";
-import {
-  CONFIRM_POSITIONS,
-  MAX_CHAR_LIMITS,
-  isControlChar,
-  isDakutenChar,
-} from "../constants/gameConstants";
+import { CONFIRM_POSITIONS, MAX_CHAR_LIMITS, isControlChar } from "../constants/gameConstants";
 import type { GameVersion, InputPath, StateHistory } from "../types";
 import { getDisplayText } from "../utils/characterMapping";
 import { calculateNextPosition } from "../utils/gridNavigation";
@@ -16,7 +11,6 @@ const initialHistory = (): StateHistory[] => [
   {
     position: { x: 0, y: 0 },
     isHiragana: false,
-    charIndex: 0,
     action: null,
     inputChar: null,
   },
@@ -36,16 +30,11 @@ export const advanceHistory = (
   const lastState = history[history.length - 1];
 
   let stepCount = 0;
-  let inputCharCount = 0;
   const newPosition = { ...lastState.position };
   let newIsHiragana = lastState.isHiragana;
   let currentInputChar: string | null = null;
 
-  for (let i = 0; i < sequences.length; i++) {
-    const sequence = sequences[i];
-    if (!isDakutenChar(sequence.char)) {
-      inputCharCount++;
-    }
+  for (const sequence of sequences) {
     if (stepCount + sequence.actions.length > currentStep) {
       const actionIndex = currentStep - stepCount;
       const action = sequence.actions[actionIndex];
@@ -70,7 +59,6 @@ export const advanceHistory = (
           {
             position: { ...newPosition },
             isHiragana: newIsHiragana,
-            charIndex: i,
             action,
             inputChar: currentInputChar,
           },
@@ -91,7 +79,7 @@ export const advanceHistory = (
         currentInputChar = "DELETE";
       } else if (action === "↑" || action === "↓" || action === "←" || action === "→") {
         const grid = createGrid(currentVersion, newIsHiragana);
-        const nextPos = calculateNextPosition(newPosition, action, grid, inputCharCount);
+        const nextPos = calculateNextPosition(newPosition, action, grid);
         newPosition.x = nextPos.x;
         newPosition.y = nextPos.y;
       }
@@ -101,7 +89,6 @@ export const advanceHistory = (
         {
           position: { ...newPosition },
           isHiragana: newIsHiragana,
-          charIndex: i,
           action,
           inputChar: currentInputChar,
         },

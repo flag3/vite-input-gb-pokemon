@@ -12,7 +12,7 @@ const buildSequences = (text: string, version: GameVersion) => {
 };
 
 const initialHistory = (): StateHistory[] => [
-  { position: { x: 0, y: 0 }, isHiragana: false, charIndex: 0, action: null, inputChar: null },
+  { position: { x: 0, y: 0 }, isHiragana: false, action: null, inputChar: null },
 ];
 
 describe("advanceHistory - 履歴からの状態導出", () => {

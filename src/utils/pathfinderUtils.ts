@@ -36,7 +36,6 @@ export const findShortestPath = (
   from: CharacterPosition,
   to: CharacterPosition,
   grid: CharacterGrid,
-  inputCharCount?: number,
 ): InputAction[] => {
   const queue: { position: CharacterPosition; actions: InputAction[] }[] = [
     { position: from, actions: [] },
@@ -58,7 +57,7 @@ export const findShortestPath = (
     }
 
     for (const direction of directions) {
-      const nextPosition = calculateNextPosition(position, direction, grid, inputCharCount);
+      const nextPosition = calculateNextPosition(position, direction, grid);
       const key = `${nextPosition.x},${nextPosition.y}`;
 
       if (!visited.has(key)) {

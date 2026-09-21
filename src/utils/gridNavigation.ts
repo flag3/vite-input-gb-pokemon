@@ -1,4 +1,4 @@
-import { CONFIRM_POSITIONS, MAX_CHAR_LIMITS } from "../constants/gameConstants";
+import { CONFIRM_POSITIONS } from "../constants/gameConstants";
 import type { InputAction, CharacterGrid, Position } from "../types";
 
 /**
@@ -8,7 +8,6 @@ export const calculateNextPosition = (
   currentPosition: Position,
   action: InputAction,
   grid: CharacterGrid,
-  inputCharCount?: number,
 ): Position => {
   const pos = { ...currentPosition };
 
@@ -19,13 +18,6 @@ export const calculateNextPosition = (
   // Sアクションの場合は、GEN2で確定ボタンへ移動
   if (action === "S") {
     return grid.version === "GEN1" ? pos : { ...CONFIRM_POSITIONS[grid.version] };
-  }
-
-  // Aアクションの場合、MAX文字数に達した場合は確定ボタンへ移動
-  if (action === "A") {
-    return inputCharCount === MAX_CHAR_LIMITS[grid.version]
-      ? { ...CONFIRM_POSITIONS[grid.version] }
-      : pos;
   }
 
   if (grid.version === "GEN1") {

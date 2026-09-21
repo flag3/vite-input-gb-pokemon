@@ -29,12 +29,8 @@ export const findInputSequence = (
       isHiragana: targetIsHiragana,
     };
   };
-  const buildMoveActions = (
-    from: CharacterPosition,
-    to: CharacterPosition,
-    inputCharCount: number,
-  ): InputAction[] => {
-    return [...findShortestPath(from, to, grid, inputCharCount), "A"];
+  const buildMoveActions = (from: CharacterPosition, to: CharacterPosition): InputAction[] => {
+    return [...findShortestPath(from, to, grid), "A"];
   };
   const buildDakutenActions = (
     currentPosition: CharacterPosition,
@@ -49,7 +45,7 @@ export const findInputSequence = (
         }
       : currentPosition;
 
-    return buildMoveActions(startPosition, targetPosition, inputCharCount);
+    return buildMoveActions(startPosition, targetPosition);
   };
   const buildSpaceSequence = (
     index: number,
@@ -75,7 +71,6 @@ export const findInputSequence = (
       nextCharPosition,
       currentIsHiragana,
       grid,
-      inputCharCount,
     );
 
     const chosenActions = applyGen1EdShortcut(
@@ -141,7 +136,7 @@ export const findInputSequence = (
       char: targetPosition.char,
     };
     const pressCount = isDakuten ? remainingToLimit : remainingToLimit + 1;
-    const moveFromED = findShortestPath(fixedPos, targetPosition, grid, inputCharCount);
+    const moveFromED = findShortestPath(fixedPos, targetPosition, grid);
     const hackActions: InputAction[] = [
       ...Array<InputAction>(pressCount).fill("A"),
       ...Array<InputAction>(pressCount).fill("B"),
@@ -196,7 +191,7 @@ export const findInputSequence = (
     const targetPosition = target.position;
 
     // 移動アクションを追加
-    const directActions = buildMoveActions(currentPosition, targetPosition, inputCharCount);
+    const directActions = buildMoveActions(currentPosition, targetPosition);
 
     // GEN1かつ5文字目または4文字目で連続文字の場合にED→削除ハックを検討
     const chosenActions = applyGen1EdShortcut(
