@@ -1,5 +1,7 @@
 import App from "./App.tsx";
 import "./index.css";
+import "@primer/primitives/dist/css/base/size/size.css";
+import "@primer/primitives/dist/css/functional/size/radius.css";
 import "@primer/primitives/dist/css/functional/typography/typography.css";
 import "@primer/primitives/dist/css/functional/themes/light.css";
 import "@primer/primitives/dist/css/functional/themes/dark.css";

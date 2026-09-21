@@ -3,16 +3,16 @@
   max-width: 1280px;
   margin: 0 auto;
   box-sizing: border-box;
-  padding: clamp(1rem, 4vw, 2rem);
+  padding: clamp(var(--base-size-16), 4vw, var(--base-size-32));
 }
 
 .simulator-layout {
-  --character-grid-width: calc(var(--grid-width) * 44px + 12px);
+  --character-grid-width: calc(var(--grid-width) * 44px + var(--base-size-12));
   max-width: var(--character-grid-width);
   margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 40px;
+  gap: var(--base-size-40);
 }
 
 .sequence-display,
@@ -25,7 +25,7 @@
 .controls-row {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--base-size-12);
 }
 
 .controls-row > * {
@@ -38,7 +38,7 @@
 }
 
 .input-controls {
-  margin-bottom: 20px;
+  margin-bottom: var(--base-size-20);
 }
 
 .step-counter {
@@ -55,10 +55,10 @@
 .grid-container {
   display: grid;
   grid-template-columns: repeat(var(--grid-width), minmax(0, 1fr));
-  gap: 4px;
-  padding: 8px;
+  gap: var(--base-size-4);
+  padding: var(--base-size-8);
   background-color: var(--bgColor-muted);
-  border-radius: 8px;
+  border-radius: var(--borderRadius-default);
 }
 
 .character-cell {
@@ -68,7 +68,7 @@
   position: relative;
   background-color: var(--bgColor-default);
   color: var(--fgColor-default);
-  border-radius: 4px;
+  border-radius: var(--borderRadius-small);
   user-select: none;
   font-size: min(16px, calc(60cqw / var(--grid-width)));
   transition: background-color 0.3s;
@@ -81,14 +81,14 @@
 
 /* Input sequence panel */
 .input-sequence {
-  margin-top: 20px;
+  margin-top: var(--base-size-20);
 }
 
 .sequence-display {
-  margin-bottom: 20px;
-  padding: 10px;
+  margin-bottom: var(--base-size-20);
+  padding: var(--base-size-12);
   background-color: var(--bgColor-muted);
-  border-radius: 4px;
+  border-radius: var(--borderRadius-small);
   font-size: 18px;
   white-space: pre-wrap;
   word-break: break-all;
@@ -110,7 +110,7 @@
 
 .sequence-item {
   background-color: var(--bgColor-default);
-  border-radius: 4px;
+  border-radius: var(--borderRadius-small);
   transition: background-color 0.3s;
 }
 
@@ -119,16 +119,16 @@
 }
 
 .sequence-char {
-  margin-right: 8px;
+  margin-right: var(--base-size-8);
   font-weight: bold;
   min-width: 2em;
 }
 
 .action-step {
-  padding: 4px 8px;
+  padding: var(--base-size-4) var(--base-size-8);
   background-color: var(--bgColor-accent-muted);
   color: var(--fgColor-default);
-  border-radius: 4px;
+  border-radius: var(--borderRadius-small);
   font-size: 14px;
   transition: all 0.3s;
 }
@@ -153,13 +153,13 @@
 
 @media (min-width: 48rem) {
   .simulator-layout {
-    max-width: calc(var(--character-grid-width) + 40px + 400px);
+    max-width: calc(var(--character-grid-width) + var(--base-size-40) + 400px);
     grid-template-columns: minmax(0, 1fr) 400px;
   }
 
   .input-sequence {
     position: sticky;
-    top: 20px;
+    top: var(--base-size-20);
     align-self: start;
     margin-top: 0;
   }
