@@ -6,6 +6,7 @@ import {
   IconButton,
   SegmentedControl,
   Select,
+  Stack,
   TextInput,
 } from "@primer/react";
 import { type ChangeEvent, type CompositionEvent } from "react";
@@ -66,7 +67,7 @@ export const InputControls = ({
   };
 
   return (
-    <>
+    <Stack className="input-controls">
       <div className="controls-row">
         <FormControl>
           <FormControl.Label>Input mode</FormControl.Label>
@@ -93,8 +94,8 @@ export const InputControls = ({
         </FormControl>
       </div>
 
-      <div className="playback-row">
-        <div className="playback-buttons">
+      <Stack direction="horizontal" align="center" wrap="wrap">
+        <Stack align="center">
           <ButtonGroup>
             <IconButton
               icon={isPlaying ? PauseIcon : PlayIcon}
@@ -120,7 +121,7 @@ export const InputControls = ({
 
             <IconButton icon={ResetIcon} aria-label="Reset" onClick={onReset} />
           </ButtonGroup>
-        </div>
+        </Stack>
 
         <SegmentedControl
           aria-label="Playback speed"
@@ -136,7 +137,7 @@ export const InputControls = ({
         <div className="step-counter">
           Step: {currentStep} / {totalSteps}
         </div>
-      </div>
-    </>
+      </Stack>
+    </Stack>
   );
 };

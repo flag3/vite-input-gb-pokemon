@@ -26,15 +26,10 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-bottom: 20px;
 }
 
 .controls-row > * {
   width: 100%;
-}
-
-.text-input-row {
-  margin-bottom: 20px;
 }
 
 .text-input-row,
@@ -42,19 +37,8 @@
   max-width: var(--character-grid-width);
 }
 
-.playback-row {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 16px;
+.input-controls {
   margin-bottom: 20px;
-}
-
-.playback-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
 }
 
 .step-counter {
@@ -124,16 +108,7 @@
   }
 }
 
-.sequence-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
 .sequence-item {
-  display: flex;
-  align-items: center;
-  padding: 8px;
   background-color: var(--bgColor-default);
   border-radius: 4px;
   transition: background-color 0.3s;
@@ -147,12 +122,6 @@
   margin-right: 8px;
   font-weight: bold;
   min-width: 2em;
-}
-
-.action-steps {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
 }
 
 .action-step {
@@ -195,18 +164,8 @@
     margin-top: 0;
   }
 
-  .controls-row,
-  .playback-row {
+  .controls-row {
     flex-direction: row;
-  }
-
-  .playback-row {
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
-  .playback-buttons {
-    justify-content: flex-start;
   }
 
   .controls-row > * {
