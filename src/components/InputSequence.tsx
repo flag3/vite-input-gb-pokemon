@@ -1,6 +1,6 @@
 import type { InputPath, StateHistory } from "../types";
 import { getDisplayText } from "../utils/characterMapping";
-import { Stack, Text } from "@primer/react";
+import { ProgressBar, Stack, Text } from "@primer/react";
 
 interface InputSequenceProps {
   sequences: InputPath[];
@@ -32,6 +32,13 @@ export const InputSequence = ({ sequences, currentStep, stateHistory }: InputSeq
           <span className="cursor">|</span>
         </div>
       </div>
+
+      <ProgressBar
+        className="sequence-progress"
+        progress={totalSteps > 0 ? Math.min(100, (currentStep / totalSteps) * 100) : 0}
+        aria-label="Playback progress"
+        aria-valuetext={`Step ${currentStep} of ${totalSteps}`}
+      />
 
       <Stack gap="condensed">
         {sequences.map((sequence, index) => {
