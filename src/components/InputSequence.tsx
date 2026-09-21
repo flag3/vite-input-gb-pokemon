@@ -25,7 +25,7 @@ export const InputSequence = ({ sequences, currentStep, stateHistory }: InputSeq
   };
 
   return (
-    <div className="input-sequence">
+    <Stack className="input-sequence" style={{ gap: "var(--base-size-20)" }}>
       <div className="sequence-display">
         <div>
           {formatText(currentText)}
@@ -34,52 +34,55 @@ export const InputSequence = ({ sequences, currentStep, stateHistory }: InputSeq
       </div>
 
       <ProgressBar
-        className="sequence-progress"
         progress={totalSteps > 0 ? Math.min(100, (currentStep / totalSteps) * 100) : 0}
         aria-label="Playback progress"
         aria-valuetext={`Step ${currentStep} of ${totalSteps}`}
       />
 
-      <Stack gap="condensed">
-        {sequences.map((sequence, index) => {
-          const stepCount = stepOffsets[index];
-          const isCurrentSequence =
-            stepCount <= currentStep && currentStep < stepCount + sequence.actions.length;
+      <div>
+        <Stack gap="condensed">
+          {sequences.map((sequence, index) => {
+            const stepCount = stepOffsets[index];
+            const isCurrentSequence =
+              stepCount <= currentStep && currentStep < stepCount + sequence.actions.length;
 
-          return (
-            <Stack
-              key={index}
-              className={`sequence-item ${isCurrentSequence ? "current" : ""}`}
-              direction="horizontal"
-              align="center"
-              gap="none"
-              padding="condensed"
-            >
-              <Text className="sequence-char">{sequence.char === "　" ? "␣" : sequence.char}:</Text>
-              <Stack direction="horizontal" gap="tight" wrap="wrap">
-                {sequence.actions.map((action, actionIndex) => {
-                  const isCurrentAction = stepCount + actionIndex === currentStep;
-                  const isCompleted = stepCount + actionIndex < currentStep;
-                  return (
-                    <span
-                      key={actionIndex}
-                      className={`action-step ${isCurrentAction ? "current" : ""} ${isCompleted ? "completed" : ""}`}
-                    >
-                      {action}
-                    </span>
-                  );
-                })}
+            return (
+              <Stack
+                key={index}
+                className={`sequence-item ${isCurrentSequence ? "current" : ""}`}
+                direction="horizontal"
+                align="center"
+                gap="none"
+                padding="condensed"
+              >
+                <Text className="sequence-char">
+                  {sequence.char === "　" ? "␣" : sequence.char}:
+                </Text>
+                <Stack direction="horizontal" gap="tight" wrap="wrap">
+                  {sequence.actions.map((action, actionIndex) => {
+                    const isCurrentAction = stepCount + actionIndex === currentStep;
+                    const isCompleted = stepCount + actionIndex < currentStep;
+                    return (
+                      <span
+                        key={actionIndex}
+                        className={`action-step ${isCurrentAction ? "current" : ""} ${isCompleted ? "completed" : ""}`}
+                      >
+                        {action}
+                      </span>
+                    );
+                  })}
+                </Stack>
+                <Label className="sequence-step-count">
+                  {sequence.actions.length} {sequence.actions.length === 1 ? "step" : "steps"}
+                </Label>
               </Stack>
-              <Label className="sequence-step-count">
-                {sequence.actions.length} {sequence.actions.length === 1 ? "step" : "steps"}
-              </Label>
-            </Stack>
-          );
-        })}
-      </Stack>
-      <Text as="div" className="sequence-total">
-        Total steps: {totalSteps}
-      </Text>
-    </div>
+            );
+          })}
+        </Stack>
+        <Text as="div" className="sequence-total">
+          Total steps: {totalSteps}
+        </Text>
+      </div>
+    </Stack>
   );
 };

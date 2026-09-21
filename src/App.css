@@ -84,11 +84,6 @@
   margin-top: var(--base-size-20);
 }
 
-.sequence-display,
-.sequence-progress {
-  margin-bottom: var(--base-size-20);
-}
-
 .sequence-display {
   padding: var(--base-size-12);
   background-color: var(--bgColor-muted);
