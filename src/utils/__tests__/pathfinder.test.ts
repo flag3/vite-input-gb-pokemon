@@ -171,7 +171,7 @@ describe("pathfinder - 入力シーケンス生成", () => {
 
       const sequences = findInputSequence(grid, chars.join(""), modes);
       const actualActions = sequences.flatMap((seq) => seq.actions);
-      const actualTotalSteps = sequences.reduce((sum, seq) => sum + seq.totalSteps, 0);
+      const actualTotalSteps = sequences.reduce((sum, seq) => sum + seq.actions.length, 0);
       const expectedSteps = expectedActions.length;
 
       expect(actualTotalSteps).toBe(expectedSteps);

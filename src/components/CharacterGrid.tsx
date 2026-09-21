@@ -1,10 +1,10 @@
 import { GROUPABLE_CHARS } from "../constants/gameConstants";
-import type { CharacterGrid as CharacterGridType } from "../types";
+import type { CharacterGrid as CharacterGridType, Position } from "../types";
 import type { CSSProperties } from "react";
 
 interface CharacterGridProps {
   grid: CharacterGridType;
-  currentPosition: { x: number; y: number };
+  currentPosition: Position;
 }
 
 export const CharacterGrid = ({ grid, currentPosition }: CharacterGridProps) => {
@@ -13,7 +13,6 @@ export const CharacterGrid = ({ grid, currentPosition }: CharacterGridProps) => 
       char: string;
       x: number[];
       y: number;
-      width: number;
     }[] = [];
 
     grid.grid.forEach((char) => {
@@ -23,13 +22,11 @@ export const CharacterGrid = ({ grid, currentPosition }: CharacterGridProps) => 
 
       if (existingGroup) {
         existingGroup.x.push(char.x);
-        existingGroup.width++;
       } else {
         cells.push({
           char: char.char,
           x: [char.x],
           y: char.y,
-          width: 1,
         });
       }
     });
@@ -49,8 +46,8 @@ export const CharacterGrid = ({ grid, currentPosition }: CharacterGridProps) => 
               key={index}
               className={`chip character-cell ${isActive ? "current" : ""}`}
               style={{
-                aspectRatio: `${cell.width} / 1`,
-                gridColumn: `${cell.x[0] + 1} / span ${cell.width}`,
+                aspectRatio: `${cell.x.length} / 1`,
+                gridColumn: `${cell.x[0] + 1} / span ${cell.x.length}`,
               }}
             >
               {cell.char}

@@ -29,5 +29,4 @@ export interface StateHistory {
 export type InputPath = {
   char: string;
   actions: InputAction[];
-  totalSteps: number;
 };

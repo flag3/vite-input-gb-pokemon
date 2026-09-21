@@ -5,10 +5,9 @@ import {
   isControlChar,
   isDakutenChar,
 } from "../constants/gameConstants";
-import type { GameVersion, StateHistory } from "../types";
+import type { GameVersion, InputPath, StateHistory } from "../types";
 import { getDisplayText } from "../utils/characterMapping";
 import { calculateNextPosition } from "../utils/gridNavigation";
-import { findInputSequence } from "../utils/pathfinder";
 import { useState, useCallback, useEffect, useMemo } from "react";
 
 const BASE_STEP_INTERVAL_MS = 500;
@@ -30,7 +29,7 @@ const initialHistory = (): StateHistory[] => [
  */
 export const advanceHistory = (
   history: StateHistory[],
-  sequences: ReturnType<typeof findInputSequence>,
+  sequences: InputPath[],
   currentVersion: GameVersion,
 ): StateHistory[] => {
   const currentStep = history.length - 1;
@@ -118,7 +117,7 @@ export const advanceHistory = (
 export const usePlayback = (
   inputText: string,
   currentVersion: GameVersion,
-  sequences: ReturnType<typeof findInputSequence>,
+  sequences: InputPath[],
 ) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);

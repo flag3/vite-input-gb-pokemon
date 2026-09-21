@@ -78,21 +78,18 @@ export const findInputSequence = (
       inputCharCount,
     );
 
-    const spaceShortcut = applyGen1EdShortcut(
+    const chosenActions = applyGen1EdShortcut(
       optimalActions,
       optimalSpacePosition,
       inputCharCount,
       false,
     );
-    const chosenActions = spaceShortcut.actions;
-    const chosenTotalSteps = spaceShortcut.totalSteps;
     const nextIsHiragana = chosenActions.includes("s") ? !currentIsHiragana : currentIsHiragana;
 
     return {
       sequence: {
         char: "　",
         actions: chosenActions,
-        totalSteps: grid.version === "GEN2_MAIL" ? chosenActions.length : chosenTotalSteps,
       },
       position: optimalSpacePosition,
       isHiragana: nextIsHiragana,
@@ -116,13 +113,12 @@ export const findInputSequence = (
       inputCharCount,
       true,
       true,
-    ).actions;
+    );
 
     return {
       sequence: {
         char,
         actions: chosenDakutenActions,
-        totalSteps: chosenDakutenActions.length,
       },
       position: dakutenResult.position,
     };
@@ -134,12 +130,11 @@ export const findInputSequence = (
     inputCharCount: number,
     skipWhenAtLimit: boolean,
     isDakuten = false,
-  ): { actions: InputAction[]; totalSteps: number } => {
-    const noChange = { actions, totalSteps: actions.length };
-    if (grid.version !== "GEN1") return noChange;
+  ): InputAction[] => {
+    if (grid.version !== "GEN1") return actions;
 
     const remainingToLimit = MAX_CHAR_LIMITS[grid.version] - inputCharCount;
-    if (remainingToLimit < 0 || (skipWhenAtLimit && remainingToLimit === 0)) return noChange;
+    if (remainingToLimit < 0 || (skipWhenAtLimit && remainingToLimit === 0)) return actions;
 
     const fixedPos: CharacterPosition = {
       ...CONFIRM_POSITIONS[grid.version],
@@ -154,21 +149,15 @@ export const findInputSequence = (
       "A",
     ];
 
-    return hackActions.length < actions.length
-      ? { actions: hackActions, totalSteps: hackActions.length }
-      : noChange;
+    return hackActions.length < actions.length ? hackActions : actions;
   };
-  const buildEndActions = (
-    totalInputChars: number,
-  ): { actions: InputAction[]; totalSteps: number } => {
+  const buildEndActions = (totalInputChars: number): InputAction[] => {
     const isAtCharLimit = totalInputChars === MAX_CHAR_LIMITS[grid.version];
-    const actions: InputAction[] =
-      grid.version === "GEN1" ? [isAtCharLimit ? "A" : "S"] : !isAtCharLimit ? ["S", "A"] : ["A"];
-
-    return {
-      actions,
-      totalSteps: grid.version === "GEN1" ? 1 : actions.length,
-    };
+    return grid.version === "GEN1"
+      ? [isAtCharLimit ? "A" : "S"]
+      : !isAtCharLimit
+        ? ["S", "A"]
+        : ["A"];
   };
 
   const sequences: InputPath[] = [];
@@ -215,14 +204,13 @@ export const findInputSequence = (
       targetPosition,
       inputCharCount,
       isDakutenChar(text[i - 1]),
-    ).actions;
+    );
 
     currentActions.push(...chosenActions);
 
     sequences.push({
       char: currentChar,
       actions: currentActions,
-      totalSteps: currentActions.length,
     });
 
     currentPosition = targetPosition;
@@ -240,11 +228,9 @@ export const findInputSequence = (
 
   // 最後の確定処理
   if (sequences.length > 0) {
-    const { actions: endActions, totalSteps } = buildEndActions(inputCharCount);
     sequences.push({
       char: "END",
-      actions: endActions,
-      totalSteps,
+      actions: buildEndActions(inputCharCount),
     });
   }
 
