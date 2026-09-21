@@ -22,16 +22,6 @@
   font-family: var(--fontStack-monospace);
 }
 
-.controls-row {
-  display: flex;
-  flex-direction: column;
-  gap: var(--base-size-12);
-}
-
-.controls-row > * {
-  width: 100%;
-}
-
 .text-input-row,
 .grid-container {
   max-width: var(--character-grid-width);
@@ -160,14 +150,6 @@
     top: var(--base-size-20);
     align-self: start;
     margin-top: 0;
-  }
-
-  .controls-row {
-    flex-direction: row;
-  }
-
-  .controls-row > * {
-    width: auto;
   }
 
   .step-counter {

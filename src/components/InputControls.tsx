@@ -69,17 +69,15 @@ export const InputControls = ({
 
   return (
     <Stack className="input-controls">
-      <div className="controls-row">
-        <FormControl>
-          <FormControl.Label>Input mode</FormControl.Label>
-          <Select block value={currentVersion} onChange={onVersionChange}>
-            <Select.Option value="GEN1">Gen 1 nickname</Select.Option>
-            <Select.Option value="GEN2_NICKNAME">Gen 2 nickname</Select.Option>
-            <Select.Option value="GEN2_BOX">Gen 2 box name</Select.Option>
-            <Select.Option value="GEN2_MAIL">Gen 2 mail</Select.Option>
-          </Select>
-        </FormControl>
-      </div>
+      <FormControl>
+        <FormControl.Label>Input mode</FormControl.Label>
+        <Select block value={currentVersion} onChange={onVersionChange}>
+          <Select.Option value="GEN1">Gen 1 nickname</Select.Option>
+          <Select.Option value="GEN2_NICKNAME">Gen 2 nickname</Select.Option>
+          <Select.Option value="GEN2_BOX">Gen 2 box name</Select.Option>
+          <Select.Option value="GEN2_MAIL">Gen 2 mail</Select.Option>
+        </Select>
+      </FormControl>
 
       <div className="text-input-row">
         <FormControl>
