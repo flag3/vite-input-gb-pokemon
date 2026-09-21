@@ -7,6 +7,7 @@ import {
   SegmentedControl,
   Select,
   Stack,
+  Text,
   TextInput,
 } from "@primer/react";
 import { type ChangeEvent, type CompositionEvent } from "react";
@@ -134,9 +135,9 @@ export const InputControls = ({
           ))}
         </SegmentedControl>
 
-        <div className="step-counter">
+        <Text as="div" className="step-counter">
           Step: {currentStep} / {totalSteps}
-        </div>
+        </Text>
       </Stack>
     </Stack>
   );
