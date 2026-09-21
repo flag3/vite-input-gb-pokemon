@@ -65,7 +65,7 @@ export const InputSequence = ({ sequences, currentStep, stateHistory }: InputSeq
                     return (
                       <span
                         key={actionIndex}
-                        className={`action-step ${isCurrentAction ? "current" : ""} ${isCompleted ? "completed" : ""}`}
+                        className={`chip action-step ${isCurrentAction ? "current" : ""} ${isCompleted ? "completed" : ""}`}
                       >
                         {action}
                       </span>

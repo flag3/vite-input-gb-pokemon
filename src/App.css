@@ -17,7 +17,7 @@
 
 .sequence-display,
 .sequence-item,
-.character-cell,
+.chip,
 .text-input-mono input {
   font-family: var(--fontStack-monospace);
 }
@@ -51,22 +51,23 @@
   border-radius: var(--borderRadius-default);
 }
 
-.character-cell {
-  display: flex;
+.chip {
+  display: inline-flex;
+  aspect-ratio: 1;
   align-items: center;
   justify-content: center;
-  position: relative;
   background-color: var(--bgColor-default);
   color: var(--fgColor-default);
   border-radius: var(--borderRadius-small);
   user-select: none;
-  font-size: min(16px, calc(60cqw / var(--grid-width)));
-  transition: background-color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
 }
 
-.character-cell.active {
-  background-color: var(--bgColor-accent-emphasis);
-  color: var(--fgColor-onEmphasis);
+.character-cell {
+  position: relative;
+  font-size: min(16px, calc(60cqw / var(--grid-width)));
 }
 
 /* Input sequence panel */
@@ -110,23 +111,22 @@
 .sequence-char {
   margin-right: var(--base-size-8);
   font-weight: bold;
-  min-width: 2em;
+  flex: 0 0 4ch;
 }
 
 .action-step {
-  padding: var(--base-size-4) var(--base-size-8);
+  width: var(--base-size-32);
+  flex-shrink: 0;
   background-color: var(--bgColor-accent-muted);
-  color: var(--fgColor-default);
-  border-radius: var(--borderRadius-small);
   font-size: 14px;
-  transition: all 0.3s;
 }
 
 .action-step.completed {
-  background-color: var(--bgColor-success-muted);
+  background-color: var(--bgColor-muted);
+  color: var(--fgColor-muted);
 }
 
-.action-step.current {
+.chip.current {
   background-color: var(--bgColor-accent-emphasis);
   color: var(--fgColor-onEmphasis);
 }

@@ -47,7 +47,7 @@ export const CharacterGrid = ({ grid, currentPosition }: CharacterGridProps) => 
           return (
             <div
               key={index}
-              className={`character-cell ${isActive ? "active" : ""}`}
+              className={`chip character-cell ${isActive ? "current" : ""}`}
               style={{
                 aspectRatio: `${cell.width} / 1`,
                 gridColumn: `${cell.x[0] + 1} / span ${cell.width}`,
